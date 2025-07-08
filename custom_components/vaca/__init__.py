@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 
 from homeassistant.components.wyoming import (
+    DomainDataItem,
     WyomingService,
     async_register_websocket_api,
 )
@@ -17,7 +18,6 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import ATTR_SPEAKER, DOMAIN
 from .devices import SatelliteDevice
-from .models import DomainDataItem
 
 _LOGGER = logging.getLogger(__name__)
 
