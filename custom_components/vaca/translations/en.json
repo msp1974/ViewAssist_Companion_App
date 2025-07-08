@@ -1,0 +1,122 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Service is already configured",
+            "no_port": "No port for endpoint",
+            "no_services": "No services found at endpoint"
+        },
+        "error": {
+            "cannot_connect": "Failed to connect"
+        },
+        "step": {
+            "hassio_confirm": {
+                "description": "Do you want to configure Home Assistant to connect to the Wyoming service provided by the add-on: {addon}?"
+            },
+            "user": {
+                "data": {
+                    "host": "Host",
+                    "port": "Port"
+                }
+            },
+            "zeroconf_confirm": {
+                "description": "Do you want to configure Home Assistant to connect to the Wyoming service {name}?",
+                "title": "Discovered Wyoming service"
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "assist_in_progress": {
+                "name": "Assist in progress"
+            }
+        },
+        "media_player": {
+            "name": "Media Player",
+            "state": {
+                "playing": "Playing",
+                "paused": "Paused",
+                "idle": "Idle"
+            }
+        },
+        "number": {
+            "mic_gain": {
+                "name": "Mic gain"
+            },
+            "screen_brightness": {
+                "name": "Screen brightness"
+            },
+            "notification_volume": {
+                "name": "Voice volume"
+            },
+            "music_volume": {
+                "name": "Music volume"
+            },
+            "ducking_percentage": {
+                "name": "Ducking percentage"
+            }
+        },
+        "select": {
+            "noise_suppression_level": {
+                "name": "Noise suppression level",
+                "state": {
+                    "high": "High",
+                    "low": "Low",
+                    "max": "Max",
+                    "medium": "Medium",
+                    "off": "Off"
+                }
+            },
+            "pipeline": {
+                "name": "Assistant",
+                "state": {
+                    "preferred": "Preferred"
+                }
+            },
+            "vad_sensitivity": {
+                "name": "Finished speaking detection",
+                "state": {
+                    "aggressive": "Aggressive",
+                    "default": "Default",
+                    "relaxed": "Relaxed"
+                }
+            },
+            "wake_word": {
+                "name": "Wake word",
+                "state": {
+                    "alexa": "Alexa",
+                    "hey_jarvis": "Hey Jarvis",
+                    "hey_mycroft": "Hey Mycroft",
+                    "hey_rhasspy": "Hey Rhasspy",
+                    "ok_computer": "OK Computer",
+                    "ok_nabu": "OK Nabu"
+                }
+            },
+            "wake_word_sound": {
+                "name": "Wake word sound",
+                "state": {
+                    "none": "None",
+                    "havpe": "Home Assistant",
+                    "alexa": "Alexa",
+                    "bubble": "Bubble",
+                    "ding": "Ding"
+                }
+            }
+        },
+        "sensor": {
+            "stt": {
+                "name": "STT"
+            },
+            "tts": {
+                "name": "TTS"
+            }
+        },
+        "switch": {
+            "mute": {
+                "name": "Mute"
+            },
+            "swipe_refresh": {
+                "name": "Swipe to refresh"
+            }
+        }
+    }
+}
