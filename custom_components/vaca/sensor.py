@@ -50,7 +50,6 @@ class WyomingSatelliteSTTSensor(VACASatelliteEntity, RestoreSensor):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-        _LOGGER.warning("Sensor sate id: %s", self._device.satellite_id)
 
         state = await self.async_get_last_state()
         if state is not None:

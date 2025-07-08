@@ -95,8 +95,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
         self.device.custom_settings = {}
         self.device.custom_settings["ha_port"] = hass.config.api.port
 
-        _LOGGER.warning("Device satellite id: %s", self.device.satellite_id)
-
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
         await super().async_will_remove_from_hass()
