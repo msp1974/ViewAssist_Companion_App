@@ -30,10 +30,11 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .client import VAAsyncTcpClient
 from .const import DOMAIN, SAMPLE_CHANNELS, SAMPLE_WIDTH
-from .custom import CustomSettings, MediaPlayerControl, VAAsyncTcpClient
-from .devices import SatelliteDevice
-from .entity import VACASatelliteEntity
+from .custom import CustomSettings, MediaPlayerControl
+from .devices import VASatelliteDevice
+from .entity import VASatelliteEntity
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -66,7 +67,7 @@ async def async_setup_entry(
     )
 
 
-class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
+class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
     """View Assist satellite entity for Wyoming devices."""
 
     entity_description = AssistSatelliteEntityDescription(
@@ -80,14 +81,14 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
         self,
         hass: HomeAssistant,
         service: WyomingService,
-        device: SatelliteDevice,
+        device: VASatelliteDevice,
         config_entry: ConfigEntry,
     ) -> None:
         """Initialize a View Assist satellite."""
         super().__init__(hass, service, device, config_entry)
-        VACASatelliteEntity.__init__(self, device)
+        VASatelliteEntity.__init__(self, device)
         self._client: VAAsyncTcpClient | None = None
-        self.device: SatelliteDevice = device
+        self.device: VASatelliteDevice = device
 
         self.device.set_custom_settings_listener(self._custom_settings_changed)
         self.device.set_media_player_listener(self._send_media_player_command)
@@ -111,6 +112,9 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
     async def on_after_send_event_callback(self, event: Event) -> None:
         """Allow injection of events after event sent."""
 
+    async def on_receive_event_callback(self, event: Event) -> None:
+        """Handle received custom events."""
+
     async def _connect(self) -> None:
         """Connect to satellite over TCP.  Uses custom TCP client to allow callbacks on send."""
         await self._disconnect()
@@ -123,8 +127,9 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
         self._client = VAAsyncTcpClient(
             self.service.host,
             self.service.port,
-            before_callback=self.on_before_send_event_callback,
-            after_callback=self.on_after_send_event_callback,
+            before_send_callback=self.on_before_send_event_callback,
+            after_send_callback=self.on_after_send_event_callback,
+            on_receive_callback=self.on_receive_event_callback,
         )
         await self._client.connect()
 
@@ -275,7 +280,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
 
     def _custom_settings_changed(self) -> None:
         """Run when device screen settings change."""
-        if self._client is not None and self._client._writer:
+        if self._client is not None and self._client.can_write_event():
             self.config_entry.async_create_background_task(
                 self.hass,
                 self._client.write_event(
@@ -288,7 +293,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VACASatelliteEntity):
         self, command: str, value: str | float | None = None
     ) -> None:
         """Send a media player command to the satellite."""
-        if self._client is not None and self._client._writer:
+        if self._client is not None and self._client.can_write_event():
             self.config_entry.async_create_background_task(
                 self.hass,
                 self._client.write_event(

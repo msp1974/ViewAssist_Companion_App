@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
-from .entity import VACASatelliteEntity
+from .entity import VASatelliteEntity
 
 if TYPE_CHECKING:
     from homeassistant.components.wyoming import DomainDataItem
@@ -43,7 +43,7 @@ async def async_setup_entry(
     )
 
 
-class WyomingSatelliteMicGainNumber(VACASatelliteEntity, RestoreNumber):
+class WyomingSatelliteMicGainNumber(VASatelliteEntity, RestoreNumber):
     """Entity to represent mic gain amount."""
 
     entity_description = NumberEntityDescription(
@@ -73,7 +73,7 @@ class WyomingSatelliteMicGainNumber(VACASatelliteEntity, RestoreNumber):
         self._device.set_custom_setting("mic_gain", mic_gain)
 
 
-class WyomingSatelliteNotificationVolumeNumber(VACASatelliteEntity, RestoreNumber):
+class WyomingSatelliteNotificationVolumeNumber(VASatelliteEntity, RestoreNumber):
     """Entity to represent notification volume multiplier."""
 
     entity_description = NumberEntityDescription(
@@ -106,7 +106,7 @@ class WyomingSatelliteNotificationVolumeNumber(VACASatelliteEntity, RestoreNumbe
         self._device.set_custom_setting("notification_volume", int(value * 10))
 
 
-class WyomingSatelliteMusicVolumeNumber(VACASatelliteEntity, RestoreNumber):
+class WyomingSatelliteMusicVolumeNumber(VASatelliteEntity, RestoreNumber):
     """Entity to represent media volume multiplier."""
 
     entity_description = NumberEntityDescription(
@@ -139,7 +139,7 @@ class WyomingSatelliteMusicVolumeNumber(VACASatelliteEntity, RestoreNumber):
         self._device.set_custom_setting("music_volume", int(value * 10))
 
 
-class WyomingSatelliteDuckingVolumeNumber(VACASatelliteEntity, RestoreNumber):
+class WyomingSatelliteDuckingVolumeNumber(VASatelliteEntity, RestoreNumber):
     """Entity to represent media volume multiplier."""
 
     entity_description = NumberEntityDescription(
@@ -170,7 +170,7 @@ class WyomingSatelliteDuckingVolumeNumber(VACASatelliteEntity, RestoreNumber):
         self._device.set_custom_setting("ducking_percentage", value)
 
 
-class WyomingSatelliteScreenBrightnessNumber(VACASatelliteEntity, RestoreNumber):
+class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
     """Entity to represent auto gain amount."""
 
     entity_description = NumberEntityDescription(

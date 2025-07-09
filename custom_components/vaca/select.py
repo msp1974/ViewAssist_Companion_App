@@ -18,7 +18,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
 from .devices import SatelliteDevice
-from .entity import VACASatelliteEntity
+from .entity import VASatelliteEntity
 
 if TYPE_CHECKING:
     from homeassistant.components.wyoming import DomainDataItem
@@ -55,14 +55,14 @@ async def async_setup_entry(
     )
 
 
-class WyomingSatellitePipelineSelect(VACASatelliteEntity, AssistPipelineSelect):
+class WyomingSatellitePipelineSelect(VASatelliteEntity, AssistPipelineSelect):
     """Pipeline selector for Wyoming satellites."""
 
     def __init__(self, hass: HomeAssistant, device: SatelliteDevice) -> None:
         """Initialize a pipeline selector."""
         self.device = device
 
-        VACASatelliteEntity.__init__(self, device)
+        VASatelliteEntity.__init__(self, device)
         AssistPipelineSelect.__init__(self, hass, DOMAIN, device.satellite_id)
 
     async def async_select_option(self, option: str) -> None:
@@ -72,7 +72,7 @@ class WyomingSatellitePipelineSelect(VACASatelliteEntity, AssistPipelineSelect):
 
 
 class WyomingSatelliteNoiseSuppressionLevelSelect(
-    VACASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
 ):
     """Entity to represent noise suppression level setting."""
 
@@ -100,14 +100,14 @@ class WyomingSatelliteNoiseSuppressionLevelSelect(
         self._device.set_noise_suppression_level(_NOISE_SUPPRESSION_LEVEL[option])
 
 
-class WyomingSatelliteVadSensitivitySelect(VACASatelliteEntity, VadSensitivitySelect):
+class WyomingSatelliteVadSensitivitySelect(VASatelliteEntity, VadSensitivitySelect):
     """VAD sensitivity selector for Wyoming satellites."""
 
     def __init__(self, hass: HomeAssistant, device: SatelliteDevice) -> None:
         """Initialize a VAD sensitivity selector."""
         self.device = device
 
-        VACASatelliteEntity.__init__(self, device)
+        VASatelliteEntity.__init__(self, device)
         VadSensitivitySelect.__init__(self, hass, device.satellite_id)
 
     async def async_select_option(self, option: str) -> None:
@@ -117,7 +117,7 @@ class WyomingSatelliteVadSensitivitySelect(VACASatelliteEntity, VadSensitivitySe
 
 
 class WyomingSatelliteWakeWordSelect(
-    VACASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
 ):
     """Entity to represent wake word setting."""
 
@@ -153,7 +153,7 @@ class WyomingSatelliteWakeWordSelect(
 
 
 class WyomingSatelliteWakeWordSoundSelect(
-    VACASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
 ):
     """Entity to represent wake word sound setting."""
 

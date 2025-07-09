@@ -12,7 +12,7 @@ from homeassistant.helpers import restore_state
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
-from .entity import VACASatelliteEntity
+from .entity import VASatelliteEntity
 
 if TYPE_CHECKING:
     from homeassistant.components.wyoming import DomainDataItem
@@ -33,12 +33,13 @@ async def async_setup_entry(
         [
             WyomingSatelliteMuteSwitch(item.device),
             WyomingSatelliteSwipeToRefreshSwitch(item.device),
+            WyomingSatelliteScreenControlSwitch(item.device),
         ]
     )
 
 
 class WyomingSatelliteMuteSwitch(
-    VACASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
+    VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
 ):
     """Entity to represent if satellite is muted."""
 
@@ -73,7 +74,7 @@ class WyomingSatelliteMuteSwitch(
 
 
 class WyomingSatelliteSwipeToRefreshSwitch(
-    VACASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
+    VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
 ):
     """Entity to control swipe to refresh."""
 
@@ -105,3 +106,38 @@ class WyomingSatelliteSwipeToRefreshSwitch(
         self._attr_is_on = False
         self.async_write_ha_state()
         self._device.set_custom_setting("swipe_refresh", self._attr_is_on)
+
+
+class WyomingSatelliteScreenControlSwitch(
+    VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
+):
+    """Entity to control swipe to refresh."""
+
+    entity_description = SwitchEntityDescription(
+        key="screen_control",
+        translation_key="screen_control",
+        icon="mdi:monitor-screenshot",
+        entity_category=EntityCategory.CONFIG,
+    )
+
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+
+        # Default to off
+        self._attr_is_on = (state is not None) and (state.state == STATE_ON)
+        self._device.set_custom_setting("screen_state", self._attr_is_on)
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn on."""
+        self._attr_is_on = True
+        self.async_write_ha_state()
+        self._device.set_custom_setting("screen_state", self._attr_is_on)
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn off."""
+        self._attr_is_on = False
+        self.async_write_ha_state()
+        self._device.set_custom_setting("screen_state", self._attr_is_on)

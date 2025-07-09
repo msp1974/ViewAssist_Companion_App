@@ -17,7 +17,7 @@ from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
 from .const import ATTR_SPEAKER, DOMAIN
-from .devices import SatelliteDevice
+from .devices import VASatelliteDevice
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -74,7 +74,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             suggested_area=satellite_info.area,
         )
 
-        item.device = SatelliteDevice(
+        item.device = VASatelliteDevice(
             satellite_id=satellite_id,
             device_id=device.id,
         )

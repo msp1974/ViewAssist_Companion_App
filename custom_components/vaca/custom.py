@@ -2,32 +2,14 @@
 
 from dataclasses import dataclass
 from enum import StrEnum
+import logging
 from typing import Any
 
-from wyoming.client import AsyncTcpClient
 from wyoming.event import Event, Eventable
 
+_LOGGER = logging.getLogger(__name__)
+
 _CUSTOM_TYPE = "custom-settings"
-
-
-class VAAsyncTcpClient(AsyncTcpClient):
-    """Custom TCP client for Wyoming events."""
-
-    def __init__(
-        self, host: str, port: int, before_callback=None, after_callback=None
-    ) -> None:
-        """Initialize the custom TCP client."""
-        super().__init__(host, port)
-        self._before_callback = before_callback
-        self._after_callback = after_callback
-
-    async def write_event(self, event: Event) -> None:
-        """Write an event to the server."""
-        if self._before_callback:
-            await self._before_callback(event)
-        await super().write_event(event)
-        if self._after_callback:
-            await self._after_callback(event)
 
 
 @dataclass

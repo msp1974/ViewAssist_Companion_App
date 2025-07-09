@@ -116,7 +116,11 @@
             },
             "swipe_refresh": {
                 "name": "Swipe to refresh"
+            },
+            "screen_control": {
+                "name": "Screen"
             }
+
         }
     }
 }

@@ -21,7 +21,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
-from .entity import VACASatelliteEntity
+from .entity import VASatelliteEntity
 
 if TYPE_CHECKING:
     from homeassistant.components.wyoming import DomainDataItem
@@ -43,7 +43,7 @@ async def async_setup_entry(
     async_add_entities([WyomingMediaPlayer(item.device)])
 
 
-class WyomingMediaPlayer(VACASatelliteEntity, MediaPlayerEntity):
+class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
     """Represents a hassmic media player."""
 
     entity_description = MediaPlayerEntityDescription(

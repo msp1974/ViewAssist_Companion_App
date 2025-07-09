@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
-from .entity import VACASatelliteEntity
+from .entity import VASatelliteEntity
 
 if TYPE_CHECKING:
     from homeassistant.components.wyoming import DomainDataItem
@@ -37,7 +37,7 @@ async def async_setup_entry(
     )
 
 
-class WyomingSatelliteSTTSensor(VACASatelliteEntity, RestoreSensor):
+class WyomingSatelliteSTTSensor(VASatelliteEntity, RestoreSensor):
     """Entity to represent STT sensor for satellite."""
 
     entity_description = SensorEntityDescription(
@@ -68,7 +68,7 @@ class WyomingSatelliteSTTSensor(VACASatelliteEntity, RestoreSensor):
             self.async_write_ha_state()
 
 
-class WyomingSatelliteTTSSensor(VACASatelliteEntity, RestoreSensor):
+class WyomingSatelliteTTSSensor(VASatelliteEntity, RestoreSensor):
     """Entity to represent TTS sensor for satellite."""
 
     entity_description = SensorEntityDescription(
