@@ -33,7 +33,7 @@ async def async_setup_entry(
         [
             WyomingSatelliteMuteSwitch(item.device),
             WyomingSatelliteSwipeToRefreshSwitch(item.device),
-            WyomingSatelliteScreenControlSwitch(item.device),
+            WyomingSatelliteScreenAutoBrightnessSwitch(item.device),
         ]
     )
 
@@ -108,14 +108,14 @@ class WyomingSatelliteSwipeToRefreshSwitch(
         self._device.set_custom_setting("swipe_refresh", self._attr_is_on)
 
 
-class WyomingSatelliteScreenControlSwitch(
+class WyomingSatelliteScreenAutoBrightnessSwitch(
     VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
 ):
     """Entity to control swipe to refresh."""
 
     entity_description = SwitchEntityDescription(
-        key="screen_control",
-        translation_key="screen_control",
+        key="screen_auto_brightness",
+        translation_key="screen_auto_brightness",
         icon="mdi:monitor-screenshot",
         entity_category=EntityCategory.CONFIG,
     )
@@ -128,16 +128,16 @@ class WyomingSatelliteScreenControlSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self._device.set_custom_setting("screen_state", self._attr_is_on)
+        self._device.set_custom_setting("screen_auto_brightness", self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
         self._attr_is_on = True
         self.async_write_ha_state()
-        self._device.set_custom_setting("screen_state", self._attr_is_on)
+        self._device.set_custom_setting("screen_auto_brightness", self._attr_is_on)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
         self._attr_is_on = False
         self.async_write_ha_state()
-        self._device.set_custom_setting("screen_state", self._attr_is_on)
+        self._device.set_custom_setting("screen_auto_brightness", self._attr_is_on)
