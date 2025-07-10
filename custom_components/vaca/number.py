@@ -143,15 +143,15 @@ class WyomingSatelliteDuckingVolumeNumber(VASatelliteEntity, RestoreNumber):
     """Entity to represent media volume multiplier."""
 
     entity_description = NumberEntityDescription(
-        key="ducking_percentage",
-        translation_key="ducking_percentage",
+        key="ducking_volume",
+        translation_key="ducking_volume",
         icon="mdi:volume-low",
         entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
-    _attr_native_min_value = 1
-    _attr_native_max_value = 50
-    _attr_native_step = 1
+    _attr_native_min_value = 0
+    _attr_native_max_value = 10
+    _attr_native_step = 0.1
     _attr_native_value = 10
 
     async def async_added_to_hass(self) -> None:
@@ -165,9 +165,9 @@ class WyomingSatelliteDuckingVolumeNumber(VASatelliteEntity, RestoreNumber):
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        self._attr_native_value = int(max(1, min(100, value)))
+        self._attr_native_value = int(max(0, min(10, value)))
         self.async_write_ha_state()
-        self._device.set_custom_setting("ducking_percentage", value)
+        self._device.set_custom_setting("ducking_volume", value * 10)
 
 
 class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
