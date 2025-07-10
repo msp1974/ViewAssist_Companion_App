@@ -51,8 +51,8 @@
             "music_volume": {
                 "name": "Music volume"
             },
-            "ducking_percentage": {
-                "name": "Ducking percentage"
+            "ducking_volume": {
+                "name": "Ducking volume"
             }
         },
         "select": {
@@ -117,8 +117,8 @@
             "swipe_refresh": {
                 "name": "Swipe to refresh"
             },
-            "screen_control": {
-                "name": "Screen"
+            "screen_auto_brightness": {
+                "name": "Auto brightness"
             }
 
         }
