@@ -32,7 +32,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .client import VAAsyncTcpClient
 from .const import DOMAIN, SAMPLE_CHANNELS, SAMPLE_WIDTH
-from .custom import CustomSettings, MediaPlayerControl
+from .custom import CustomAction, CustomSettings
 from .devices import VASatelliteDevice
 from .entity import VASatelliteEntity
 
@@ -91,16 +91,17 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         self.device: VASatelliteDevice = device
 
         self.device.set_custom_settings_listener(self._custom_settings_changed)
-        self.device.set_media_player_listener(self._send_media_player_command)
+        self.device.set_custom_action_listener(self._send_custom_action)
 
         self.device.custom_settings = {}
         self.device.custom_settings["ha_port"] = hass.config.api.port
 
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
-        await super().async_will_remove_from_hass()
-        with contextlib.suppress(AssertionError):
-            self.stop_satellite()
+        try:
+            await super().async_will_remove_from_hass()
+        except AssertionError as ex:
+            _LOGGER.debug("Assertion error while stopping satellite: %s", ex)
 
     async def on_before_send_event_callback(self, event: Event) -> None:
         """Allow injection of events before event sent."""
@@ -289,15 +290,15 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 "custom settings event",
             )
 
-    def _send_media_player_command(
-        self, command: str, value: str | float | None = None
+    def _send_custom_action(
+        self, command: str, payload: str | float | None = None
     ) -> None:
         """Send a media player command to the satellite."""
         if self._client is not None and self._client.can_write_event():
             self.config_entry.async_create_background_task(
                 self.hass,
                 self._client.write_event(
-                    MediaPlayerControl(action=command, value=value).event()
+                    CustomAction(action=command, payload=payload).event()
                 ),
                 "media player command",
             )

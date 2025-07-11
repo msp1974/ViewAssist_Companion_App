@@ -16,11 +16,10 @@ class VASatelliteDevice(SatelliteDevice):
 
     custom_settings: dict[str, Any] | None = None
 
-    media_player_listener: Callable[[str], None] | None = None
+    _custom_settings_listener: Callable[[], None] | None = None
+    _custom_action_listener: Callable[[], None] | None = None
     stt_listener: Callable[[str], None] | None = None
     tts_listener: Callable[[str], None] | None = None
-
-    _custom_settings_listener: Callable[[], None] | None = None
 
     @callback
     def set_custom_setting(self, setting: str, value: str | float) -> None:
@@ -39,12 +38,12 @@ class VASatelliteDevice(SatelliteDevice):
             self._custom_settings_listener()
 
     @callback
-    def send_media_player_command(
-        self, command: str, value: str | float | None = None
+    def send_custom_action(
+        self, command: str, payload: dict[str, Any] | None = None
     ) -> None:
         """Send a media player command."""
-        if self.media_player_listener is not None:
-            self.media_player_listener(command, value)
+        if self._custom_action_listener is not None:
+            self._custom_action_listener(command, payload)
 
     @callback
     def set_custom_settings_listener(
@@ -54,11 +53,11 @@ class VASatelliteDevice(SatelliteDevice):
         self._custom_settings_listener = custom_settings_listener
 
     @callback
-    def set_media_player_listener(
-        self, media_player_listener: Callable[[str], None]
+    def set_custom_action_listener(
+        self, custom_action_listener: Callable[[], None]
     ) -> None:
         """Listen for stt updates."""
-        self.media_player_listener = media_player_listener
+        self._custom_action_listener = custom_action_listener
 
     @callback
     def set_stt_listener(self, stt_listener: Callable[[str], None]) -> None:

@@ -9,12 +9,13 @@ from wyoming.event import Event, Eventable
 
 _LOGGER = logging.getLogger(__name__)
 
-_CUSTOM_TYPE = "custom-settings"
+_CUSTOM_SETTINGS_TYPE = "custom-settings"
+_CUSTOM_ACTION_TYPE = "custom-action"
 
 
 @dataclass
 class CustomSettings(Eventable):
-    """Request pong message."""
+    """Custom settings event."""
 
     settings: dict[str, Any]
     """Text to copy to response."""
@@ -22,12 +23,12 @@ class CustomSettings(Eventable):
     @staticmethod
     def is_type(event_type: str) -> bool:
         """Check if the event type is a custom settings event."""
-        return event_type == _CUSTOM_TYPE
+        return event_type == _CUSTOM_SETTINGS_TYPE
 
     def event(self) -> Event:
         """Create an event for custom settings."""
         return Event(
-            type=_CUSTOM_TYPE,
+            type=_CUSTOM_SETTINGS_TYPE,
             data={"settings": self.settings},
         )
 
@@ -37,48 +38,43 @@ class CustomSettings(Eventable):
         return CustomSettings(settings=event.data.get("settings"))
 
 
-class MediaControlActions(StrEnum):
+class CustomActions(StrEnum):
     """Actions for media control."""
 
-    PLAY = "play"
-    """Play media."""
-    PAUSE = "pause"
-    """Pause media."""
-    STOP = "stop"
-    """Stop media."""
-    NEXT = "next"
-    """Next media."""
-    PREVIOUS = "previous"
-    """Previous media."""
-    VOLUME_UP = "volume_up"
-    """Increase volume."""
-    VOLUME_DOWN = "volume_down"
-    """Decrease volume."""
+    GET_DEVICE_INFO = "get-device-info"
+    TOAST_MESSAGE = "toast-message"
+    MEDIA_PLAY_MEDIA = "play-media"
+    MEDIA_PLAY = "play"
+    MEDIA_PAUSE = "pause"
+    MEDIA_STOP = "stop"
+    MEDIA_SET_VOLUME = "set-volume"
 
 
 @dataclass
-class MediaPlayerControl(Eventable):
-    """Media control event."""
+class CustomAction(Eventable):
+    """Custom action event."""
 
-    action: MediaControlActions
-    """Action to perform on media."""
+    action: CustomActions
+    """Action to perform."""
 
-    value: str | float = None
-    """Optional URL of the media to control."""
+    payload: dict[str, Any] | None = None
+    """Optional payload for the action."""
 
     @staticmethod
     def is_type(event_type: str) -> bool:
-        """Check if the event type is a media control event."""
-        return event_type == "media-control"
+        """Check if the event type is a custom action event."""
+        return event_type == _CUSTOM_ACTION_TYPE
 
     def event(self) -> Event:
-        """Create an event for media control."""
+        """Create an event for custom action."""
         return Event(
-            type="media-control",
-            data={"action": self.action, "value": self.value},
+            type=_CUSTOM_ACTION_TYPE,
+            data={"action": self.action, "payload": self.payload},
         )
 
     @staticmethod
-    def from_event(event: Event) -> "MediaPlayerControl":
-        """Create a MediaPlayerControl instance from an event."""
-        return MediaPlayerControl(action=event.data.get("action"))
+    def from_event(event: Event) -> "CustomAction":
+        """Create a CustomAction instance from an event."""
+        return CustomAction(
+            action=event.data.get("action"), payload=event.data.get("payload")
+        )

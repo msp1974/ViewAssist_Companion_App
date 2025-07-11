@@ -25,7 +25,8 @@ class VAAsyncTcpClient(AsyncTcpClient):
         """Write an event to the server."""
         if self._before_send_callback:
             await self._before_send_callback(event)
-        await super().write_event(event)
+        if self.can_write_event():
+            await super().write_event(event)
         if self._after_send_callback:
             await self._after_send_callback(event)
 
