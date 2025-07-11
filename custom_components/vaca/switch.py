@@ -34,6 +34,7 @@ async def async_setup_entry(
             WyomingSatelliteMuteSwitch(item.device),
             WyomingSatelliteSwipeToRefreshSwitch(item.device),
             WyomingSatelliteScreenAutoBrightnessSwitch(item.device),
+            WyomingSatelliteScreenAlwaysOnSwitch(item.device),
         ]
     )
 
@@ -53,7 +54,7 @@ class WyomingSatelliteMuteSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self._device.set_custom_setting("is_muted", self._attr_is_on)
+        self.do_switch(self._attr_is_on)
 
     @property
     def icon(self) -> str:
@@ -62,15 +63,17 @@ class WyomingSatelliteMuteSwitch(
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self._attr_is_on = True
-        self.async_write_ha_state()
-        self._device.set_custom_setting("is_muted", self._attr_is_on)
+        self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self._attr_is_on = False
+        self.do_switch(False)
+
+    def do_switch(self, value: bool) -> None:
+        """Perform the switch action."""
+        self._attr_is_on = value
         self.async_write_ha_state()
-        self._device.set_custom_setting("is_muted", self._attr_is_on)
+        self._device.set_custom_setting(self.entity_description.key, self._attr_is_on)
 
 
 class WyomingSatelliteSwipeToRefreshSwitch(
@@ -93,19 +96,21 @@ class WyomingSatelliteSwipeToRefreshSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self._device.set_custom_setting("swipe_refresh", self._attr_is_on)
+        self.do_switch(self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self._attr_is_on = True
-        self.async_write_ha_state()
-        self._device.set_custom_setting("swipe_refresh", self._attr_is_on)
+        self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self._attr_is_on = False
+        self.do_switch(False)
+
+    def do_switch(self, value: bool) -> None:
+        """Perform the switch action."""
+        self._attr_is_on = value
         self.async_write_ha_state()
-        self._device.set_custom_setting("swipe_refresh", self._attr_is_on)
+        self._device.set_custom_setting(self.entity_description.key, self._attr_is_on)
 
 
 class WyomingSatelliteScreenAutoBrightnessSwitch(
@@ -128,16 +133,55 @@ class WyomingSatelliteScreenAutoBrightnessSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self._device.set_custom_setting("screen_auto_brightness", self._attr_is_on)
+        self.do_switch(self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self._attr_is_on = True
-        self.async_write_ha_state()
-        self._device.set_custom_setting("screen_auto_brightness", self._attr_is_on)
+        self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self._attr_is_on = False
+        self.do_switch(False)
+
+    def do_switch(self, value: bool) -> None:
+        """Perform the switch action."""
+        self._attr_is_on = value
         self.async_write_ha_state()
-        self._device.set_custom_setting("screen_auto_brightness", self._attr_is_on)
+        self._device.set_custom_setting(self.entity_description.key, self._attr_is_on)
+
+
+class WyomingSatelliteScreenAlwaysOnSwitch(
+    VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
+):
+    """Entity to control swipe to refresh."""
+
+    entity_description = SwitchEntityDescription(
+        key="screen_always_on",
+        translation_key="screen_always_on",
+        icon="mdi:monitor-screenshot",
+        entity_category=EntityCategory.CONFIG,
+    )
+
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+
+        # Default to off
+        self._attr_is_on = (state is not None) and (state.state == STATE_ON)
+        self.do_switch(self._attr_is_on)
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn on."""
+        self.do_switch(True)
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn off."""
+        self.do_switch(False)
+
+    def do_switch(self, value: bool) -> None:
+        """Perform the switch action."""
+        self._attr_is_on = value
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, self._attr_is_on)

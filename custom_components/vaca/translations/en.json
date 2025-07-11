@@ -119,6 +119,9 @@
             },
             "screen_auto_brightness": {
                 "name": "Auto brightness"
+            },
+            "screen_always_on": {
+                "name": "Keep screen on"
             }
 
         }
