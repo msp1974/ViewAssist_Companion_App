@@ -25,6 +25,7 @@ CONFIG_SCHEMA = cv.empty_config_schema(DOMAIN)
 
 SATELLITE_PLATFORMS = [
     Platform.ASSIST_SATELLITE,
+    Platform.BUTTON,
     Platform.SELECT,
     Platform.SWITCH,
     Platform.MEDIA_PLAYER,
