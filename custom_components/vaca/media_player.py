@@ -152,10 +152,6 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
             command=CustomActions.MEDIA_SET_VOLUME,
             payload={"volume": volume * 100},
         )
-        self._device.send_custom_action(
-            command=CustomActions.TOAST_MESSAGE,
-            payload={"message": f"Volume set to {int(volume * 100)}%"},
-        )
         self._attr_volume_level = volume
         self.async_write_ha_state()
 
