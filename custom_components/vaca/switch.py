@@ -94,8 +94,8 @@ class WyomingSatelliteSwipeToRefreshSwitch(
 
         state = await self.async_get_last_state()
 
-        # Default to off
-        self._attr_is_on = (state is not None) and (state.state == STATE_ON)
+        # Default to on
+        self._attr_is_on = (state is None) or (state.state == STATE_ON)
         await self.do_switch(self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
