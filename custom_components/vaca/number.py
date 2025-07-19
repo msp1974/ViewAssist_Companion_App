@@ -39,6 +39,7 @@ async def async_setup_entry(
             WyomingSatelliteMusicVolumeNumber(item.device),
             WyomingSatelliteDuckingVolumeNumber(item.device),
             WyomingSatelliteScreenBrightnessNumber(item.device),
+            WyomingSatelliteWakeWordThresholdNumber(item.device),
         ]
     )
 
@@ -55,7 +56,7 @@ class WyomingSatelliteMicGainNumber(VASatelliteEntity, RestoreNumber):
     _attr_should_poll = False
     _attr_native_min_value = 1
     _attr_native_max_value = _MAX_MIC_GAIN
-    _attr_native_value = 1
+    _attr_native_value = 20
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
@@ -152,7 +153,7 @@ class WyomingSatelliteDuckingVolumeNumber(VASatelliteEntity, RestoreNumber):
     _attr_native_min_value = 0
     _attr_native_max_value = 10
     _attr_native_step = 0.1
-    _attr_native_value = 10
+    _attr_native_value = 1
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
@@ -198,3 +199,33 @@ class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
         self._attr_native_value = screen_brightness
         self.async_write_ha_state()
         self._device.set_custom_setting("screen_brightness", screen_brightness)
+
+
+class WyomingSatelliteWakeWordThresholdNumber(VASatelliteEntity, RestoreNumber):
+    """Entity to represent wake word trigger threshold."""
+
+    entity_description = NumberEntityDescription(
+        key="wake_word_threshold",
+        translation_key="wake_word_threshold",
+        icon="mdi:account-voice",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = 0
+    _attr_native_max_value = 10
+    _attr_native_value = 8
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None:
+            await self.async_set_native_value(float(state.state))
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        value = int(max(0, min(10, value)))
+        self._attr_native_value = value
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, value)
