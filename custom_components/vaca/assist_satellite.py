@@ -186,7 +186,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     "result": event.data.get("intent_output"),
                     "device_id": self.device.device_id,
                 }
-                self.hass.bus.async_fire(INTENT_EVENT, event_data)
+                # self.hass.bus.async_fire(INTENT_EVENT, event_data)
 
         super().on_pipeline_event(event)
 
