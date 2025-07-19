@@ -128,14 +128,24 @@ class WyomingSatelliteWakeWordSelect(
     )
     _attr_should_poll = False
     _attr_current_option = "hey_jarvis"
-    _attr_options = [
-        "alexa",
-        "hey_jarvis",
-        "hey_mycroft",
-        "hey_rhasspy",
-        "ok_nabu",
-        "ok_computer",
-    ]
+
+    @property
+    def options(self) -> list[str]:
+        """Return the list of available wake word options."""
+        return self.get_wake_word_options()
+
+    def get_wake_word_options(self) -> list[str]:
+        """Return the list of available wake word options."""
+        wake_options: list[dict[str, str]] = []
+        if self._device.info:
+            if self._device.info.wake:
+                for wake_program in self._device.info.wake:
+                    if wake_program.name == "available_wake_words":
+                        wake_options = [
+                            model.name.replace("_", " ").title()
+                            for model in wake_program.models
+                        ]
+        return wake_options
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
@@ -149,7 +159,7 @@ class WyomingSatelliteWakeWordSelect(
         """Select an option."""
         self._attr_current_option = option
         self.async_write_ha_state()
-        self._device.set_custom_setting("wake_word", option)
+        self._device.set_custom_setting("wake_word", option.lower().replace(" ", "_"))
 
 
 class WyomingSatelliteWakeWordSoundSelect(

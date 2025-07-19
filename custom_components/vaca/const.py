@@ -8,3 +8,5 @@ SAMPLE_CHANNELS = 1
 
 # For multi-speaker voices, this is the name of the selected speaker.
 ATTR_SPEAKER = "speaker"
+
+INTENT_EVENT = f"{DOMAIN}_intent_event"

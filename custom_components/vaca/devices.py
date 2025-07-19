@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.wyoming import SatelliteDevice
+from homeassistant.components.wyoming.data import Info
 from homeassistant.core import callback
 
 
@@ -14,6 +15,7 @@ from homeassistant.core import callback
 class VASatelliteDevice(SatelliteDevice):
     """VACA Class to store device."""
 
+    info: Info | None = None
     custom_settings: dict[str, Any] | None = None
 
     _custom_settings_listener: Callable[[], None] | None = None

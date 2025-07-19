@@ -78,3 +78,28 @@ class CustomAction(Eventable):
         return CustomAction(
             action=event.data.get("action"), payload=event.data.get("payload")
         )
+
+
+@dataclass
+class CustomStatus(Eventable):
+    """Custom sensor value event."""
+
+    data: Any
+    """Value of the sensor."""
+
+    @staticmethod
+    def is_type(event_type: str) -> bool:
+        """Check if the event type is a custom sensor value event."""
+        return event_type == "custom-status"
+
+    def event(self) -> Event:
+        """Create an event for custom sensor value."""
+        return Event(
+            type="custom-status",
+            data=self.data,
+        )
+
+    @staticmethod
+    def from_event(event: Event) -> "CustomStatus":
+        """Create a CustomSensorValue instance from an event."""
+        return CustomStatus(data=event.data)

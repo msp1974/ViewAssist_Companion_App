@@ -53,6 +53,9 @@
             },
             "ducking_volume": {
                 "name": "Ducking volume"
+            },
+            "wake_word_threshold": {
+                "name": "Wake word threshold"
             }
         },
         "select": {
@@ -81,15 +84,7 @@
                 }
             },
             "wake_word": {
-                "name": "Wake word",
-                "state": {
-                    "alexa": "Alexa",
-                    "hey_jarvis": "Hey Jarvis",
-                    "hey_mycroft": "Hey Mycroft",
-                    "hey_rhasspy": "Hey Rhasspy",
-                    "ok_computer": "OK Computer",
-                    "ok_nabu": "OK Nabu"
-                }
+                "name": "Wake word"
             },
             "wake_word_sound": {
                 "name": "Wake word sound",
@@ -108,6 +103,17 @@
             },
             "tts": {
                 "name": "TTS"
+            },
+            "light_level": {
+                "name": "Light level"
+            },
+            "orientation": {
+                "name": "Orientation",
+                "state": {
+                    "unknown": "Unknown",
+                    "portrait": "Portrait",
+                    "landscape": "Landscape"
+                }
             }
         },
         "switch": {
@@ -122,6 +128,9 @@
             },
             "screen_always_on": {
                 "name": "Keep screen on"
+            },
+            "do_not_disturb": {
+                "name": "Do not disturb"
             }
 
         }

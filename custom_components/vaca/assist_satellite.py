@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
 import io
 import logging
 import time
@@ -28,11 +27,12 @@ from homeassistant.components.wyoming import DomainDataItem, WyomingService
 from homeassistant.components.wyoming.assist_satellite import WyomingAssistSatellite
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .client import VAAsyncTcpClient
-from .const import DOMAIN, SAMPLE_CHANNELS, SAMPLE_WIDTH
-from .custom import CustomAction, CustomSettings
+from .const import DOMAIN, INTENT_EVENT, SAMPLE_CHANNELS, SAMPLE_WIDTH
+from .custom import CustomAction, CustomSettings, CustomStatus
 from .devices import VASatelliteDevice
 from .entity import VASatelliteEntity
 
@@ -75,7 +75,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
     )
 
     _attr_name = None
-    _attr_supported_features = AssistSatelliteEntityFeature.ANNOUNCE
+    _attr_supported_features = (
+        AssistSatelliteEntityFeature.ANNOUNCE
+        | AssistSatelliteEntityFeature.START_CONVERSATION
+    )
 
     def __init__(
         self,
@@ -93,6 +96,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         self.device.set_custom_settings_listener(self._custom_settings_changed)
         self.device.set_custom_action_listener(self._send_custom_action)
 
+        # Make info accessible from entities
+        self.device.info = service.info
+
+        # Init custom settings
         self.device.custom_settings = {}
         self.device.custom_settings["ha_port"] = hass.config.api.port
 
@@ -105,16 +112,28 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
     async def on_before_send_event_callback(self, event: Event) -> None:
         """Allow injection of events before event sent."""
+
+    async def on_after_send_event_callback(self, event: Event) -> None:
+        """Allow injection of events after event sent."""
         if RunSatellite().is_type(event.type):
             await self._client.write_event(
                 CustomSettings(self.device.custom_settings).event()
             )
 
-    async def on_after_send_event_callback(self, event: Event) -> None:
-        """Allow injection of events after event sent."""
-
     async def on_receive_event_callback(self, event: Event) -> None:
         """Handle received custom events."""
+        if event and CustomStatus.is_type(event.type):
+            # Custom status event
+            status = CustomStatus.from_event(event)
+            _LOGGER.debug(
+                "Received status event: %s",
+                status.data,
+            )
+            async_dispatcher_send(
+                self.hass,
+                f"{DOMAIN}_{self.device.device_id}_status_update",
+                status.data,
+            )
 
     async def _connect(self) -> None:
         """Connect to satellite over TCP.  Uses custom TCP client to allow callbacks on send."""
@@ -156,6 +175,18 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             if event.data:
                 if self.device.tts_listener is not None:
                     self.device.tts_listener(event.data["tts_input"])
+        elif event.type == assist_pipeline.PipelineEventType.INTENT_END:
+            # Intent processing complete - to be converted to intent sensor
+            if event.data:
+                _LOGGER.debug(
+                    "Intent processing complete: %s",
+                    event.data,
+                )
+                event_data = {
+                    "result": event.data.get("intent_output"),
+                    "device_id": self.device.device_id,
+                }
+                self.hass.bus.async_fire(INTENT_EVENT, event_data)
 
         super().on_pipeline_event(event)
 
