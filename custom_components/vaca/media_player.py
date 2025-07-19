@@ -51,6 +51,7 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
         key="media_player",
         translation_key="media_player",
         device_class=MediaPlayerDeviceClass.SPEAKER,
+        name="Media player",
     )
 
     _attr_state = MediaPlayerState.IDLE
