@@ -54,7 +54,7 @@ class WyomingSatelliteMuteSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self.do_switch(self._attr_is_on)
+        await self.do_switch(self._attr_is_on)
 
     @property
     def icon(self) -> str:
@@ -63,13 +63,13 @@ class WyomingSatelliteMuteSwitch(
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self.do_switch(True)
+        await self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self.do_switch(False)
+        await self.do_switch(False)
 
-    def do_switch(self, value: bool) -> None:
+    async def do_switch(self, value: bool) -> None:
         """Perform the switch action."""
         self._attr_is_on = value
         self.async_write_ha_state()
@@ -96,17 +96,17 @@ class WyomingSatelliteSwipeToRefreshSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self.do_switch(self._attr_is_on)
+        await self.do_switch(self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self.do_switch(True)
+        await self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self.do_switch(False)
+        await self.do_switch(False)
 
-    def do_switch(self, value: bool) -> None:
+    async def do_switch(self, value: bool) -> None:
         """Perform the switch action."""
         self._attr_is_on = value
         self.async_write_ha_state()
@@ -133,17 +133,17 @@ class WyomingSatelliteScreenAutoBrightnessSwitch(
 
         # Default to off
         self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self.do_switch(self._attr_is_on)
+        await self.do_switch(self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self.do_switch(True)
+        await self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self.do_switch(False)
+        await self.do_switch(False)
 
-    def do_switch(self, value: bool) -> None:
+    async def do_switch(self, value: bool) -> None:
         """Perform the switch action."""
         self._attr_is_on = value
         self.async_write_ha_state()
@@ -153,7 +153,7 @@ class WyomingSatelliteScreenAutoBrightnessSwitch(
 class WyomingSatelliteScreenAlwaysOnSwitch(
     VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity
 ):
-    """Entity to control swipe to refresh."""
+    """Entity to control screen always on."""
 
     entity_description = SwitchEntityDescription(
         key="screen_always_on",
@@ -168,19 +168,19 @@ class WyomingSatelliteScreenAlwaysOnSwitch(
 
         state = await self.async_get_last_state()
 
-        # Default to off
-        self._attr_is_on = (state is not None) and (state.state == STATE_ON)
-        self.do_switch(self._attr_is_on)
+        # Default to on
+        self._attr_is_on = (state is None) or (state.state == STATE_ON)
+        await self.do_switch(self._attr_is_on)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
-        self.do_switch(True)
+        await self.do_switch(True)
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn off."""
-        self.do_switch(False)
+        await self.do_switch(False)
 
-    def do_switch(self, value: bool) -> None:
+    async def do_switch(self, value: bool) -> None:
         """Perform the switch action."""
         self._attr_is_on = value
         self.async_write_ha_state()
