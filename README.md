@@ -41,6 +41,8 @@ The integration and Android application together have the following features:
 
 There are 2 components to this solution, a HA custom integration and an Android application.
 
+**NOTE**: You will need the latest dev version of the View Assist integration which has support for VACA to be able to select the microphone entity when setting up the device in View Assist
+
 ### Custom Integration
 
 As is common with new custom instegrations, it can take a little while to be fully available via HACs. However, you can add this as a custom respository by the following link to then provide the normal HACs install and update experience.
