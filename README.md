@@ -37,7 +37,7 @@ The integration and Android application together have the following features:
 - Start on boot
 - Securtity to prevent intrusion once paired to a HA server
 
-## Installtion
+## Installation
 
 There are 2 components to this solution, a HA custom integration and an Android application.
 
@@ -45,7 +45,7 @@ There are 2 components to this solution, a HA custom integration and an Android 
 
 As is common with new custom instegrations, it can take a little while to be fully available via HACs. However, you can add this as a custom respository by the following link to then provide the normal HACs install and update experience.
 
-**_ADD HACS LINK HERE_**
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=msp1974&repository=ViewAssist_Companion_App&category=Integration)
 
 ### Android Application
 
