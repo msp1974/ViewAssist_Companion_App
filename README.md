@@ -41,11 +41,11 @@ The integration and Android application together have the following features:
 
 There are 2 components to this solution, a HA custom integration and an Android application.
 
-**NOTE**: You will need the latest dev version of the View Assist integration which has support for VACA to be able to select the microphone entity when setting up the device in View Assist
+**IMPORTANT**: You will need the at least the 2025.7 version of the View Assist integration which has support for VACA to be able to select the microphone entity when setting up the device in View Assist
 
 ### Custom Integration
 
-As is common with new custom instegrations, it can take a little while to be fully available via HACs. However, you can add this as a custom respository by the following link to then provide the normal HACs install and update experience.
+As is common with new custom integrations, it can take a little while to be fully available via HACs. However, you can add this as a custom respository by the following link to then provide the normal HACs install and update experience.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=msp1974&repository=ViewAssist_Companion_App&category=Integration)
 
