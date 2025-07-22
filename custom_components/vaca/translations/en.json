@@ -104,6 +104,9 @@
             "tts": {
                 "name": "TTS"
             },
+            "intent": {
+                "name": "Intent"
+            },
             "light_level": {
                 "name": "Light level"
             },

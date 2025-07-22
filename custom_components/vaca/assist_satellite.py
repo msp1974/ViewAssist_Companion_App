@@ -176,17 +176,22 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 if self.device.tts_listener is not None:
                     self.device.tts_listener(event.data["tts_input"])
         elif event.type == assist_pipeline.PipelineEventType.INTENT_END:
-            # Intent processing complete - to be converted to intent sensor
+            # Intent processing complete - update intent sensor
             if event.data:
                 _LOGGER.debug(
                     "Intent processing complete: %s",
                     event.data,
                 )
-                event_data = {
-                    "result": event.data.get("intent_output"),
-                    "device_id": self.device.device_id,
-                }
-                # self.hass.bus.async_fire(INTENT_EVENT, event_data)
+                if (
+                    event.data.get("intent_output", {})
+                    .get("response", {})
+                    .get("speech")
+                ):
+                    async_dispatcher_send(
+                        self.hass,
+                        f"{DOMAIN}_{self.device.device_id}_intent_output",
+                        event.data,
+                    )
 
         super().on_pipeline_event(event)
 
