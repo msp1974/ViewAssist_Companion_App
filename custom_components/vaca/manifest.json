@@ -15,6 +15,6 @@
   "integration_type": "service",
   "iot_class": "local_push",
   "requirements": ["wyoming>=1.7.1"],
-  "version": "0.3.0",
+  "version": "0.3.1",
   "zeroconf": ["_vaca._tcp.local."]
 }
