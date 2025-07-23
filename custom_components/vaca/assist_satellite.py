@@ -101,7 +101,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         # Init custom settings
         self.device.custom_settings = {}
-        self.device.custom_settings["ha_port"] = hass.config.api.port
 
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
@@ -116,6 +115,12 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
     async def on_after_send_event_callback(self, event: Event) -> None:
         """Allow injection of events after event sent."""
         if RunSatellite().is_type(event.type):
+            # Update url and port
+            self.device.custom_settings["ha_port"] = self.hass.config.api.port
+            self.device.custom_settings["ha_url"] = (
+                self.hass.config.internal_url if self.hass.config.internal_url else ""
+            )
+            # Send config event
             await self._client.write_event(
                 CustomSettings(self.device.custom_settings).event()
             )
