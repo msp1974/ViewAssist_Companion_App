@@ -104,6 +104,9 @@
             "tts": {
                 "name": "TTS"
             },
+            "intent": {
+                "name": "Intent"
+            },
             "light_level": {
                 "name": "Light level"
             },
@@ -131,8 +134,10 @@
             },
             "do_not_disturb": {
                 "name": "Do not disturb"
+            },
+            "dark_mode": {
+                "name": "Dark mode"
             }
-
         }
     }
 }

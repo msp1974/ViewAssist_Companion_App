@@ -4,7 +4,7 @@ This is an Android application and Home Assistant integration to compliment the 
 
 ## How is this different from existing solutions?
 
-Other solutions are a combination of applications for voice and display and often have quite an involved setup. VACA is a 1-stop shop of voice and browser support providing a simplified setup with just a signle Android application install. Built specifically for View Assist also means that it provides the features and capabilities needed to support this project, without having to piece other solutions together.
+Other solutions are a combination of applications for voice and display and often have quite an involved setup. VACA is a 1-stop shop of voice and browser support providing a simplified setup with just a single Android application install. Built specifically for View Assist also means that it provides the features and capabilities needed to support this project, without having to piece other solutions together.
 
 ## Will it work for me?
 
@@ -52,3 +52,44 @@ As is common with new custom integrations, it can take a little while to be full
 ### Android Application
 
 The app is not currently available in the Play store and will need to be downloaded from the apk folder in this repository and installed on your device.
+
+# FAQs
+
+### My device detects the wake word ok but then doesn't hear what I am saying
+
+This is caused by the mic gain setting either being too low or too high. Too low and it will struggle to hear you, too high and it will clip the audio and make your voice unintelligable.
+
+- On a Lenovo TSV, start at 1 and don't go any more than 5
+- On a Lenovo LSD 8 & 10, try a setting of around 60 and adjust between 40 and 80 to get the best result
+- On other devices, always start at 1 and adjust in increments of 1 if it hears you but needs to be more sensitive or in increments of 10 if it doesn't hear you at all when set to 1.
+
+---
+
+### My device doesn't pick up the wake word or picks up too many false positives
+
+Try adjusting the wake word threshold. It is default set to 80 but play around with it until it works the best. The lower the setting the more it will detect but becomes more suseptable to fale positives. The higher it is, the more likley background noise will stop it detecting. Default is 80 as that seems to be the best compromise in most tested situations.
+
+---
+
+### I dont understand how to turn the screen off on my device
+
+There is some variation here with how devices will turn on/off their screens.
+
+- Lenovo TSV - use the keep screen on switch and set the screen timeout on your device low. When keep screen on if set to off, it will sleep on this screne timeout. Turin keep screen on back to on, will wake up the screen.
+- Lenovo LSD - use the brightness slider and set to 0 to turn screen off
+- Lenovo SC2 - set auto brightness to off and then set brightness to 0.
+- Other devices - try any of the above solutions. In the main, the more modern the device the more likley the TSV solution is the right answer.
+
+---
+
+### Can I use a custom wake word
+
+This is a future ambition but for now it is limited to those listed and built into the app
+
+---
+
+### Can I use a custom wake word sound
+
+See above answer!
+
+---

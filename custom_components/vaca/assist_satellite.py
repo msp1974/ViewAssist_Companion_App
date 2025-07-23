@@ -101,7 +101,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         # Init custom settings
         self.device.custom_settings = {}
-        self.device.custom_settings["ha_port"] = hass.config.api.port
 
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
@@ -116,6 +115,12 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
     async def on_after_send_event_callback(self, event: Event) -> None:
         """Allow injection of events after event sent."""
         if RunSatellite().is_type(event.type):
+            # Update url and port
+            self.device.custom_settings["ha_port"] = self.hass.config.api.port
+            self.device.custom_settings["ha_url"] = (
+                self.hass.config.internal_url if self.hass.config.internal_url else ""
+            )
+            # Send config event
             await self._client.write_event(
                 CustomSettings(self.device.custom_settings).event()
             )
@@ -176,17 +181,22 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 if self.device.tts_listener is not None:
                     self.device.tts_listener(event.data["tts_input"])
         elif event.type == assist_pipeline.PipelineEventType.INTENT_END:
-            # Intent processing complete - to be converted to intent sensor
+            # Intent processing complete - update intent sensor
             if event.data:
                 _LOGGER.debug(
                     "Intent processing complete: %s",
                     event.data,
                 )
-                event_data = {
-                    "result": event.data.get("intent_output"),
-                    "device_id": self.device.device_id,
-                }
-                # self.hass.bus.async_fire(INTENT_EVENT, event_data)
+                if (
+                    event.data.get("intent_output", {})
+                    .get("response", {})
+                    .get("speech")
+                ):
+                    async_dispatcher_send(
+                        self.hass,
+                        f"{DOMAIN}_{self.device.device_id}_intent_output",
+                        event.data,
+                    )
 
         super().on_pipeline_event(event)
 
