@@ -4,7 +4,7 @@ This is an Android application and Home Assistant integration to compliment the 
 
 ## How is this different from existing solutions?
 
-Other solutions are a combination of applications for voice and display and often have quite an involved setup. VACA is a 1-stop shop of voice and browser support providing a simplified setup with just a signle Android application install. Built specifically for View Assist also means that it provides the features and capabilities needed to support this project, without having to piece other solutions together.
+Other solutions are a combination of applications for voice and display and often have quite an involved setup. VACA is a 1-stop shop of voice and browser support providing a simplified setup with just a single Android application install. Built specifically for View Assist also means that it provides the features and capabilities needed to support this project, without having to piece other solutions together.
 
 ## Will it work for me?
 
@@ -45,10 +45,45 @@ There are 2 components to this solution, a HA custom integration and an Android 
 
 ### Custom Integration
 
-As is common with new custom instegrations, it can take a little while to be fully available via HACs. However, you can add this as a custom respository by the following link to then provide the normal HACs install and update experience.
+As is common with new custom integrations, it can take a little while to be fully available via HACs. However, you can add this as a custom respository by the following link to then provide the normal HACs install and update experience.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=msp1974&repository=ViewAssist_Companion_App&category=Integration)
 
 ### Android Application
 
 The app is not currently available in the Play store and will need to be downloaded from the apk folder in this repository and installed on your device.
+
+# FAQs
+
+### My device detects the wake word ok but then doesn't hear what I am saying
+
+This is caused by the mic gain setting either being too low or too high. Too low and it will struggle to hear you, too high and it will clip the audio and make your voice unintelligable.
+
+- On a Lenovo TSV, start at 1 and don't go any more than 5
+- On a Lenovo LSD 8 & 10, try a setting of around 60 and adjust between 40 and 80 to get the best result
+- On other devices, always start at 1 and adjust in increments of 1 if it hears you but needs to be more sensitive or in increments of 10 if it doesn't hear you at all when set to 1.
+
+---
+
+### I dont understand how to turn the screen off on my device
+
+There is some variation here with how devices will turn on/off their screens.
+
+- Lenovo TSV - use the keep screen on switch and set the screen timeout on your device low. When keep screen on if set to off, it will sleep on this screne timeout. Turin keep screen on back to on, will wake up the screen.
+- Lenovo LSD - use the brightness slider and set to 0 to turn screen off
+- Lenovo SC2 - set auto brightness to off and then set brightness to 0.
+- Other devices - try any of the above solutions. In the main, the more modern the device the more likley the TSV solution is the right answer.
+
+---
+
+### Can I use a custom wake word
+
+This is a future ambition but for now it is limited to those listed and built into the app
+
+---
+
+### Can I use a custom wake word sound
+
+See above answer!
+
+---
