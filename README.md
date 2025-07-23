@@ -65,6 +65,12 @@ This is caused by the mic gain setting either being too low or too high. Too low
 
 ---
 
+### My device doesn't pick up the wake word or picks up too many false positives
+
+Try adjusting the wake word threshold. It is default set to 80 but play around with it until it works the best. The lower the setting the more it will detect but becomes more suseptable to fale positives. The higher it is, the more likley background noise will stop it detecting. Default is 80 as that seems to be the best compromise in most tested situations.
+
+---
+
 ### I dont understand how to turn the screen off on my device
 
 There is some variation here with how devices will turn on/off their screens.
