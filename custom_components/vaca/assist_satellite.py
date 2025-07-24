@@ -167,7 +167,11 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         updating listeners for speech-to-text and text-to-speech outputs.
         MSP - Added by MSP1974 2025-07-08
         """
-        if event.type == assist_pipeline.PipelineEventType.STT_END:
+        if event.type == assist_pipeline.PipelineEventType.RUN_START:
+            # Fix for error when running pipeline for ask question
+            if not event.data.get("tts_output"):
+                event.data["tts_output"] = {"token": ""}
+        elif event.type == assist_pipeline.PipelineEventType.STT_END:
             # Speech-to-text transcript
             if event.data:
                 # Inform client of transript
