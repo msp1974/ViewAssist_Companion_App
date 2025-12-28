@@ -8,11 +8,11 @@
         }
       },
       "hassio_confirm": {
-        "description": "Do you want to configure Home Assistant to connect to the Wyoming service provided by the add-on: {addon}?"
+        "description": "[%key:config::step::hassio_confirm::description%]"
       },
       "zeroconf_confirm": {
-        "description": "Do you want to configure Home Assistant to connect to the Wyoming service {name}?",
-        "title": "Discovered Wyoming service"
+        "description": "[%key:config::step::zeroconf_confirm::description%]",
+        "title": "[%key:config::step::zeroconf_confirm::title%]"
       }
     },
     "error": {
@@ -20,8 +20,8 @@
     },
     "abort": {
       "already_configured": "[%key:common::config_flow::abort::already_configured_service%]",
-      "no_services": "No services found at endpoint",
-      "no_port": "No port for endpoint"
+      "no_services": "[%key:config::abort::no_services%]",
+      "no_port": "[%key:config::abort::no_port%]"
     }
   },
   "entity": {
@@ -38,13 +38,13 @@
         }
       },
       "noise_suppression_level": {
-        "name": "Noise suppression level",
+        "name": "[%key:entity::select::noise_suppression_level::name%]",
         "state": {
           "off": "[%key:common::state::off%]",
-          "low": "[%key:common::state::low%]",
-          "medium": "[%key:common::state::medium%]",
-          "high": "[%key:common::state::high%]",
-          "max": "Max"
+          "low": "[%key:entity::select::noise_suppression_level::state::low%]",
+          "medium": "[%key:entity::select::noise_suppression_level::state::medium%]",
+          "high": "[%key:entity::select::noise_suppression_level::state::high%]",
+          "max": "[%key:entity::select::noise_suppression_level::state::max%]"
         }
       },
       "vad_sensitivity": {
@@ -58,18 +58,18 @@
     },
     "switch": {
       "mute": {
-        "name": "Mute"
+        "name": "[%key:entity::switch::mute::name%]"
       }
     },
     "number": {
-      "auto_gain": {
-        "name": "Auto gain"
+      "mic_gain": {
+        "name": "[%key:entity::number::mic_gain::name%]"
       },
-      "volume_multiplier": {
-        "name": "Mic volume"
+      "notification_volume": {
+        "name": "[%key:entity::number::notification_volume::name%]"
       },
       "screen_brightness": {
-        "name": "Screen brightness"
+        "name": "[%key:entity::number::screen_brightness::name%]"
       }
     }
   }

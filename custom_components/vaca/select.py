@@ -12,7 +12,7 @@ from homeassistant.components.assist_pipeline import (
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import restore_state
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -154,12 +154,30 @@ class WyomingSatelliteWakeWordSelect(
         """When entity is added to Home Assistant."""
         await super().async_added_to_hass()
 
+        self._device.set_info_listener(self._info_updated)
+
         state = await self.async_get_last_state()
-        if state is not None and state.state in self.options:
-            await self.async_select_option(state.state)
+        if state is not None:
+            if state.state in self.options:
+                await self.async_select_option(state.state)
+            else:
+                # Save the state for when options become available
+                self._saved_state = state.state
+                # Default to the first available option for now
+                if self.options:
+                    await self.async_select_option(self.options[0])
         # Default to the first available option if no state is found
         elif self.options:
             await self.async_select_option(self.options[0])
+
+    @callback
+    def _info_updated(self) -> None:
+        """Called when device info is updated."""
+        # Check if we have a saved state that is now available
+        if hasattr(self, "_saved_state") and self._saved_state in self.options:
+            self.hass.async_create_task(self.async_select_option(self._saved_state))
+            delattr(self, "_saved_state")
+        self.async_write_ha_state()
 
     async def async_select_option(self, option: str) -> None:
         """Select an option."""

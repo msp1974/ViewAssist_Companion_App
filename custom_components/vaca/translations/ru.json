@@ -1,0 +1,216 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Сервис уже настроен",
+            "no_port": "Нет порта для конечной точки",
+            "no_services": "Службы не найдены в конечной точке"
+        },
+        "error": {
+            "cannot_connect": "Не удалось подключиться"
+        },
+        "step": {
+            "hassio_confirm": {
+                "description": "Вы хотите настроить Home Assistant для подключения к службе Wyoming, предоставляемой дополнением: {addon}?"
+            },
+            "user": {
+                "data": {
+                    "host": "Хост",
+                    "port": "Порт"
+                }
+            },
+            "zeroconf_confirm": {
+                "description": "Вы хотите настроить Home Assistant для подключения к службе Wyoming {name}?",
+                "title": "Обнаружена служба Wyoming"
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "battery_charging": {
+                "name": "Зарядка батареи"
+            },
+            "screen_on": {
+                "name": "Экран"
+            }
+        },
+        "button": {
+            "refresh": {
+                "name": "Обновить"
+            },
+            "screen_wake": {
+                "name": "Пробудить экран"
+            },
+            "screen_sleep": {
+                "name": "Отключить экран"
+            },
+            "wake": {
+                "name": "Пробуждение"
+            }
+        },
+        "media_player": {
+            "media_player": {
+                "name": "Медиаплеер",
+                "state": {
+                    "playing": "Воспроизведение",
+                    "paused": "Пауза",
+                    "idle": "Бездействие"
+                }
+            }
+        },
+        "number": {
+            "mic_gain": {
+                "name": "Усиление микрофона"
+            },
+            "screen_brightness": {
+                "name": "Яркость экрана"
+            },
+            "notification_volume": {
+                "name": "Громкость голоса"
+            },
+            "motion_detection_sensitivity": {
+                "name": "Чувствительность обнаружения движения"
+            },
+            "music_volume": {
+                "name": "Громкость музыки"
+            },
+            "ducking_volume": {
+                "name": "Громкость приглушения"
+            },
+            "wake_word_threshold": {
+                "name": "Порог пробуждающего слова"
+            },
+            "zoom_level": {
+                "name": "Уровень масштабирования"
+            }
+        },
+        "select": {
+            "noise_suppression_level": {
+                "name": "Уровень шумоподавления",
+                "state": {
+                    "high": "Высокий",
+                    "low": "Низкий",
+                    "max": "Максимальный",
+                    "medium": "Средний",
+                    "off": "Выключено"
+                }
+            },
+            "pipeline": {
+                "name": "Ассистент",
+                "state": {
+                    "preferred": "Предпочтительный"
+                }
+            },
+            "vad_sensitivity": {
+                "name": "Обнаружение окончания речи",
+                "state": {
+                    "aggressive": "Агрессивный",
+                    "default": "По умолчанию",
+                    "relaxed": "Расслабленный"
+                }
+            },
+            "wake_word": {
+                "name": "Пробуждающее слово"
+            },
+            "wake_word_sound": {
+                "name": "Звук пробуждающего слова",
+                "state": {
+                    "none": "Нет",
+                    "havpe": "Home Assistant",
+                    "alexa": "Alexa",
+                    "bubble": "Пузырь",
+                    "ding": "Динь"
+                }
+            },
+            "screen_timeout": {
+                "name": "Тайм-аут экрана",
+                "state": {
+                    "15": "15 секунд",
+                    "30": "30 секунд",
+                    "60": "1 минута",
+                    "120": "2 минуты",
+                    "300": "5 минут",
+                    "600": "10 минут",
+                    "1800": "30 минут"
+                }
+            }
+        },
+        "sensor": {
+            "stt": {
+                "name": "STT"
+            },
+            "tts": {
+                "name": "TTS"
+            },
+            "intent": {
+                "name": "Намерение"
+            },
+            "light_level": {
+                "name": "Уровень освещенности"
+            },
+            "orientation": {
+                "name": "Ориентация",
+                "state": {
+                    "unknown": "Неизвестно",
+                    "portrait": "Портретная",
+                    "landscape": "Альбомная"
+                }
+            },
+            "battery_level": {
+                "name": "Батарея"
+            },
+            "app_version": {
+                "name": "Версия приложения"
+            },
+            "current_path": {
+                "name": "Текущий путь"
+            },
+            "last_motion": {
+                "name": "Последнее движение"
+            }
+        },
+        "switch": {
+            "mute": {
+                "name": "Без звука"
+            },
+            "swipe_refresh": {
+                "name": "Проведите для обновления"
+            },
+            "screen_auto_brightness": {
+                "name": "Автояркость"
+            },
+            "screen_always_on": {
+                "name": "Экран всегда включен"
+            },
+            "do_not_disturb": {
+                "name": "Не беспокоить"
+            },
+            "dark_mode": {
+                "name": "Темный режим"
+            },
+            "diagnostics_enabled": {
+                "name": "Диагностика на экране"
+            },
+            "continue_conversation": {
+                "name": "Продолжить разговор"
+            },
+            "alarm": {
+                "name": "Будильник"
+            },
+            "enable_motion_detection": {
+                "name": "Обнаружение движения"
+            },
+            "screen_on_wake_word": {
+                "name": "Экран при пробуждающем слове"
+            },
+            "screen_on_bump": {
+                "name": "Экран при встряхивании"
+            },
+            "screen_on_proximity": {
+                "name": "Экран при приближении"
+            },
+            "screen_on_motion": {
+                "name": "Экран при движении"
+            }
+        }
+    }
+}

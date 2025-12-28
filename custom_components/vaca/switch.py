@@ -193,9 +193,14 @@ class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
     entity_description = SwitchEntityDescription(
         key="do_not_disturb",
         translation_key="do_not_disturb",
-        icon="mdi:do-not-disturb",
+        icon="mdi:minus-circle-outline",
     )
     default_on = False
+
+    @property
+    def icon(self) -> str:
+        """Return the icon to use in the frontend."""
+        return "mdi:minus-circle-outline"
 
 
 class WyomingSatelliteDiagnosticsSwitch(BaseSwitch):

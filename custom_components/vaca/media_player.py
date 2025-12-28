@@ -1,6 +1,7 @@
 """Media player entity for VA Wyoming."""
 
 from __future__ import annotations
+from datetime import datetime
 
 import logging
 from typing import TYPE_CHECKING, Any
@@ -17,11 +18,12 @@ from homeassistant.components.media_player import (
     async_process_play_media_url,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN
-from .custom import CustomActions
+from .custom import CustomActions, STATUS_EVENT_TYPE
 from .devices import VASatelliteDevice
 from .entity import VASatelliteEntity
 
@@ -56,8 +58,9 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
         name="Media player",
     )
 
-    _attr_state = MediaPlayerState.IDLE
-    _attr_volume_level = 0.9
+    _attr_media_position: int | None = None
+    _attr_media_duration: int | None = None
+    _attr_media_position_updated_at: datetime | None = None
     _attr_supported_features = (
         MediaPlayerEntityFeature(0)
         | MediaPlayerEntityFeature.MEDIA_ANNOUNCE
@@ -65,15 +68,51 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
         | MediaPlayerEntityFeature.PLAY
         | MediaPlayerEntityFeature.PLAY_MEDIA
         | MediaPlayerEntityFeature.STOP
+        | MediaPlayerEntityFeature.NEXT_TRACK
+        | MediaPlayerEntityFeature.PREVIOUS_TRACK
         | MediaPlayerEntityFeature.VOLUME_SET
         | MediaPlayerEntityFeature.BROWSE_MEDIA
-        # | MediaPlayerEntityFeature.MEDIA_ENQUEUE
-        # | MediaPlayerEntityFeature.NEXT_TRACK
+        | MediaPlayerEntityFeature.TURN_ON
+        | MediaPlayerEntityFeature.TURN_OFF
+        | MediaPlayerEntityFeature.SEEK
     )
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
         await super().async_added_to_hass()
+
+        # Set defaults if not restored
+        if getattr(self, '_attr_state', None) is None:
+            self._attr_state = MediaPlayerState.IDLE
+        if getattr(self, '_attr_volume_level', None) is None:
+            self._attr_volume_level = 0.9
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_{STATUS_EVENT_TYPE}_update",
+                self._handle_status_update,
+            )
+        )
+
+    @callback
+    def _handle_status_update(self, event_data: dict[str, Any]) -> None:
+        """Handle status update."""
+        if "position" in event_data:
+            self._attr_media_position = event_data["position"]
+        if "duration" in event_data:
+            self._attr_media_duration = event_data["duration"]
+        
+        self._attr_media_position_updated_at = datetime.utcnow()
+        self.async_write_ha_state()
+
+    async def async_turn_on(self) -> None:
+        """Turn the media player on."""
+        await self.async_media_play()
+
+    async def async_turn_off(self) -> None:
+        """Turn the media player off."""
+        await self.async_media_stop()
 
     async def async_play_media(
         self,
@@ -92,6 +131,14 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
             announce,
             kwargs,
         )
+
+        # Stop currently playing media
+        self._device.send_custom_action(command=CustomActions.MEDIA_STOP)
+
+        # Reset position and duration
+        self._attr_media_position = None
+        self._attr_media_duration = None
+        self._attr_media_position_updated_at = None
 
         # resolve a media_source_id into a URL
         # https://developers.home-assistant.io/docs/core/entity/media-player/#play-media
@@ -145,7 +192,33 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
             command=CustomActions.MEDIA_STOP,
         )
         self._attr_state = MediaPlayerState.IDLE
+        self._attr_media_position = None
+        self._attr_media_duration = None
+        self._attr_media_position_updated_at = None
         await self.async_process_metadata({})
+        self.async_write_ha_state()
+
+    async def async_media_seek(self, position: float) -> None:
+        """Send seek command."""
+        self._device.send_custom_action(
+            command=CustomActions.MEDIA_SEEK,
+            payload={"position": position},
+        )
+
+    async def async_media_next_track(self):
+        """Send next track command."""
+        _LOGGER.info("Next track")
+        self._device.send_custom_action(
+            command=CustomActions.MEDIA_NEXT_TRACK,
+        )
+        self.async_write_ha_state()
+
+    async def async_media_previous_track(self):
+        """Send previous track command."""
+        _LOGGER.info("Previous track")
+        self._device.send_custom_action(
+            command=CustomActions.MEDIA_PREV_TRACK,
+        )
         self.async_write_ha_state()
 
     async def async_set_volume_level(self, volume: float) -> None:

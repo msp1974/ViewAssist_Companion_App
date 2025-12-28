@@ -25,6 +25,7 @@ class VASatelliteDevice(SatelliteDevice):
 
     _custom_settings_listener: Callable[[], None] | None = None
     _custom_action_listener: Callable[[Any, Any], None] | None = None
+    _info_listener: Callable[[], None] | None = None
     stt_listener: Callable[[str], None] | None = None
     tts_listener: Callable[[str], None] | None = None
 
@@ -86,6 +87,11 @@ class VASatelliteDevice(SatelliteDevice):
     ) -> None:
         """Listen for stt updates."""
         self._custom_action_listener = custom_action_listener
+
+    @callback
+    def set_info_listener(self, info_listener: Callable[[], None]) -> None:
+        """Listen for info updates."""
+        self._info_listener = info_listener
 
     @callback
     def set_stt_listener(self, stt_listener: Callable[[str], None]) -> None:

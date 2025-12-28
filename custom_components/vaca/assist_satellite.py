@@ -107,6 +107,8 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         # Make info accessible from entities
         self.device.info = service.info
+        if self.device._info_listener is not None:
+            self.device._info_listener()
 
         # Init custom settings
         self.device.custom_settings = {}
