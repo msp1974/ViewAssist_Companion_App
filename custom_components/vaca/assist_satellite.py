@@ -30,6 +30,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.components import intent
 
 from .client import VAAsyncTcpClient
 from .const import DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
@@ -257,7 +258,8 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             # Intent processing complete - update intent sensor
             if event.data:
                 _LOGGER.debug(
-                    "Intent processing complete: %s",
+                    "Intent %s complete: %s",
+                    event.type,
                     event.data,
                 )
                 if (
@@ -509,3 +511,18 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             return
 
         self.tts_response_finished()
+
+    @callback
+    def _handle_timer(
+        self, event_type: intent.TimerEventType, timer: intent.TimerInfo
+    ) -> None:
+        """Forward timer events to view assist."""
+        super()._handle_timer(event_type, timer)
+        # Send timer event to custom listeners
+        async_dispatcher_send(
+            self.hass,
+            f"{DOMAIN}_{self.device.device_id}_timer_event",
+            self.device.device_id,
+            event_type,
+            timer,
+        )

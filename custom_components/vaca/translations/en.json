@@ -31,6 +31,9 @@
             },
             "screen_on": {
                 "name": "Screen"
+            },
+            "motion_detected": {
+                "name": "Motion"
             }
         },
         "button": {

@@ -184,10 +184,10 @@ class WyomingSatelliteDarkModeSwitch(BaseSwitch):
         icon="mdi:compare",
         entity_category=EntityCategory.CONFIG,
     )
-    default_on = False
+    default_on = True
 
 
-class WyomingSatelliteDNDSwitch(BaseSwitch):
+class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
     """Entity to control screen always on."""
 
     entity_description = SwitchEntityDescription(

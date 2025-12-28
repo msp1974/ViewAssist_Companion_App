@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+from asyncio import Task
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -59,16 +61,17 @@ class _WyomingSatelliteDeviceBinarySensorBase(
 
     _attr_is_on = False
     _listener_class = "status_update"
+    _dont_restore_state = False
 
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
-
-        state = await self.async_get_last_state()
-        if state is not None:
-            # Restore the state of the binary sensor
-            self._attr_is_on = bool(state.state)
-            self.async_write_ha_state()
+        if not self._dont_restore_state:
+            state = await self.async_get_last_state()
+            if state is not None:
+                # Restore the state of the binary sensor
+                self._attr_is_on = bool(state.state)
+                self.async_write_ha_state()
 
         self.async_on_remove(
             async_dispatcher_connect(
@@ -118,9 +121,31 @@ class WyomingSatelliteScreenOnBinarySensor(_WyomingSatelliteDeviceBinarySensorBa
 class WyomingSatelliteMotionDetectedSensor(_WyomingSatelliteDeviceBinarySensorBase):
     """Entity to represent screen on status sensor for satellite."""
 
+    detection_reset_task: Task | None = None
+    _dont_restore_state = True
     entity_description = BinarySensorEntityDescription(
-        key="last_motion",
-        translation_key="last_motion",
+        key="motion_detected",
+        translation_key="motion_detected",
         icon="mdi:monitor",
         device_class=BinarySensorDeviceClass.MOTION,
     )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity."""
+        super().status_update(data)
+        if (
+            self.detection_reset_task is not None
+            and not self.detection_reset_task.done()
+        ):
+            self.detection_reset_task.cancel()
+
+        self.detection_reset_task = self.hass.async_create_background_task(
+            self.reset_detection(), name="VACA Motion Detection Reset"
+        )
+
+    async def reset_detection(self) -> None:
+        """Reset motion detection."""
+        await asyncio.sleep(20)
+        self._attr_is_on = False
+        self.schedule_update_ha_state()

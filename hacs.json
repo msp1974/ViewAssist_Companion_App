@@ -1,5 +1,5 @@
 {
-    "name": "View Assist Companion App",
-    "homeassistant": "2025.7.0",
-    "render_readme": true
+  "name": "View Assist Companion App",
+  "homeassistant": "2025.11.0",
+  "render_readme": true
 }
