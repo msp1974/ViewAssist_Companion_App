@@ -48,6 +48,7 @@ async def async_setup_entry(
         WyomingSatelliteIntentSensor(device),
         WyomingSatelliteOrientationSensor(device),
         WyomingSatelliteBrowserPathSensor(device),
+        WyomingSatelliteInstalledAppsSensor(device),
     ]
 
     if capabilities := device.capabilities:
@@ -350,3 +351,47 @@ class WyomingSatelliteAppVersionSensor(_WyomingSatelliteDeviceSensorBase):
         ):
             return [sensor.get("name") for sensor in sensors]
         return None
+
+class WyomingSatelliteInstalledAppsSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent installed apps list for satellite."""
+
+    _listener_class = "capabilities_update"
+    _attr_native_value = 0
+    entity_description = SensorEntityDescription(
+        key="installed_apps",
+        translation_key="installed_apps",
+        icon="mdi:apps",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_sensor_data()
+        if state is not None:
+            self._attr_native_value = state.native_value
+            if state.extra_data:
+                self._attr_extra_state_attributes = state.extra_data.as_dict()
+            self.async_write_ha_state()
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_capabilities_update",
+                self._capabilities_updated,
+            )
+        )
+
+    @callback
+    def _capabilities_updated(self, data: dict[str, Any]) -> None:
+        """Update entity when capabilities event is received."""
+        if not self._device.capabilities:
+            return
+
+        installed_apps: list[dict] = self._device.capabilities.get("installed_apps", [])
+        self._attr_native_value = len(installed_apps)
+        self._attr_extra_state_attributes = {
+            "installed_apps": installed_apps,
+        }
+        self.async_write_ha_state()

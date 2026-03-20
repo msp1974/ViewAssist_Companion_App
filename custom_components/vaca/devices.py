@@ -133,3 +133,9 @@ class VASatelliteDevice(SatelliteDevice):
         if self.capabilities and (audio := self.capabilities.get("audio")):
             return audio.get("max_notification_volume")
         return 10
+
+    def get_installed_apps(self) -> list[dict] | None:
+        """Get list of installed apps from capabilities."""
+        if self.capabilities:
+            return self.capabilities.get("installed_apps")
+        return None
