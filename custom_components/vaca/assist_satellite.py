@@ -260,19 +260,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     event.type,
                     event.data,
                 )
-                if self._client is not None:
-                    # Update client with intent output structure
-                    self.config_entry.async_create_background_task(
-                        self.hass,
-                        self._client.write_event(
-                            CustomEvent(
-                                ACTION_EVENT_TYPE,
-                                {"action": "intent-output", "data": event.data},
-                            ).event()
-                        ),
-                        "send intent output event",
-                    )
-
                 if (
                     event.data.get("intent_output", {})
                     .get("response", {})
