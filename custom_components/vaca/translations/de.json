@@ -193,9 +193,6 @@
             "diagnostics_enabled": {
                 "name": "Bildschirmdiagnose"
             },
-            "continue_conversation": {
-                "name": "Unterhaltung fortsetzen"
-            },
             "alarm": {
                 "name": "Alarm"
             },

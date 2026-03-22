@@ -43,7 +43,6 @@ async def async_setup_entry(
         WyomingSatelliteScreenAlwaysOnSwitch(device),
         WyomingSatelliteDarkModeSwitch(device),
         WyomingSatelliteDiagnosticsSwitch(device),
-        WyomingSatelliteContinueConversationSwitch(device),
         WyomingSatelliteAlarmSwitch(device),
         WyomingSatelliteScreenOnWakeWordSwitch(device),
         WyomingSatelliteScreenSaverSwitch(device),
@@ -249,18 +248,6 @@ class WyomingSatelliteDiagnosticsSwitch(BaseSwitch):
         entity_category=EntityCategory.DIAGNOSTIC,
     )
     default_on = False
-
-
-class WyomingSatelliteContinueConversationSwitch(BaseSwitch):
-    """Entity to control continue conversation on/off."""
-
-    entity_description = SwitchEntityDescription(
-        key="continue_conversation",
-        translation_key="continue_conversation",
-        icon="mdi:message-bulleted",
-        entity_category=EntityCategory.CONFIG,
-    )
-    default_on = True
 
 
 class WyomingSatelliteAlarmSwitch(BaseFeedbackSwitch):
