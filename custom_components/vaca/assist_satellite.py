@@ -113,6 +113,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         # stream tts var to allow interupt and cancel remaining response
         self.stream_tts = False
+        self._continue_conversation = False
 
     async def on_restart(self) -> None:
         """Block until pipeline loop will be restarted."""
@@ -175,7 +176,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         """Handle received custom events."""
         if event and AudioStop.is_type(event.type):
             self.stream_tts = False
-            return not self.stream_tts, event
+            return True, event
 
         if event and CustomEvent.is_type(event.type):
             # Custom event
@@ -236,9 +237,14 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             if self._client is not None:
                 self.config_entry.async_create_background_task(
                     self.hass,
-                    self._client.write_event(PipelineEnded().event()),
+                    self._client.write_event(
+                        PipelineEnded(
+                            continue_conversation=self._continue_conversation
+                        ).event()
+                    ),
                     "send pipeline ended event",
                 )
+            self._continue_conversation = False
         elif event.type == assist_pipeline.PipelineEventType.STT_END:
             # Speech-to-text transcript
             if event.data:
@@ -260,18 +266,9 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     event.type,
                     event.data,
                 )
-                if self._client is not None:
-                    # Update client with intent output structure
-                    self.config_entry.async_create_background_task(
-                        self.hass,
-                        self._client.write_event(
-                            CustomEvent(
-                                ACTION_EVENT_TYPE,
-                                {"action": "intent-output", "data": event.data},
-                            ).event()
-                        ),
-                        "send intent output event",
-                    )
+                self._continue_conversation = event.data.get("intent_output", {}).get(
+                    "continue_conversation", False
+                )
 
                 if (
                     event.data.get("intent_output", {})
@@ -396,12 +393,12 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
     async def async_start_conversation(
         self, start_announcement: AssistSatelliteAnnouncement
     ) -> None:
-        """Start a conversation from the satellite."""
+        """Start a conversation from the satellite (listen, intent, then TTS)."""
         await self.async_announce(start_announcement)
         self._run_pipeline_once(
             RunPipeline(
                 start_stage=PipelineStage.ASR,
-                end_stage=PipelineStage.ASR,
+                end_stage=PipelineStage.TTS,
                 restart_on_end=False,
             )
         )
@@ -491,14 +488,15 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                         timestamp=timestamp,
                     )
                     await self._client.write_event(chunk.event())
-                    timestamp += int(chunk.seconds)
+                    timestamp += chunk.milliseconds
                     total_seconds += chunk.seconds
 
                 await self._client.write_event(AudioStop(timestamp=timestamp).event())
                 _LOGGER.debug("TTS streaming complete")
         finally:
             send_duration = time.monotonic() - start_time
-            timeout_seconds = max(0, total_seconds - send_duration + _TTS_TIMEOUT_EXTRA)
+            # Grace period is applied once in _tts_timeout (not here) to avoid double-counting.
+            timeout_seconds = max(0, total_seconds - send_duration)
 
             if self._played_event_received is None:
                 self._played_event_received = asyncio.Event()

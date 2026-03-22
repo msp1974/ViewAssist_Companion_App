@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 import logging
 from typing import Any
+from datetime import date, datetime, time
 
 from awesomeversion import AwesomeVersion
 from wyoming.event import Event, Eventable
@@ -44,6 +45,8 @@ class CustomActions(StrEnum):
 class PipelineEnded(Eventable):
     """Event triggered when a pipeline ends."""
 
+    continue_conversation: bool = False
+
     @staticmethod
     def is_type(event_type: str) -> bool:
         """Check if the event type matches."""
@@ -51,12 +54,28 @@ class PipelineEnded(Eventable):
 
     def event(self) -> Event:
         """Create an event for the pipeline ended."""
-        return Event(type=_PIPELINE_ENDED_EVENT_TYPE)
+        return Event(
+            type=_PIPELINE_ENDED_EVENT_TYPE,
+            data={"continue_conversation": self.continue_conversation},
+        )
 
     @staticmethod
     def from_event(event: Event) -> "PipelineEnded":
         """Create a PipelineEnded instance from an event."""
-        return PipelineEnded()
+        return PipelineEnded(
+            continue_conversation=event.data.get("continue_conversation", False)
+        )
+
+
+def _sanitize_data(data: Any) -> Any:
+    """Recursively convert non-serializable objects (like time) to JSON-serializable types."""
+    if isinstance(data, dict):
+        return {k: _sanitize_data(v) for k, v in data.items()}
+    if isinstance(data, (list, tuple, set)):
+        return [_sanitize_data(i) for i in data]
+    if isinstance(data, (datetime, date, time)):
+        return data.isoformat()
+    return data
 
 
 @dataclass
@@ -78,7 +97,7 @@ class CustomEvent(Eventable):
         """Create an event for the custom event."""
         data = {"event_type": self.event_type}
         if self.event_data is not None:
-            data.update(self.event_data)
+            data.update(_sanitize_data(self.event_data))
         return Event(
             type=_CUSTOM_EVENT_TYPE,
             data=data,
