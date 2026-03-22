@@ -76,8 +76,11 @@
             "music_volume": {
                 "name": "Music volume"
             },
+            "alarm_volume": {
+                "name": "Alarm volume"
+            },
             "ducking_volume": {
-                "name": "Ducking volume"
+                "name": "Ducking reduction (%)"
             },
             "wake_word_threshold": {
                 "name": "Wake word threshold"

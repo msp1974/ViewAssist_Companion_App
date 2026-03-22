@@ -42,6 +42,7 @@ async def async_setup_entry(
             WyomingSatelliteMicGainNumber(device),
             WyomingSatelliteNotificationVolumeNumber(device),
             WyomingSatelliteMusicVolumeNumber(device),
+            WyomingSatelliteAlarmVolumeNumber(device),
             WyomingSatelliteDuckingVolumeNumber(device),
             WyomingSatelliteScreenBrightnessNumber(device),
             WyomingSatelliteWakeWordThresholdNumber(device),
@@ -128,7 +129,7 @@ class WyomingSatelliteMicGainNumber(BaseNumberEntity):
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        mic_gain = int(max(-10, min(10, value)))
+        mic_gain = int(max(-10, min(10, int(value))))
         self._attr_native_value = mic_gain
         self.async_write_ha_state()
         self._device.set_custom_setting(self.entity_description.key, mic_gain)
@@ -154,15 +155,15 @@ class WyomingSatelliteNotificationVolumeNumber(BaseFeedbackNumber):
         await super().async_added_to_hass()
         self._attr_native_max_value = self._device.getMaxNotificationVolume()
         last_number_data = await self.async_get_last_number_data()
-        if (last_number_data is not None) and (
-            last_number_data.native_value is not None
-        ):
+        if last_number_data and last_number_data.native_value is not None:
             await self.async_set_native_value(last_number_data.native_value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
         self._attr_native_max_value = self._device.getMaxNotificationVolume()
-        await super().async_set_native_value(value)
+        await super().async_set_native_value(
+            int(max(_MIN_SOUND_VOLUME, min(self._attr_native_max_value, int(value))))
+        )
 
 
 class WyomingSatelliteMusicVolumeNumber(BaseFeedbackNumber):
@@ -185,15 +186,46 @@ class WyomingSatelliteMusicVolumeNumber(BaseFeedbackNumber):
         await super().async_added_to_hass()
         self._attr_native_max_value = self._device.getMaxMusicVolume()
         last_number_data = await self.async_get_last_number_data()
-        if (last_number_data is not None) and (
-            last_number_data.native_value is not None
-        ):
+        if last_number_data is not None and last_number_data.native_value is not None:
             await self.async_set_native_value(last_number_data.native_value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
         self._attr_native_max_value = self._device.getMaxMusicVolume()
-        await super().async_set_native_value(value)
+        await super().async_set_native_value(
+            int(max(_MIN_SOUND_VOLUME, min(self._attr_native_max_value, int(value))))
+        )
+
+
+class WyomingSatelliteAlarmVolumeNumber(BaseFeedbackNumber):
+    """Entity to represent alarm volume multiplier."""
+
+    entity_description = NumberEntityDescription(
+        key="alarm_volume",
+        translation_key="alarm_volume",
+        icon="mdi:alarm",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = _MIN_SOUND_VOLUME
+    _attr_native_max_value = _MAX_SOUND_VOLUME
+    _attr_native_step = 1
+    _attr_native_value = 5
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+        self._attr_native_max_value = self._device.getMaxAlarmVolume()
+        last_number_data = await self.async_get_last_number_data()
+        if last_number_data is not None and last_number_data.native_value is not None:
+            await self.async_set_native_value(last_number_data.native_value)
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        self._attr_native_max_value = self._device.getMaxAlarmVolume()
+        await super().async_set_native_value(
+            int(max(_MIN_SOUND_VOLUME, min(self._attr_native_max_value, int(value))))
+        )
 
 
 class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
@@ -202,23 +234,20 @@ class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
     entity_description = NumberEntityDescription(
         key="ducking_volume",
         translation_key="ducking_volume",
-        icon="mdi:volume-low",
+        icon="mdi:percent",
         entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
-    _attr_native_min_value = _MIN_SOUND_VOLUME
-    _attr_native_max_value = _MAX_SOUND_VOLUME
+    _attr_native_min_value = 0
+    _attr_native_max_value = 100
     _attr_native_step = 1
-    _attr_native_value = 1
+    _attr_native_value = 70
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
         await super().async_added_to_hass()
-        self._attr_native_max_value = self._device.getMaxMusicVolume()
         last_number_data = await self.async_get_last_number_data()
-        if (last_number_data is not None) and (
-            last_number_data.native_value is not None
-        ):
+        if last_number_data is not None and last_number_data.native_value is not None:
             await self.async_set_native_value(last_number_data.native_value)
 
     async def async_set_native_value(self, value: float) -> None:
@@ -227,7 +256,7 @@ class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
             max(self._attr_native_min_value, min(self._attr_native_max_value, value))
         )
         self.async_write_ha_state()
-        self._device.set_custom_setting(self.entity_description.key, value)
+        self._device.set_custom_setting(self.entity_description.key, int(value))
 
 
 class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
@@ -315,7 +344,7 @@ class WyomingSatelliteZoomLevelNumber(VASatelliteEntity, RestoreNumber):
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        value = max(0, min(self._attr_native_max_value, value))
+        value = int(max(0, min(self._attr_native_max_value, int(value))))
         self._attr_native_value = value
         self.async_write_ha_state()
         self._device.set_custom_setting(
@@ -350,7 +379,7 @@ class WyomingSatelliteMotionDetectionSensitivityNumber(
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        value = max(0, min(self._attr_native_max_value, value))
+        value = int(max(0, min(self._attr_native_max_value, int(value))))
         self._attr_native_value = value
         self.async_write_ha_state()
         # Sensitivity is sent as 0-50 scale
@@ -382,7 +411,7 @@ class WyomingSatelliteBumpDetectionSensitivityNumber(VASatelliteEntity, RestoreN
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        value = max(0, min(self._attr_native_max_value, value))
+        value = int(max(0, min(self._attr_native_max_value, int(value))))
         self._attr_native_value = value
         self.async_write_ha_state()
         # Sensitivity is sent as 1-10 scale
@@ -413,7 +442,7 @@ class WyomingSatelliteRawProximityThresholdNumber(VASatelliteEntity, RestoreNumb
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
-        value = int(max(0, min(self._attr_native_max_value, value)))
+        value = int(max(0, min(self._attr_native_max_value, int(value))))
         self._attr_native_value = value
         self.async_write_ha_state()
         self._device.set_custom_setting(self.entity_description.key, value)
