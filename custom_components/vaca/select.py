@@ -39,6 +39,19 @@ _DEFAULT_NOISE_SUPPRESSION_LEVEL: Final = "off"
 
 _LOGGER = logging.getLogger(__name__)
 
+_SOUND_OPTIONS: Final = [
+    "none",
+    "alexa",
+    "havpe",
+    "ding",
+    "bubble",
+    "processing",
+    "error",
+    "stop_word",
+    "mute_switch_on",
+    "mute_switch_off",
+]
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -60,6 +73,11 @@ async def async_setup_entry(
             WyomingSatelliteWakeWordEngineSelect(device),
             WyomingSatelliteWakeWordSelect(device),
             WyomingSatelliteWakeWordSoundSelect(device),
+            WyomingSatelliteProcessingSoundSelect(device),
+            WyomingSatelliteErrorSoundSelect(device),
+            WyomingSatelliteStopWordSoundSelect(device),
+            WyomingSatelliteMicOnSoundSelect(device),
+            WyomingSatelliteMicOffSoundSelect(device),
             WyomingSatelliteScreenTimeoutSelect(device),
             WyomingSatelliteScreenOrientationModeSelect(device),
         ]
@@ -202,7 +220,7 @@ class WyomingSatelliteWakeWordSoundSelect(
     )
     _attr_should_poll = False
     _attr_current_option = "havpe"
-    _attr_options = ["none", "alexa", "havpe", "ding", "bubble"]
+    _attr_options = _SOUND_OPTIONS
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
@@ -217,6 +235,151 @@ class WyomingSatelliteWakeWordSoundSelect(
         self._attr_current_option = option
         self.async_write_ha_state()
         self._device.set_custom_setting("wake_word_sound", option)
+
+
+class WyomingSatelliteProcessingSoundSelect(
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent processing sound setting."""
+
+    entity_description = SelectEntityDescription(
+        key="processing_sound",
+        translation_key="processing_sound",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_current_option = "processing"
+    _attr_options = _SOUND_OPTIONS
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            await self.async_select_option(state.state)
+
+    async def async_select_option(self, option: str) -> None:
+        """Select an option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        self._device.set_custom_setting("processing_sound", option)
+
+
+class WyomingSatelliteErrorSoundSelect(
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent error sound setting."""
+
+    entity_description = SelectEntityDescription(
+        key="error_sound",
+        translation_key="error_sound",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_current_option = "error"
+    _attr_options = _SOUND_OPTIONS
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            await self.async_select_option(state.state)
+
+    async def async_select_option(self, option: str) -> None:
+        """Select an option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        self._device.set_custom_setting("error_sound", option)
+
+
+class WyomingSatelliteStopWordSoundSelect(
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent stop word sound setting."""
+
+    entity_description = SelectEntityDescription(
+        key="stop_word_sound",
+        translation_key="stop_word_sound",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_current_option = "stop_word"
+    _attr_options = _SOUND_OPTIONS
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            await self.async_select_option(state.state)
+
+    async def async_select_option(self, option: str) -> None:
+        """Select an option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        self._device.set_custom_setting("stop_word_sound", option)
+
+
+class WyomingSatelliteMicOnSoundSelect(
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent mic on sound setting."""
+
+    entity_description = SelectEntityDescription(
+        key="mic_on_sound",
+        translation_key="mic_on_sound",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_current_option = "mute_switch_on"
+    _attr_options = _SOUND_OPTIONS
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            await self.async_select_option(state.state)
+
+    async def async_select_option(self, option: str) -> None:
+        """Select an option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        self._device.set_custom_setting("mic_on_sound", option)
+
+
+class WyomingSatelliteMicOffSoundSelect(
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent mic off sound setting."""
+
+    entity_description = SelectEntityDescription(
+        key="mic_off_sound",
+        translation_key="mic_off_sound",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_current_option = "mute_switch_off"
+    _attr_options = _SOUND_OPTIONS
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            await self.async_select_option(state.state)
+
+    async def async_select_option(self, option: str) -> None:
+        """Select an option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        self._device.set_custom_setting("mic_off_sound", option)
 
 
 class WyomingSatelliteScreenTimeoutSelect(

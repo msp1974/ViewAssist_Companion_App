@@ -128,10 +128,90 @@
                 "name": "Wake word sound",
                 "state": {
                     "none": "None",
-                    "havpe": "Home Assistant",
-                    "alexa": "Alexa",
-                    "bubble": "Bubble",
-                    "ding": "Ding"
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Generic - bubble",
+                    "ding": "Generic - ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Generic - error",
+                    "stop_word": "Generic - stop word",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "processing_sound": {
+                "name": "Processing sound",
+                "state": {
+                    "none": "None",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Generic - bubble",
+                    "ding": "Generic - ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Generic - error",
+                    "stop_word": "Generic - stop word",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "error_sound": {
+                "name": "Error sound",
+                "state": {
+                    "none": "None",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Generic - bubble",
+                    "ding": "Generic - ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Generic - error",
+                    "stop_word": "Generic - stop word",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "stop_word_sound": {
+                "name": "Stop sound",
+                "state": {
+                    "none": "None",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Generic - bubble",
+                    "ding": "Generic - ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Generic - error",
+                    "stop_word": "Generic - stop word",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "mic_on_sound": {
+                "name": "Mic on sound",
+                "state": {
+                    "none": "None",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Generic - bubble",
+                    "ding": "Generic - ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Generic - error",
+                    "stop_word": "Generic - stop word",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "mic_off_sound": {
+                "name": "Mic off sound",
+                "state": {
+                    "none": "None",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Generic - bubble",
+                    "ding": "Generic - ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Generic - error",
+                    "stop_word": "Generic - stop word",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
                 }
             },
             "screen_timeout": {

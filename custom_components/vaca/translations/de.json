@@ -121,10 +121,90 @@
                 "name": "Weckwort-Ton",
                 "state": {
                     "none": "Kein",
-                    "havpe": "Home Assistant",
-                    "alexa": "Alexa",
-                    "bubble": "Blase",
-                    "ding": "Ding"
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Allgemein - Blase",
+                    "ding": "Allgemein - Ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Allgemein - Fehler",
+                    "stop_word": "Allgemein - Stop-Wort",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "processing_sound": {
+                "name": "Verarbeitungston",
+                "state": {
+                    "none": "Kein",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Allgemein - Blase",
+                    "ding": "Allgemein - Ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Allgemein - Fehler",
+                    "stop_word": "Allgemein - Stop-Wort",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "error_sound": {
+                "name": "Fehlerton",
+                "state": {
+                    "none": "Kein",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Allgemein - Blase",
+                    "ding": "Allgemein - Ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Allgemein - Fehler",
+                    "stop_word": "Allgemein - Stop-Wort",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "stop_word_sound": {
+                "name": "Stop-Ton",
+                "state": {
+                    "none": "Kein",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Allgemein - Blase",
+                    "ding": "Allgemein - Ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Allgemein - Fehler",
+                    "stop_word": "Allgemein - Stop-Wort",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "mic_on_sound": {
+                "name": "Mikrofon an Ton",
+                "state": {
+                    "none": "Kein",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Allgemein - Blase",
+                    "ding": "Allgemein - Ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Allgemein - Fehler",
+                    "stop_word": "Allgemein - Stop-Wort",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
+                }
+            },
+            "mic_off_sound": {
+                "name": "Mikrofon aus Ton",
+                "state": {
+                    "none": "Kein",
+                    "havpe": "HAVPE - wake word",
+                    "alexa": "Alexa - wake word",
+                    "bubble": "Allgemein - Blase",
+                    "ding": "Allgemein - Ding",
+                    "processing": "HAVPE - processing",
+                    "error": "Allgemein - Fehler",
+                    "stop_word": "Allgemein - Stop-Wort",
+                    "mute_switch_on": "HAVPE - mute on",
+                    "mute_switch_off": "HAVPE - mute off"
                 }
             },
             "screen_timeout": {
