@@ -18,6 +18,7 @@ from homeassistant.components.media_player import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .const import DOMAIN
@@ -74,6 +75,20 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
         await super().async_added_to_hass()
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_settings_update",
+                self.status_update,
+            )
+        )
+
+    async def status_update(self, data: dict[str, Any]) -> None:
+        """Handle status update."""
+        if settings := data.get("settings"):
+            if "player_volume" in settings:
+                self._attr_volume_level = float(settings["player_volume"]) / 100.0
+                self.async_write_ha_state()
 
     async def async_play_media(
         self,
