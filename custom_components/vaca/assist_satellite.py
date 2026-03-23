@@ -53,8 +53,8 @@ _SAMPLES_PER_CHUNK: Final = 1024
 _RECONNECT_SECONDS: Final = 5
 _RESTART_SECONDS: Final = 3
 _MAX_RECONNECT_SECONDS: Final = 30  # 30 seconds
-_PING_TIMEOUT: Final = 5
-_PING_SEND_DELAY: Final = 2
+# The satellite sends a ping every 2 seconds.
+# Disconnection is detected by a 5 second readout timeout in client.py.
 _PIPELINE_FINISH_TIMEOUT: Final = 1
 _TTS_SAMPLE_RATE: Final = 22050
 _ANNOUNCE_CHUNK_BYTES: Final = 2048  # 1024 samples
@@ -208,6 +208,17 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         if event and AudioStop.is_type(event.type):
             self.stream_tts = False
             return True, event
+
+        if event and event.type == "ping":
+            # Satellite is checking if we are alive. We must send a pong back
+            # or it will disconnect itself after 3 missed pongs (6 seconds).
+            if self._client and self._client.can_write_event():
+                self.config_entry.async_create_background_task(
+                    self.hass,
+                    self._client.write_event(Event("pong", data={"text": ""})),
+                    "send pong",
+                )
+            return False, None
 
         if event and CustomEvent.is_type(event.type):
             # Custom event
