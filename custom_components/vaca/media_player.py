@@ -55,9 +55,9 @@ class VACAMediaPlayer(VASatelliteEntity, MediaPlayerEntity, RestoreEntity):
         key="media_player",
         translation_key="media_player",
         device_class=MediaPlayerDeviceClass.SPEAKER,
-        name="Media player",
     )
 
+    _attr_name = None
     _attr_state = MediaPlayerState.IDLE
     _attr_volume_level: float | None = None  # Lazy init
     _attr_supported_features = (
