@@ -25,8 +25,14 @@ class VAAsyncTcpClient(AsyncTcpClient):
         """Write an event to the server."""
         if self._before_send_callback:
             await self._before_send_callback(event)
-        if self.can_write_event():
-            await super().write_event(event)
+
+        if not self.can_write_event():
+            # If we don't return here, super().write_event will raise an error
+            # when trying to write to a closed writer.
+            return
+
+        await super().write_event(event)
+
         if self._after_send_callback:
             await self._after_send_callback(event)
 
@@ -37,9 +43,15 @@ class VAAsyncTcpClient(AsyncTcpClient):
         while not forward_event:
             try:
                 event = await super().read_event()
+                if event is None:
+                    # EOF - connection closed
+                    return None
+
                 if self._on_receive_callback:
                     forward_event, modified_event = self._on_receive_callback(event)
-            except ConnectionResetError:
+                else:
+                    forward_event = True
+            except (ConnectionResetError, ConnectionAbortedError):
                 return None
         return modified_event if modified_event else event
 

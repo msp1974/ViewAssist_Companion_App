@@ -130,11 +130,11 @@ async def get_device_capabilities(item: DomainDataItem):
     """Get device capabilities."""
     capabilities: dict[str, Any] | None = None
 
-    for _ in range(4):
+    for attempt in range(4):
         try:
             async with (
                 AsyncTcpClient(item.service.host, item.service.port) as client,
-                asyncio.timeout(1),
+                asyncio.timeout(2),
             ):
                 # Describe -> Info
                 await client.write_event(CustomEvent("capabilities").event())
@@ -154,10 +154,21 @@ async def get_device_capabilities(item: DomainDataItem):
                 if capabilities is not None:
                     break  # for
         except (TimeoutError, OSError, WyomingError) as ex:
-            _LOGGER.warning(
-                "Error getting device capabilities: %s, %s", ex, capabilities
+            _LOGGER.debug(
+                "Attempt %s/4: Error getting device capabilities at %s:%s: %s",
+                attempt + 1,
+                item.service.host,
+                item.service.port,
+                ex,
             )
             # Sleep and try again
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
+
+    if capabilities is None:
+        _LOGGER.warning(
+            "Failed to get device capabilities for satellite at %s:%s after 4 attempts",
+            item.service.host,
+            item.service.port,
+        )
 
     return capabilities

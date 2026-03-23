@@ -50,8 +50,9 @@ from .entity import VASatelliteEntity
 _LOGGER = logging.getLogger(__name__)
 
 _SAMPLES_PER_CHUNK: Final = 1024
-_RECONNECT_SECONDS: Final = 10
+_RECONNECT_SECONDS: Final = 5
 _RESTART_SECONDS: Final = 3
+_MAX_RECONNECT_SECONDS: Final = 30  # 30 seconds
 _PING_TIMEOUT: Final = 5
 _PING_SEND_DELAY: Final = 2
 _PIPELINE_FINISH_TIMEOUT: Final = 1
@@ -114,10 +115,15 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         # stream tts var to allow interupt and cancel remaining response
         self.stream_tts = False
         self._continue_conversation = False
+        self._reconnect_delay = _RECONNECT_SECONDS
+
+    async def async_added_to_hass(self) -> None:
+        """Run when entity is added to hass."""
+        await super().async_added_to_hass()
 
     async def on_restart(self) -> None:
         """Block until pipeline loop will be restarted."""
-        _LOGGER.warning(
+        _LOGGER.info(
             "Satellite %s has been disconnected. Reconnecting in %s second(s)",
             self.entity_id.replace("assist_satellite.", ""),
             _RECONNECT_SECONDS,
@@ -127,11 +133,28 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
     async def on_reconnect(self) -> None:
         """Block until a reconnection attempt should be made."""
         _LOGGER.debug(
-            "Failed to connect to %s satellite. Reconnecting in %s second(s)",
+            "Failed to connect to %s satellite. Reconnecting in %s second(s) (backoff: %s)",
             self.entity_id.replace("assist_satellite.", ""),
-            _RECONNECT_SECONDS,
+            self._reconnect_delay,
+            self._reconnect_delay > _RECONNECT_SECONDS,
         )
-        await asyncio.sleep(_RECONNECT_SECONDS)
+        await asyncio.sleep(self._reconnect_delay)
+
+        # Increase delay for next time (exponential backoff)
+        self._reconnect_delay = min(_MAX_RECONNECT_SECONDS, self._reconnect_delay * 2)
+
+    async def _disconnect(self) -> None:
+        """Disconnect from satellite."""
+        client = self._client
+        self._client = None
+        if client is not None:
+            await client.disconnect()
+
+            self.device.set_is_connected(False)
+            async_dispatcher_send(
+                self.hass, f"{DOMAIN}_{self.device.device_id}_connectivity"
+            )
+            self.async_write_ha_state()
 
     async def async_will_remove_from_hass(self) -> None:
         """Run when entity will be removed from hass."""
@@ -144,6 +167,14 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         """Allow injection of events before event sent."""
 
         if RunSatellite().is_type(event.type):
+            # Update volume
+            volume = event.data.get("volume", 1.0)
+            if self.device.getMaxMusicVolume() is not None:
+                self.device.set_custom_setting(
+                    "music_volume",
+                    int(max(0, min(float(self.device.getMaxMusicVolume() or 0), volume))),
+                )
+            self.async_write_ha_state()
             # integration version
             if self.device and self.device.custom_settings:
                 self.device.custom_settings[
@@ -219,6 +250,14 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         )
         await self._client.connect()
 
+        # Reset backoff delay on successful connection
+        self._reconnect_delay = _RECONNECT_SECONDS
+
+        self.device.set_is_connected(True)
+        async_dispatcher_send(
+            self.hass, f"{DOMAIN}_{self.device.device_id}_connectivity"
+        )
+
     def on_pipeline_event(self, event: PipelineEvent) -> None:
         """Handle pipeline events from the assist pipeline.
 
@@ -234,10 +273,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 event.data["tts_output"] = {"token": ""}
         elif event.type == assist_pipeline.PipelineEventType.RUN_END:
             # Pipeline ended
-            if self._client is not None:
+            if (client := self._client) is not None:
                 self.config_entry.async_create_background_task(
                     self.hass,
-                    self._client.write_event(
+                    client.write_event(
                         PipelineEnded(
                             continue_conversation=self._continue_conversation
                         ).event()
@@ -407,10 +446,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         self, setting: str | None = None, value: Any = None
     ) -> None:
         """Run when device screen settings change."""
-        if self._client is not None and self._client.can_write_event():
+        if (client := self._client) is not None and client.can_write_event():
             self.config_entry.async_create_background_task(
                 self.hass,
-                self._client.write_event(
+                client.write_event(
                     CustomEvent(
                         SETTINGS_EVENT_TYPE,
                         {
@@ -427,10 +466,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         self, command: str, payload: str | float | None = None
     ) -> None:
         """Send a media player command to the satellite."""
-        if self._client is not None and self._client.can_write_event():
+        if (client := self._client) is not None and client.can_write_event():
             self.config_entry.async_create_background_task(
                 self.hass,
-                self._client.write_event(
+                client.write_event(
                     CustomEvent(
                         ACTION_EVENT_TYPE,
                         {"action": command, "payload": payload},
