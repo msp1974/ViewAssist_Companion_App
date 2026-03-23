@@ -77,7 +77,7 @@
                 "name": "Alarm ses seviyesi"
             },
             "ducking_volume": {
-                "name": "Ses kısma oranı (%)"
+                "name": "Ses kısma oranı"
             },
             "wake_word_threshold": {
                 "name": "Uyandırma kelimesi eşiği"

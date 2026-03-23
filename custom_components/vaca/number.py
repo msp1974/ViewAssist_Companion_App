@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Final, Any
 
 from homeassistant.components.number import NumberEntityDescription, RestoreNumber
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, PERCENTAGE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -232,6 +232,7 @@ class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
         key="ducking_volume",
         translation_key="ducking_volume",
         icon="mdi:percent",
+        native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
@@ -263,6 +264,7 @@ class WyomingSatelliteScreenBrightnessNumber(BaseFeedbackNumber):
         key="screen_brightness",
         translation_key="screen_brightness",
         icon="mdi:brightness-4",
+        native_unit_of_measurement=PERCENTAGE,
     )
     _attr_should_poll = False
     _attr_native_min_value = 0
@@ -349,6 +351,7 @@ class WyomingSatelliteMotionDetectionSensitivityNumber(
         key="motion_detection_sensitivity",
         translation_key="motion_detection_sensitivity",
         icon="mdi:tune-variant",
+        native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False

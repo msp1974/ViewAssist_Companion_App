@@ -80,7 +80,7 @@
                 "name": "Alarmlautstärke"
             },
             "ducking_volume": {
-                "name": "Lautstärkeabsenkung (%)"
+                "name": "Lautstärkeabsenkung"
             },
             "wake_word_threshold": {
                 "name": "Weckwort-Schwellenwert"
