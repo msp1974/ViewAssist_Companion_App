@@ -167,13 +167,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         """Allow injection of events before event sent."""
 
         if RunSatellite().is_type(event.type):
-            # Update volume
-            volume = event.data.get("volume", 1.0)
-            if self.device.getMaxMusicVolume() is not None:
-                self.device.set_custom_setting(
-                    "music_volume",
-                    int(max(0, min(float(self.device.getMaxMusicVolume() or 0), volume))),
-                )
             self.async_write_ha_state()
             # integration version
             if self.device and self.device.custom_settings:

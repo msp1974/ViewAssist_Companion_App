@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 _MAX_MIC_GAIN: Final = 100
 _MIN_SOUND_VOLUME: Final = 0
-_MAX_SOUND_VOLUME: Final = 10
+_MAX_SOUND_VOLUME: Final = 15
 
 
 async def async_setup_entry(
@@ -71,7 +71,10 @@ class BaseNumberEntity(VASatelliteEntity, RestoreNumber):
 
         state = await self.async_get_last_state()
         if state is not None:
-            await self.async_set_native_value(float(state.state))
+            # We restore the internal HA state but do NOT push it to the device yet.
+            # We want the device's actual physical state (reported during handshake)
+            # to be the source of truth on reconnection.
+            await self.update_number(float(state.state), send_to_device=False)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
@@ -151,11 +154,10 @@ class WyomingSatelliteNotificationVolumeNumber(BaseFeedbackNumber):
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
+        self._attr_native_max_value = (
+            self._device.getMaxNotificationVolume() or _MAX_SOUND_VOLUME
+        )
         await super().async_added_to_hass()
-        self._attr_native_max_value = self._device.getMaxNotificationVolume()
-        last_number_data = await self.async_get_last_number_data()
-        if last_number_data and last_number_data.native_value is not None:
-            await self.async_set_native_value(last_number_data.native_value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
@@ -181,11 +183,8 @@ class WyomingSatelliteMusicVolumeNumber(BaseFeedbackNumber):
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
+        self._attr_native_max_value = self._device.getMaxMusicVolume() or _MAX_SOUND_VOLUME
         await super().async_added_to_hass()
-        self._attr_native_max_value = self._device.getMaxMusicVolume()
-        last_number_data = await self.async_get_last_number_data()
-        if last_number_data is not None and last_number_data.native_value is not None:
-            await self.async_set_native_value(last_number_data.native_value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
@@ -211,11 +210,10 @@ class WyomingSatelliteAlarmVolumeNumber(BaseFeedbackNumber):
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
+        self._attr_native_max_value = (
+            self._device.getMaxAlarmVolume() or _MAX_SOUND_VOLUME
+        )
         await super().async_added_to_hass()
-        self._attr_native_max_value = self._device.getMaxAlarmVolume()
-        last_number_data = await self.async_get_last_number_data()
-        if last_number_data is not None and last_number_data.native_value is not None:
-            await self.async_set_native_value(last_number_data.native_value)
 
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
