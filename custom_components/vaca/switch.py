@@ -228,12 +228,12 @@ class WyomingSatelliteDarkModeSwitch(BaseSwitch):
 
 
 class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
-    """Entity to control screen always on."""
+    """Entity to control do not disturb."""
 
     entity_description = SwitchEntityDescription(
         key="do_not_disturb",
         translation_key="do_not_disturb",
-        icon="mdi:do-not-disturb",
+        icon="mdi:minus-circle",
     )
     default_on = False
 
