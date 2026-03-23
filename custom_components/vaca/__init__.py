@@ -93,11 +93,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         # Update device info with capabilities
         if item.device.capabilities:
+            app_version = item.device.capabilities.get("app_version")
+            android_version = item.device.capabilities.get("release")
+            manufacturer = item.device.capabilities.get("manufacturer")
+            model = item.device.capabilities.get("model")
+
+            sw_version = (
+                f"View Assist Companion App {app_version}" if app_version else None
+            )
+            hw_version = f"Android: {android_version}" if android_version else None
+
             dev_reg.async_update_device(
                 device.id,
-                model="View Assist Companion App",
-                sw_version=item.device.capabilities.get("app_version"),
-                hw_version=item.device.capabilities.get("release"),
+                manufacturer=manufacturer,
+                model=model,
+                sw_version=sw_version,
+                hw_version=hw_version,
             )
 
         # Set up satellite entity, sensors, switches, etc.
