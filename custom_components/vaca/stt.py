@@ -1,4 +1,4 @@
-"""Support for Wyoming speech-to-text services."""
+"""Support for VACA speech-to-text services."""
 
 from collections.abc import AsyncIterable
 import logging
@@ -26,17 +26,17 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up Wyoming speech-to-text."""
+    """Set up VACA speech-to-text."""
     item: DomainDataItem = hass.data[DOMAIN][config_entry.entry_id]
     async_add_entities(
         [
-            WyomingSttProvider(config_entry, item.service),
+            VACASttProvider(config_entry, item.service),
         ]
     )
 
 
-class WyomingSttProvider(stt.SpeechToTextEntity):
-    """Wyoming speech-to-text provider."""
+class VACASttProvider(stt.SpeechToTextEntity):
+    """VACA speech-to-text provider."""
 
     def __init__(
         self,

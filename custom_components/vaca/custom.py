@@ -17,7 +17,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-_CUSTOM_EVENT_TYPE = "custom-event"
+_CUSTOM_EVENT_TYPE = "custom-vaca"
 _PIPELINE_ENDED_EVENT_TYPE = "pipeline-ended"
 
 ACTION_EVENT_TYPE = "action"
@@ -97,7 +97,7 @@ class CustomEvent(Eventable):
         """Create an event for the custom event."""
         data = {"event_type": self.event_type}
         if self.event_data is not None:
-            data.update(_sanitize_data(self.event_data))
+            data["data"] = _sanitize_data(self.event_data)
         return Event(
             type=_CUSTOM_EVENT_TYPE,
             data=data,

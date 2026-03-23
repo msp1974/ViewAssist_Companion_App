@@ -1,4 +1,4 @@
-"""Sensor for Wyoming."""
+"""Sensor for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
 
@@ -43,28 +43,28 @@ async def async_setup_entry(
     assert item.device is not None
 
     entities = [
-        WyomingSatelliteSTTSensor(device),
-        WyomingSatelliteTTSSensor(device),
-        WyomingSatelliteIntentSensor(device),
-        WyomingSatelliteOrientationSensor(device),
-        WyomingSatelliteBrowserPathSensor(device),
+        VACASTTSensor(device),
+        VACATTSSensor(device),
+        VACAIntentSensor(device),
+        VACAOrientationSensor(device),
+        VACABrowserPathSensor(device),
     ]
 
     if capabilities := device.capabilities:
         if capabilities.get("app_version"):
-            entities.append(WyomingSatelliteAppVersionSensor(device))
+            entities.append(VACAAppVersionSensor(device))
         if capabilities.get("has_battery"):
-            entities.append(WyomingSatelliteBatteryLevelSensor(device))
+            entities.append(VACABatteryLevelSensor(device))
         if device.has_light_sensor():
-            entities.append(WyomingSatelliteLightSensor(device))
+            entities.append(VACALightLevelSensor(device))
         if capabilities.get("has_front_camera"):
-            entities.append(WyomingSatelliteLastMotionSensor(device))
+            entities.append(VACALastMotionSensor(device))
 
     async_add_entities(entities)
 
 
-class WyomingSatelliteSTTSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent STT sensor for satellite."""
+class VACASTTSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent STT sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="stt",
@@ -94,8 +94,8 @@ class WyomingSatelliteSTTSensor(VASatelliteEntity, RestoreSensor):
             self.async_write_ha_state()
 
 
-class WyomingSatelliteTTSSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent TTS sensor for satellite."""
+class VACATTSSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent TTS sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="tts", translation_key="tts", icon="mdi:speaker-message"
@@ -123,8 +123,8 @@ class WyomingSatelliteTTSSensor(VASatelliteEntity, RestoreSensor):
             self.async_write_ha_state()
 
 
-class WyomingSatelliteIntentSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent intent sensor for satellite."""
+class VACAIntentSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent intent sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="intent", translation_key="intent", icon="mdi:message-bulleted"
@@ -153,7 +153,7 @@ class WyomingSatelliteIntentSensor(VASatelliteEntity, RestoreSensor):
         """Update entity."""
         if data and data.get("intent_output"):
             value = str(
-                self.get_key("intent_output.response.speech.plain.speech", data)
+                self._get_key("intent_output.response.speech.plain.speech", data)
             )
             if value:
                 if len(value) > 254:
@@ -164,11 +164,10 @@ class WyomingSatelliteIntentSensor(VASatelliteEntity, RestoreSensor):
             self._attr_extra_state_attributes = data
             self.async_write_ha_state()
 
-    def get_key(
+    def _get_key(
         self, dot_notation_path: str, data: dict
     ) -> dict[str, dict | str | int] | str | int | None:
         """Try to get a deep value from a dict based on a dot-notation."""
-
         try:
             if "." in dot_notation_path:
                 dn_list = dot_notation_path.split(".")
@@ -179,10 +178,10 @@ class WyomingSatelliteIntentSensor(VASatelliteEntity, RestoreSensor):
             return None
 
 
-class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
-    """Base class for device sensors."""
+class _VACADeviceSensorBase(VASatelliteEntity, RestoreSensor):
+    """Base class for VACA device sensors."""
 
-    _attr_native_value = 0
+    _attr_native_value: Any = 0
     _listener_class = "status_update"
 
     async def async_added_to_hass(self) -> None:
@@ -217,7 +216,7 @@ class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
 
     def _get_timestamp_from_string(self, timestamp_str: str) -> Any:
         """Convert timestamp string to datetime object."""
-        if timestamp_str.startswith("1970-01-01"):
+        if not timestamp_str or timestamp_str.startswith("1970-01-01") or timestamp_str == UNKNOWN:
             return None
         if parsed_time := parse_datetime(timestamp_str):
             if parsed_time > now(parsed_time.tzinfo):
@@ -255,8 +254,8 @@ class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
                 self.async_write_ha_state()
 
 
-class WyomingSatelliteLightSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent light sensor for satellite."""
+class VACALightLevelSensor(_VACADeviceSensorBase):
+    """Entity to represent light level sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="light",
@@ -268,8 +267,8 @@ class WyomingSatelliteLightSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteOrientationSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent orientation sensor for satellite."""
+class VACAOrientationSensor(_VACADeviceSensorBase):
+    """Entity to represent orientation sensor for VACA satellite."""
 
     _attr_native_value = UNKNOWN
     entity_description = SensorEntityDescription(
@@ -280,8 +279,8 @@ class WyomingSatelliteOrientationSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteBatteryLevelSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent battery level sensor for satellite."""
+class VACABatteryLevelSensor(_VACADeviceSensorBase):
+    """Entity to represent battery level sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="battery_level",
@@ -292,8 +291,8 @@ class WyomingSatelliteBatteryLevelSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteBrowserPathSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent browser path sensor for satellite."""
+class VACABrowserPathSensor(_VACADeviceSensorBase):
+    """Entity to represent browser path sensor for VACA satellite."""
 
     _attr_native_value = UNKNOWN
     entity_description = SensorEntityDescription(
@@ -301,8 +300,8 @@ class WyomingSatelliteBrowserPathSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteLastMotionSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent last motion for satellite."""
+class VACALastMotionSensor(_VACADeviceSensorBase):
+    """Entity to represent last motion timestamp for VACA satellite."""
 
     _attr_native_value = UNKNOWN
     entity_description = SensorEntityDescription(
@@ -314,8 +313,8 @@ class WyomingSatelliteLastMotionSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteAppVersionSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent app version sensor for satellite."""
+class VACAAppVersionSensor(_VACADeviceSensorBase):
+    """Entity to represent app version sensor for VACA satellite."""
 
     _listener_class = "capabilities_update"
     _attr_native_value = UNKNOWN
@@ -334,22 +333,22 @@ class WyomingSatelliteAppVersionSensor(_WyomingSatelliteDeviceSensorBase):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return entity attributes."""
         return {
-            "device_signature": self.get_capability("device_signature"),
-            "android_version": self.get_capability("release"),
-            "webview_version": self.get_capability("webview_version"),
-            "has_battery": self.get_capability("has_battery"),
-            "has_front_camera": self.get_capability("has_front_camera"),
+            "device_signature": self._get_capability("device_signature"),
+            "android_version": self._get_capability("release"),
+            "webview_version": self._get_capability("webview_version"),
+            "has_battery": self._get_capability("has_battery"),
+            "has_front_camera": self._get_capability("has_front_camera"),
             "has_light_sensor": self._device.has_light_sensor(),
-            "sensors": self.get_sensor_names(),
+            "sensors": self._get_sensor_names(),
         }
 
-    def get_capability(self, capability: str) -> Any:
+    def _get_capability(self, capability: str) -> Any:
         """Get a specific capability from the device."""
         if self._device.capabilities is None:
             return UNKNOWN
         return self._device.capabilities.get(capability, UNKNOWN)
 
-    def get_sensor_names(self) -> list[str] | None:
+    def _get_sensor_names(self) -> list[str] | None:
         """Get the names of all sensors."""
         if self._device.capabilities and (
             sensors := self._device.capabilities.get("sensors")

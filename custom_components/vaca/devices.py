@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import Any
+from collections.abc import Callable
 
 from wyoming.info import Info
 
@@ -128,20 +129,20 @@ class VASatelliteDevice(SatelliteDevice):
                     return True
         return False
 
-    def getMaxMusicVolume(self) -> int | None:
-        """Get max music volume."""
-        if self.capabilities and (audio := self.capabilities.get("audio")):
-            return audio.get("max_music_volume")
-        return 10
+    def getMaxMediaVolume(self) -> int | None:
+        """Get max media volume."""
+        return self.get_max_stream_volume("max_media_volume")
 
-    def getMaxNotificationVolume(self) -> int | None:
-        """Get max notification volume."""
-        if self.capabilities and (audio := self.capabilities.get("audio")):
-            return audio.get("max_notification_volume")
-        return 10
+    def getMaxVoiceVolume(self) -> int | None:
+        """Get max voice volume."""
+        return self.get_max_stream_volume("max_voice_volume")
 
     def getMaxAlarmVolume(self) -> int | None:
         """Get max alarm volume."""
+        return self.get_max_stream_volume("max_alarm_volume")
+
+    def get_max_stream_volume(self, key: str) -> int | None:
+        """Get max volume for a specific stream from capabilities."""
         if self.capabilities and (audio := self.capabilities.get("audio")):
-            return audio.get("max_alarm_volume")
-        return 10
+            return audio.get(key)
+        return None

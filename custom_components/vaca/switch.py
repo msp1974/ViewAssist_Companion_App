@@ -1,4 +1,4 @@
-"""Wyoming switch entities."""
+"""Switch entities for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
 
@@ -36,38 +36,39 @@ async def async_setup_entry(
     # Setup is only forwarded for satellites
     assert device is not None
     entities = [
-        WyomingSatelliteMuteSwitch(device),
-        WyomingSatelliteScreenSwitch(device),
-        WyomingSatelliteSwipeToRefreshSwitch(device),
-        WyomingSatelliteScreenAutoBrightnessSwitch(device),
-        WyomingSatelliteScreenAlwaysOnSwitch(device),
-        WyomingSatelliteDarkModeSwitch(device),
-        WyomingSatelliteDiagnosticsSwitch(device),
-        WyomingSatelliteAlarmSwitch(device),
-        WyomingSatelliteScreenOnWakeWordSwitch(device),
-        WyomingSatelliteScreenSaverSwitch(device),
+        VACAMicSwitch(device),
+        VACAScreenSwitch(device),
+        VACASwipeToRefreshSwitch(device),
+        VACAScreenAutoBrightnessSwitch(device),
+        VACAScreenAlwaysOnSwitch(device),
+        VACADarkModeSwitch(device),
+        VACADiagnosticsSwitch(device),
+        VACAAlarmSwitch(device),
+        VACAScreenOnWakeWordSwitch(device),
+        VACAScreenSaverSwitch(device),
     ]
 
+    # Optional switches based on capabilities
     if capabilities := device.capabilities:
         if capabilities.get("has_dnd"):
-            entities.append(WyomingSatelliteDNDSwitch(device))
+            entities.append(VACADNDSwitch(device))
 
     if device.supportBump():
-        entities.append(WyomingSatelliteScreenOnBumpSwitch(device))
+        entities.append(VACAScreenOnBumpSwitch(device))
 
     if device.supportProximity():
-        entities.append(WyomingSatelliteScreenOnProximitySwitch(device))
+        entities.append(VACAScreenOnProximitySwitch(device))
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
-        entities.append(WyomingSatelliteEnableMotionDetectionSwitch(device))
-        entities.append(WyomingSatelliteScreenOnMotionSwitch(device))
+        entities.append(VACAEnableMotionDetectionSwitch(device))
+        entities.append(VACAScreenOnMotionSwitch(device))
 
     if entities:
         async_add_entities(entities)
 
 
 class BaseSwitch(VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity):
-    """Base class for all switch entities."""
+    """Base class for all VACA switch entities where HA is the source of truth."""
 
     entity_description: SwitchEntityDescription
     default_on = False
@@ -78,13 +79,15 @@ class BaseSwitch(VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity):
 
         state = await self.async_get_last_state()
 
-        # Set restore state or default
-        if state is None:
-            self._attr_is_on = self.default_on
-        else:
-            self._attr_is_on = state.state == STATE_ON
-
-        await self.do_switch(self._attr_is_on)
+        # Set restore state or default if available
+        if state is not None:
+             self._attr_is_on = state.state == STATE_ON
+             # Push restored state to device settings store immediately
+             await self.do_switch(self._attr_is_on, send_to_device=True)
+        elif self.default_on is not None:
+             self._attr_is_on = self.default_on
+             # Populate settings store with default
+             await self.do_switch(self._attr_is_on, send_to_device=True)
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn on."""
@@ -108,13 +111,21 @@ class BaseSwitch(VASatelliteEntity, restore_state.RestoreEntity, SwitchEntity):
 
 
 class BaseFeedbackSwitch(BaseSwitch):
-    """Base class for switches that receive feedback from device."""
+    """Base class for switches where the device is the source of truth (lazy init)."""
 
     _listener_class = "settings_update"
+    default_on = None # Wait for device feedback
 
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
-        await super().async_added_to_hass()
+        # For feedback switches, we override to avoid redundant pushing of restored state
+        await super(BaseSwitch, self).async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None:
+             self._attr_is_on = state.state == STATE_ON
+             # We rely on initial device status sync later
+             await self.do_switch(self._attr_is_on, send_to_device=False)
 
         self.async_on_remove(
             async_dispatcher_connect(
@@ -126,14 +137,24 @@ class BaseFeedbackSwitch(BaseSwitch):
 
     async def status_update(self, data: dict[str, Any]) -> None:
         """Handle status update."""
-        if settings := data.get("settings"):
-            if self.entity_description.key in settings:
-                setting_state = settings[self.entity_description.key]
+        update_key = self.entity_description.key
+        
+        # Check settings or sensors depending on listener class
+        if self._listener_class == "settings_update":
+            update_source = "settings"
+        elif self._listener_class == "status_update":
+            update_source = "sensors"
+        else:
+            return
+        
+        if updates := data.get(update_source):
+            if update_key in updates:
+                setting_state = updates[update_key]
                 await self.do_switch(setting_state, send_to_device=False)
 
 
-class WyomingSatelliteScreenSwitch(BaseFeedbackSwitch):
-    """Entity to control screen on/off."""
+class VACAScreenSwitch(BaseFeedbackSwitch):
+    """Entity to control screen on/off for VACA satellite (Feedback powered)."""
 
     _listener_class = "status_update"
 
@@ -142,19 +163,11 @@ class WyomingSatelliteScreenSwitch(BaseFeedbackSwitch):
         translation_key="screen_on",
         icon="mdi:monitor",
     )
-    default_on = True
 
     @property
     def icon(self) -> str:
         """Return the icon to use in the frontend."""
         return "mdi:monitor" if self._attr_is_on else "mdi:monitor-off"
-
-    async def status_update(self, data: dict[str, Any]) -> None:
-        """Handle status update."""
-        if settings := data.get("sensors"):
-            if self.entity_description.key in settings:
-                setting_state = settings[self.entity_description.key]
-                await self.do_switch(setting_state, send_to_device=False)
 
     async def do_switch(self, value: bool, send_to_device: bool = True) -> None:
         """Perform the switch action."""
@@ -167,20 +180,20 @@ class WyomingSatelliteScreenSwitch(BaseFeedbackSwitch):
                 self._device.send_custom_action(CustomActions.SCREEN_SLEEP)
 
 
-class WyomingSatelliteMuteSwitch(BaseSwitch):
-    """Entity to represent if satellite is muted."""
+class VACAMicSwitch(BaseSwitch):
+    """Entity to represent if VACA satellite microphone is enabled (HA mastered)."""
 
-    entity_description = SwitchEntityDescription(key="mute", translation_key="mute")
-    default_on = False
+    entity_description = SwitchEntityDescription(key="mic", translation_key="mic")
+    default_on = True
 
     @property
     def icon(self) -> str:
         """Return the icon to use in the frontend."""
-        return "mdi:microphone-off" if self._attr_is_on else "mdi:microphone"
+        return "mdi:microphone" if self._attr_is_on else "mdi:microphone-off"
 
 
-class WyomingSatelliteSwipeToRefreshSwitch(BaseSwitch):
-    """Entity to control swipe to refresh."""
+class VACASwipeToRefreshSwitch(BaseSwitch):
+    """Entity to control swipe to refresh on VACA satellite."""
 
     entity_description = SwitchEntityDescription(
         key="swipe_refresh",
@@ -191,8 +204,8 @@ class WyomingSatelliteSwipeToRefreshSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteScreenAutoBrightnessSwitch(BaseSwitch):
-    """Entity to control swipe to refresh."""
+class VACAScreenAutoBrightnessSwitch(BaseSwitch):
+    """Entity to control screen auto brightness on VACA satellite."""
 
     entity_description = SwitchEntityDescription(
         key="screen_auto_brightness",
@@ -203,8 +216,8 @@ class WyomingSatelliteScreenAutoBrightnessSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteScreenAlwaysOnSwitch(BaseSwitch):
-    """Entity to control screen always on."""
+class VACAScreenAlwaysOnSwitch(BaseSwitch):
+    """Entity to control screen always on status for VACA satellite."""
 
     entity_description = SwitchEntityDescription(
         key="screen_always_on",
@@ -215,8 +228,8 @@ class WyomingSatelliteScreenAlwaysOnSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteDarkModeSwitch(BaseSwitch):
-    """Entity to control screen always on."""
+class VACADarkModeSwitch(BaseSwitch):
+    """Entity to control dark mode for VACA satellite."""
 
     entity_description = SwitchEntityDescription(
         key="dark_mode",
@@ -227,19 +240,18 @@ class WyomingSatelliteDarkModeSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
-    """Entity to control do not disturb."""
+class VACADNDSwitch(BaseFeedbackSwitch):
+    """Entity to control do not disturb for VACA satellite (Feedback powered)."""
 
     entity_description = SwitchEntityDescription(
         key="do_not_disturb",
         translation_key="do_not_disturb",
         icon="mdi:minus-circle",
     )
-    default_on = False
 
 
-class WyomingSatelliteDiagnosticsSwitch(BaseSwitch):
-    """Entity to control diagnostics overlay on/off."""
+class VACADiagnosticsSwitch(BaseSwitch):
+    """Entity to control diagnostics overlay on VACA satellite."""
 
     entity_description = SwitchEntityDescription(
         key="diagnostics_enabled",
@@ -250,15 +262,14 @@ class WyomingSatelliteDiagnosticsSwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteAlarmSwitch(BaseFeedbackSwitch):
-    """Entity to control alarm on/off."""
+class VACAAlarmSwitch(BaseFeedbackSwitch):
+    """Entity to control alarm for VACA satellite (Feedback powered)."""
 
     entity_description = SwitchEntityDescription(
         key="alarm",
         translation_key="alarm",
         icon="mdi:alarm-bell",
     )
-    default_on = False
 
     async def do_switch(self, value: bool, send_to_device: bool = True) -> None:
         """Perform the switch action."""
@@ -274,8 +285,8 @@ class WyomingSatelliteAlarmSwitch(BaseFeedbackSwitch):
             )
 
 
-class WyomingSatelliteScreenOnWakeWordSwitch(BaseSwitch):
-    """Entity to control screen on/off with wake word."""
+class VACAScreenOnWakeWordSwitch(BaseSwitch):
+    """Entity to control screen wake on wake word detection."""
 
     entity_description = SwitchEntityDescription(
         key="screen_on_wake_word",
@@ -286,8 +297,8 @@ class WyomingSatelliteScreenOnWakeWordSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteScreenOnBumpSwitch(BaseSwitch):
-    """Entity to control screen on with bump."""
+class VACAScreenOnBumpSwitch(BaseSwitch):
+    """Entity to control screen wake on bump detection."""
 
     entity_description = SwitchEntityDescription(
         key="screen_on_bump",
@@ -298,8 +309,8 @@ class WyomingSatelliteScreenOnBumpSwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteScreenOnProximitySwitch(BaseSwitch):
-    """Entity to control screen on with proximity."""
+class VACAScreenOnProximitySwitch(BaseSwitch):
+    """Entity to control screen wake on proximity detection."""
 
     entity_description = SwitchEntityDescription(
         key="screen_on_proximity",
@@ -310,8 +321,8 @@ class WyomingSatelliteScreenOnProximitySwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteEnableMotionDetectionSwitch(BaseSwitch):
-    """Entity to control motion detection."""
+class VACAEnableMotionDetectionSwitch(BaseSwitch):
+    """Entity to control motion detection status."""
 
     entity_description = SwitchEntityDescription(
         key="enable_motion_detection",
@@ -322,8 +333,8 @@ class WyomingSatelliteEnableMotionDetectionSwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteScreenOnMotionSwitch(BaseSwitch):
-    """Entity to control screen on with motion."""
+class VACAScreenOnMotionSwitch(BaseSwitch):
+    """Entity to control screen wake on motion detection."""
 
     entity_description = SwitchEntityDescription(
         key="screen_on_motion",
@@ -334,12 +345,11 @@ class WyomingSatelliteScreenOnMotionSwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteScreenSaverSwitch(BaseFeedbackSwitch):
-    """Entity to control screen saver setting."""
+class VACAScreenSaverSwitch(BaseFeedbackSwitch):
+    """Entity to control screen saver for VACA satellite (Feedback powered)."""
 
     entity_description = SwitchEntityDescription(
         key="screen_saver",
         translation_key="screen_saver",
         icon="mdi:monitor-shimmer",
     )
-    default_on = False

@@ -10,7 +10,7 @@ from .devices import VASatelliteDevice
 
 
 class VASatelliteEntity(entity.Entity):
-    """Wyoming satellite entity."""
+    """VACA satellite entity."""
 
     _attr_has_entity_name = True
     _attr_should_poll = False

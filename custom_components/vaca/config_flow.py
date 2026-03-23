@@ -1,4 +1,4 @@
-"""Config flow for Wyoming integration."""
+"""Config flow for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
 
@@ -12,5 +12,5 @@ from .const import DOMAIN
 _LOGGER = logging.getLogger(__name__)
 
 
-class VAWyomingConfigFlow(WyomingConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Wyoming integration."""
+class VACAConfigFlow(WyomingConfigFlow, domain=DOMAIN):
+    """Handle a config flow for VACA integration."""

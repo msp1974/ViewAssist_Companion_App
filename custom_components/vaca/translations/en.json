@@ -61,14 +61,14 @@
             "screen_brightness": {
                 "name": "Screen brightness"
             },
-            "notification_volume": {
+            "voice_volume": {
                 "name": "Voice volume"
             },
             "motion_detection_sensitivity": {
                 "name": "Motion detection sensitivity"
             },
-            "music_volume": {
-                "name": "Music volume"
+            "media_volume": {
+                "name": "Media volume"
             },
             "alarm_volume": {
                 "name": "Alarm volume"
@@ -83,7 +83,7 @@
                 "name": "Zoom level"
             },
             "raw_proximity_threshold": {
-              "name": "Proximity threshold"
+                "name": "Proximity threshold"
             },
             "bump_sensitivity": {
                 "name": "Bump sensitivity"
@@ -125,94 +125,22 @@
                 "name": "Wake word"
             },
             "wake_word_sound": {
-                "name": "Wake word sound",
-                "state": {
-                    "none": "None",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Generic - bubble",
-                    "ding": "Generic - ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Generic - error",
-                    "stop_word": "Generic - stop word",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Wake word sound"
             },
             "processing_sound": {
-                "name": "Processing sound",
-                "state": {
-                    "none": "None",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Generic - bubble",
-                    "ding": "Generic - ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Generic - error",
-                    "stop_word": "Generic - stop word",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Processing sound"
             },
             "error_sound": {
-                "name": "Error sound",
-                "state": {
-                    "none": "None",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Generic - bubble",
-                    "ding": "Generic - ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Generic - error",
-                    "stop_word": "Generic - stop word",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Error sound"
             },
             "stop_word_sound": {
-                "name": "Stop sound",
-                "state": {
-                    "none": "None",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Generic - bubble",
-                    "ding": "Generic - ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Generic - error",
-                    "stop_word": "Generic - stop word",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Stop sound"
             },
             "mic_on_sound": {
-                "name": "Mic on sound",
-                "state": {
-                    "none": "None",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Generic - bubble",
-                    "ding": "Generic - ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Generic - error",
-                    "stop_word": "Generic - stop word",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Mic on sound"
             },
             "mic_off_sound": {
-                "name": "Mic off sound",
-                "state": {
-                    "none": "None",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Generic - bubble",
-                    "ding": "Generic - ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Generic - error",
-                    "stop_word": "Generic - stop word",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Mic off sound"
             },
             "screen_timeout": {
                 "name": "Screen timeout",
@@ -272,8 +200,8 @@
             }
         },
         "switch": {
-            "mute": {
-                "name": "Mute"
+            "mic": {
+                "name": "Microphone"
             },
             "screen_on": {
                 "name": "Screen"

@@ -64,14 +64,14 @@
             "screen_brightness": {
                 "name": "Ekran parlaklığı"
             },
-            "notification_volume": {
+            "voice_volume": {
                 "name": "Konuşma ses seviyesi"
             },
             "motion_detection_sensitivity": {
                 "name": "Hareket algılama hassasiyeti"
             },
-            "music_volume": {
-                "name": "Müzik ses seviyesi"
+            "media_volume": {
+                "name": "Medya ses seviyesi"
             },
             "alarm_volume": {
                 "name": "Alarm ses seviyesi"
@@ -115,94 +115,22 @@
                 "name": "Uyandırma kelimesi"
             },
             "wake_word_sound": {
-                "name": "Uyandırma kelimesi sesi",
-                "state": {
-                    "none": "Yok",
-                    "havpe": "HAVPE - uyandırma kelimesi",
-                    "alexa": "Alexa - uyandırma kelimesi",
-                    "bubble": "Genel - baloncuk",
-                    "ding": "Genel - zil",
-                    "processing": "HAVPE - işleme",
-                    "error": "Genel - hata",
-                    "stop_word": "Genel - durdurma kelimesi",
-                    "mute_switch_on": "HAVPE - sessiz açık",
-                    "mute_switch_off": "HAVPE - sessiz kapalı"
-                }
+                "name": "Uyandırma kelimesi sesi"
             },
             "processing_sound": {
-                "name": "İşleme sesi",
-                "state": {
-                    "none": "Yok",
-                    "havpe": "HAVPE - uyandırma kelimesi",
-                    "alexa": "Alexa - uyandırma kelimesi",
-                    "bubble": "Genel - baloncuk",
-                    "ding": "Genel - zil",
-                    "processing": "HAVPE - işleme",
-                    "error": "Genel - hata",
-                    "stop_word": "Genel - durdurma kelimesi",
-                    "mute_switch_on": "HAVPE - sessiz açık",
-                    "mute_switch_off": "HAVPE - sessiz kapalı"
-                }
+                "name": "İşleme sesi"
             },
             "error_sound": {
-                "name": "Hata sesi",
-                "state": {
-                    "none": "Yok",
-                    "havpe": "HAVPE - uyandırma kelimesi",
-                    "alexa": "Alexa - uyandırma kelimesi",
-                    "bubble": "Genel - baloncuk",
-                    "ding": "Genel - zil",
-                    "processing": "HAVPE - işleme",
-                    "error": "Genel - hata",
-                    "stop_word": "Genel - durdurma kelimesi",
-                    "mute_switch_on": "HAVPE - sessiz açık",
-                    "mute_switch_off": "HAVPE - sessiz kapalı"
-                }
+                "name": "Hata sesi"
             },
             "stop_word_sound": {
-                "name": "Durdurma sesi",
-                "state": {
-                    "none": "Yok",
-                    "havpe": "HAVPE - uyandırma kelimesi",
-                    "alexa": "Alexa - uyandırma kelimesi",
-                    "bubble": "Genel - baloncuk",
-                    "ding": "Genel - zil",
-                    "processing": "HAVPE - işleme",
-                    "error": "Genel - hata",
-                    "stop_word": "Genel - durdurma kelimesi",
-                    "mute_switch_on": "HAVPE - sessiz açık",
-                    "mute_switch_off": "HAVPE - sessiz kapalı"
-                }
+                "name": "Durdurma sesi"
             },
             "mic_on_sound": {
-                "name": "Mikrofon açık sesi",
-                "state": {
-                    "none": "Yok",
-                    "havpe": "HAVPE - uyandırma kelimesi",
-                    "alexa": "Alexa - uyandırma kelimesi",
-                    "bubble": "Genel - baloncuk",
-                    "ding": "Genel - zil",
-                    "processing": "HAVPE - işleme",
-                    "error": "Genel - hata",
-                    "stop_word": "Genel - durdurma kelimesi",
-                    "mute_switch_on": "HAVPE - sessiz açık",
-                    "mute_switch_off": "HAVPE - sessiz kapalı"
-                }
+                "name": "Mikrofon açık sesi"
             },
             "mic_off_sound": {
-                "name": "Mikrofon kapalı sesi",
-                "state": {
-                    "none": "Yok",
-                    "havpe": "HAVPE - uyandırma kelimesi",
-                    "alexa": "Alexa - uyandırma kelimesi",
-                    "bubble": "Genel - baloncuk",
-                    "ding": "Genel - zil",
-                    "processing": "HAVPE - işleme",
-                    "error": "Genel - hata",
-                    "stop_word": "Genel - durdurma kelimesi",
-                    "mute_switch_on": "HAVPE - sessiz açık",
-                    "mute_switch_off": "HAVPE - sessiz kapalı"
-                }
+                "name": "Mikrofon kapalı sesi"
             },
             "screen_timeout": {
                 "name": "Ekran zaman aşımı",

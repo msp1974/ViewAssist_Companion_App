@@ -1,4 +1,4 @@
-"""The Wyoming integration."""
+"""The ViewAssist Companion App (VACA) integration."""
 
 from __future__ import annotations
 
@@ -47,19 +47,19 @@ __all__ = [
 ]
 
 
-class WyomingError(HomeAssistantError):
-    """Base class for Wyoming errors."""
+class VACAError(HomeAssistantError):
+    """Base class for VACA errors."""
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the Wyoming integration."""
+    """Set up the VACA integration."""
     async_register_websocket_api(hass)
 
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Load Wyoming."""
+    """Load VACA."""
     service = await WyomingService.create(entry.data["host"], entry.data["port"])
 
     if service is None:
@@ -101,7 +101,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             sw_version = (
                 f"View Assist Companion App {app_version}" if app_version else None
             )
-            hw_version = f"Android: {android_version}" if android_version else None
+            hw_version = f"Android {android_version}" if android_version else None
 
             dev_reg.async_update_device(
                 device.id,
@@ -123,7 +123,7 @@ async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload Wyoming."""
+    """Unload VACA."""
     item: DomainDataItem = hass.data[DOMAIN][entry.entry_id]
 
     platforms = list(item.service.platforms)
@@ -152,7 +152,7 @@ async def get_device_capabilities(item: DomainDataItem):
                 while True:
                     event = await client.read_event()
                     if event is None:
-                        raise WyomingError(  # noqa: TRY301
+                        raise VACAError(  # noqa: TRY301
                             "Connection closed unexpectedly",
                         )
 
@@ -164,7 +164,7 @@ async def get_device_capabilities(item: DomainDataItem):
 
                 if capabilities is not None:
                     break  # for
-        except (TimeoutError, OSError, WyomingError) as ex:
+        except (TimeoutError, OSError, VACAError) as ex:
             _LOGGER.debug(
                 "Attempt %s/4: Error getting device capabilities at %s:%s: %s",
                 attempt + 1,

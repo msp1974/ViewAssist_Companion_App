@@ -67,14 +67,14 @@
             "screen_brightness": {
                 "name": "Bildschirmhelligkeit"
             },
-            "notification_volume": {
+            "voice_volume": {
                 "name": "Sprachlautstärke"
             },
             "motion_detection_sensitivity": {
                 "name": "Bewegungserkennungsempfindlichkeit"
             },
-            "music_volume": {
-                "name": "Musiklautstärke"
+            "media_volume": {
+                "name": "Medienlautstärke"
             },
             "alarm_volume": {
                 "name": "Alarmlautstärke"
@@ -118,94 +118,22 @@
                 "name": "Weckwort"
             },
             "wake_word_sound": {
-                "name": "Weckwort-Ton",
-                "state": {
-                    "none": "Kein",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Allgemein - Blase",
-                    "ding": "Allgemein - Ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Allgemein - Fehler",
-                    "stop_word": "Allgemein - Stop-Wort",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Weckwort-Ton"
             },
             "processing_sound": {
-                "name": "Verarbeitungston",
-                "state": {
-                    "none": "Kein",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Allgemein - Blase",
-                    "ding": "Allgemein - Ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Allgemein - Fehler",
-                    "stop_word": "Allgemein - Stop-Wort",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Verarbeitungston"
             },
             "error_sound": {
-                "name": "Fehlerton",
-                "state": {
-                    "none": "Kein",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Allgemein - Blase",
-                    "ding": "Allgemein - Ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Allgemein - Fehler",
-                    "stop_word": "Allgemein - Stop-Wort",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Fehlerton"
             },
             "stop_word_sound": {
-                "name": "Stop-Ton",
-                "state": {
-                    "none": "Kein",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Allgemein - Blase",
-                    "ding": "Allgemein - Ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Allgemein - Fehler",
-                    "stop_word": "Allgemein - Stop-Wort",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Stop-Ton"
             },
             "mic_on_sound": {
-                "name": "Mikrofon an Ton",
-                "state": {
-                    "none": "Kein",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Allgemein - Blase",
-                    "ding": "Allgemein - Ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Allgemein - Fehler",
-                    "stop_word": "Allgemein - Stop-Wort",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Mikrofon an Ton"
             },
             "mic_off_sound": {
-                "name": "Mikrofon aus Ton",
-                "state": {
-                    "none": "Kein",
-                    "havpe": "HAVPE - wake word",
-                    "alexa": "Alexa - wake word",
-                    "bubble": "Allgemein - Blase",
-                    "ding": "Allgemein - Ding",
-                    "processing": "HAVPE - processing",
-                    "error": "Allgemein - Fehler",
-                    "stop_word": "Allgemein - Stop-Wort",
-                    "mute_switch_on": "HAVPE - mute on",
-                    "mute_switch_off": "HAVPE - mute off"
-                }
+                "name": "Mikrofon aus Ton"
             },
             "screen_timeout": {
                 "name": "Bildschirm-Timeout",
