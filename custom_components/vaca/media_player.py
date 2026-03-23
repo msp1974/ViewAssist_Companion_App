@@ -17,7 +17,7 @@ from homeassistant.components.media_player import (
     async_process_play_media_url,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -96,8 +96,11 @@ class VACAMediaPlayer(VASatelliteEntity, MediaPlayerEntity, RestoreEntity):
             )
         )
 
-    async def status_update(self, data: dict[str, Any]) -> None:
+    @callback
+    def status_update(self, data: dict[str, Any] | None) -> None:
         """Handle status update."""
+        if not data:
+            return
         if settings := data.get("settings"):
             if "media_player_gain" in settings:
                 self._attr_volume_level = float(settings["media_player_gain"]) / 100.0

@@ -13,7 +13,7 @@ from homeassistant.components.assist_pipeline import (
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import restore_state
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,

@@ -184,8 +184,11 @@ class BaseFeedbackNumber(BaseNumberEntity):
             )
         )
 
-    def status_update(self, data: dict[str, Any]) -> None:
+    @callback
+    def status_update(self, data: dict[str, Any] | None) -> None:
         """Handle status update."""
+        if not data:
+            return
         if settings := data.get("settings"):
             if self.entity_description.key in settings:
                 setting_value = settings[self.entity_description.key]

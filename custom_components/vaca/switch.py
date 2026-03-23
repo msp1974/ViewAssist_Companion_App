@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import STATE_ON, EntityCategory
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import restore_state
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -135,10 +135,13 @@ class BaseFeedbackSwitch(BaseSwitch):
             )
         )
 
-    async def status_update(self, data: dict[str, Any]) -> None:
+    @callback
+    def status_update(self, data: dict[str, Any] | None) -> None:
         """Handle status update."""
+        if not data:
+            return
         update_key = self.entity_description.key
-        
+
         # Check settings or sensors depending on listener class
         if self._listener_class == "settings_update":
             update_source = "settings"
@@ -146,11 +149,11 @@ class BaseFeedbackSwitch(BaseSwitch):
             update_source = "sensors"
         else:
             return
-        
+
         if updates := data.get(update_source):
             if update_key in updates:
-                setting_state = updates[update_key]
-                await self.do_switch(setting_state, send_to_device=False)
+                self._attr_is_on = bool(updates[update_key])
+                self.async_write_ha_state()
 
 
 class VACAScreenSwitch(BaseFeedbackSwitch):
@@ -204,8 +207,8 @@ class VACASwipeToRefreshSwitch(BaseSwitch):
     default_on = True
 
 
-class VACAScreenAutoBrightnessSwitch(BaseSwitch):
-    """Entity to control screen auto brightness on VACA satellite."""
+class VACAScreenAutoBrightnessSwitch(BaseFeedbackSwitch):
+    """Entity to control screen auto brightness on VACA satellite (device feedback)."""
 
     entity_description = SwitchEntityDescription(
         key="screen_auto_brightness",
@@ -213,7 +216,6 @@ class VACAScreenAutoBrightnessSwitch(BaseSwitch):
         icon="mdi:monitor-screenshot",
         entity_category=EntityCategory.CONFIG,
     )
-    default_on = True
 
 
 class VACAScreenAlwaysOnSwitch(BaseSwitch):
