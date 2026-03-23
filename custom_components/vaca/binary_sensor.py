@@ -13,6 +13,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -42,8 +43,6 @@ async def async_setup_entry(
 
     entities = []
 
-    entities.append(WyomingSatelliteScreenOnBinarySensor(device))
-
     if capabilities := device.capabilities:
         if capabilities.get("has_battery"):
             entities.append(WyomingSatelliteBatteryChargingBinarySensor(device))
@@ -70,7 +69,7 @@ class _WyomingSatelliteDeviceBinarySensorBase(
             state = await self.async_get_last_state()
             if state is not None:
                 # Restore the state of the binary sensor
-                self._attr_is_on = bool(state.state)
+                self._attr_is_on = state.state == STATE_ON
                 self.async_write_ha_state()
 
         self.async_on_remove(
@@ -107,14 +106,6 @@ class WyomingSatelliteBatteryChargingBinarySensor(
         key="battery_charging",
         translation_key="battery_charging",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
-    )
-
-
-class WyomingSatelliteScreenOnBinarySensor(_WyomingSatelliteDeviceBinarySensorBase):
-    """Entity to represent screen on status sensor for satellite."""
-
-    entity_description = BinarySensorEntityDescription(
-        key="screen_on", translation_key="screen_on", icon="mdi:monitor"
     )
 
 

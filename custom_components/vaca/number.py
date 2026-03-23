@@ -259,8 +259,8 @@ class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
         self._device.set_custom_setting(self.entity_description.key, int(value))
 
 
-class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
-    """Entity to represent auto gain amount."""
+class WyomingSatelliteScreenBrightnessNumber(BaseFeedbackNumber):
+    """Entity to represent screen brightness amount."""
 
     entity_description = NumberEntityDescription(
         key="screen_brightness",
@@ -276,17 +276,9 @@ class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
         await super().async_added_to_hass()
-
-        state = await self.async_get_last_state()
-        if state is not None:
-            await self.async_set_native_value(float(state.state))
-
-    async def async_set_native_value(self, value: float) -> None:
-        """Set new value."""
-        screen_brightness = int(max(0, min(100, value)))
-        self._attr_native_value = screen_brightness
-        self.async_write_ha_state()
-        self._device.set_custom_setting(self.entity_description.key, screen_brightness)
+        last_number_data = await self.async_get_last_number_data()
+        if last_number_data is not None and last_number_data.native_value is not None:
+            await self.async_set_native_value(last_number_data.native_value)
 
 
 class WyomingSatelliteWakeWordThresholdNumber(VASatelliteEntity, RestoreNumber):
