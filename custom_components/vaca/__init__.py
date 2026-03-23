@@ -91,6 +91,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
         item.device.capabilities = await get_device_capabilities(item)
 
+        # Update device info with capabilities
+        if item.device.capabilities:
+            dev_reg.async_update_device(
+                device.id,
+                model="View Assist Companion App",
+                sw_version=item.device.capabilities.get("app_version"),
+                hw_version=item.device.capabilities.get("release"),
+            )
+
         # Set up satellite entity, sensors, switches, etc.
         await hass.config_entries.async_forward_entry_setups(entry, SATELLITE_PLATFORMS)
 

@@ -142,7 +142,6 @@ class WyomingSatelliteNotificationVolumeNumber(BaseFeedbackNumber):
         key="notification_volume",
         translation_key="notification_volume",
         icon="mdi:speaker-message",
-        entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
     _attr_native_min_value = _MIN_SOUND_VOLUME
@@ -173,7 +172,6 @@ class WyomingSatelliteMusicVolumeNumber(BaseFeedbackNumber):
         key="music_volume",
         translation_key="music_volume",
         icon="mdi:music",
-        entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
     _attr_native_min_value = _MIN_SOUND_VOLUME
@@ -204,7 +202,6 @@ class WyomingSatelliteAlarmVolumeNumber(BaseFeedbackNumber):
         key="alarm_volume",
         translation_key="alarm_volume",
         icon="mdi:alarm",
-        entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
     _attr_native_min_value = _MIN_SOUND_VOLUME
@@ -266,7 +263,6 @@ class WyomingSatelliteScreenBrightnessNumber(BaseFeedbackNumber):
         key="screen_brightness",
         translation_key="screen_brightness",
         icon="mdi:brightness-4",
-        entity_category=EntityCategory.CONFIG,
     )
     _attr_should_poll = False
     _attr_native_min_value = 0

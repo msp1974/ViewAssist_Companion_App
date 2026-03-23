@@ -106,6 +106,7 @@ class WyomingSatelliteBatteryChargingBinarySensor(
         key="battery_charging",
         translation_key="battery_charging",
         device_class=BinarySensorDeviceClass.BATTERY_CHARGING,
+        entity_category=EntityCategory.DIAGNOSTIC,
     )
 
 
