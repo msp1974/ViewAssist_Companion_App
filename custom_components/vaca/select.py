@@ -28,12 +28,13 @@ from .entity import VASatelliteEntity
 if TYPE_CHECKING:
     from homeassistant.components.wyoming import DomainDataItem
 
+# Maps to the Android app's Speex processor denoise scale (0-100%)
 _NOISE_SUPPRESSION_LEVEL: Final = {
     "off": 0,
-    "low": 1,
-    "medium": 2,
-    "high": 3,
-    "max": 4,
+    "low": 25,
+    "medium": 50,
+    "high": 75,
+    "max": 100,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -184,7 +185,7 @@ class VACANoiseSuppressionLevelSelect(BaseSelect):
 
     def send_to_device(self, option: str) -> None:
         """Send setting to device."""
-        self._device.set_noise_suppression_level(_NOISE_SUPPRESSION_LEVEL[option])
+        self._device.set_custom_setting(self.entity_description.key, _NOISE_SUPPRESSION_LEVEL[option])
 
 
 class VACAVadSensitivitySelect(VASatelliteEntity, VadSensitivitySelect):
