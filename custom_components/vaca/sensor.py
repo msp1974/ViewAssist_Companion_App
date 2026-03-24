@@ -218,7 +218,6 @@ class VACALightLevelSensor(_VACADeviceSensorBase):
         device_class=SensorDeviceClass.ILLUMINANCE,
         native_unit_of_measurement=LIGHT_LUX,
         suggested_display_precision=0,
-        entity_category=EntityCategory.DIAGNOSTIC,
     )
 
 
@@ -230,7 +229,6 @@ class VACAOrientationSensor(_VACADeviceSensorBase):
         key="orientation",
         translation_key="orientation",
         icon="mdi:screen-rotation",
-        entity_category=EntityCategory.DIAGNOSTIC,
     )
 
 
@@ -242,7 +240,6 @@ class VACABatteryLevelSensor(_VACADeviceSensorBase):
         translation_key="battery_level",
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
-        entity_category=EntityCategory.DIAGNOSTIC,
     )
 
 
@@ -264,7 +261,6 @@ class VACALastMotionSensor(_VACADeviceSensorBase):
         translation_key="last_motion",
         icon="mdi:motion-sensor",
         device_class=SensorDeviceClass.TIMESTAMP,
-        entity_category=EntityCategory.DIAGNOSTIC,
     )
 
 
