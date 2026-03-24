@@ -426,7 +426,7 @@ def test_get_device_capabilities_returns_none_after_failures():
     assert result is None
 
 
-def test_on_receive_event_ping_sends_pong_and_swallow():
+def test_on_receive_event_ping_sends_pong_and_forwards():
     _install_assist_module_stubs()
     module = _load_module(
         "custom_components.vaca.assist_satellite", VACA_DIR / "assist_satellite.py"
@@ -454,8 +454,8 @@ def test_on_receive_event_ping_sends_pong_and_swallow():
 
     forward, event = entity.on_receive_event_callback(module.Event("ping", {}))
 
-    assert forward is False
-    assert event is None
+    assert forward is True
+    assert event is not None
     assert len(recorded_tasks) == 1
     asyncio.run(recorded_tasks[0])
     assert entity._client.last_event.type == "pong"
