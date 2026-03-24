@@ -1,8 +1,6 @@
 """Sensor for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
-
-from functools import reduce
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -46,7 +44,6 @@ async def async_setup_entry(
     entities = [
         VACASTTSensor(device),
         VACATTSSensor(device),
-        VACAIntentSensor(device),
         VACAOrientationSensor(device),
         VACABrowserPathSensor(device),
         VACAAudioInputDiagnosticsSensor(device),
@@ -123,61 +120,6 @@ class VACATTSSensor(VASatelliteEntity, RestoreSensor):
                 value = value[:252] + ".."
             self._attr_native_value = value
             self.async_write_ha_state()
-
-
-class VACAIntentSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent intent sensor for VACA satellite."""
-
-    entity_description = SensorEntityDescription(
-        key="intent", translation_key="intent", icon="mdi:message-bulleted"
-    )
-    _attr_native_value = UNKNOWN
-
-    async def async_added_to_hass(self) -> None:
-        """Call when entity about to be added to hass."""
-        await super().async_added_to_hass()
-
-        state = await self.async_get_last_state()
-        if state is not None:
-            self._attr_native_value = state.state
-            self.async_write_ha_state()
-
-        self.async_on_remove(
-            async_dispatcher_connect(
-                self.hass,
-                f"{DOMAIN}_{self._device.device_id}_intent_output",
-                self.status_update,
-            )
-        )
-
-    @callback
-    def status_update(self, data: dict[str, Any]) -> None:
-        """Update entity."""
-        if data and data.get("intent_output"):
-            value = str(
-                self._get_key("intent_output.response.speech.plain.speech", data)
-            )
-            if value:
-                if len(value) > 254:
-                    # Limit the length of the value to avoid issues with Home Assistant
-                    value = value[:252] + ".."
-                self._attr_native_value = value
-
-            self._attr_extra_state_attributes = data
-            self.async_write_ha_state()
-
-    def _get_key(
-        self, dot_notation_path: str, data: dict
-    ) -> dict[str, dict | str | int] | str | int | None:
-        """Try to get a deep value from a dict based on a dot-notation."""
-        try:
-            if "." in dot_notation_path:
-                dn_list = dot_notation_path.split(".")
-            else:
-                dn_list = [dot_notation_path]
-            return reduce(dict.get, dn_list, data)  # type: ignore[return-value]
-        except (TypeError, KeyError):
-            return None
 
 
 class _VACADeviceSensorBase(VASatelliteEntity, RestoreSensor):
