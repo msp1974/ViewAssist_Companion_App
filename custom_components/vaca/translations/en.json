@@ -103,8 +103,9 @@
             "echo_cancellation_mode": {
                 "name": "Echo cancellation mode",
                 "state": {
-                    "platform": "Platform (Android AEC)",
-                    "software": "Software (Speex)"
+                    "hardware": "Hardware (Android Built-in AEC)",
+                    "speex": "Software (Speex Legacy)",
+                    "webrtc": "Software (WebRTC Native APM)"
                 }
             },
             "pipeline": {
@@ -212,8 +213,9 @@
             "active_echo_mode": {
                 "name": "Audio input diagnostics",
                 "state": {
-                    "platform": "Platform AEC",
-                    "software": "Software echo suppression",
+                    "hardware": "Hardware AEC",
+                    "speex": "Software Speex",
+                    "webrtc": "Software WebRTC APM",
                     "none": "No active echo cancellation"
                 }
             },

@@ -198,8 +198,8 @@ class VACAEchoCancellationModeSelect(BaseSelect):
         translation_key="echo_cancellation_mode",
         entity_category=EntityCategory.CONFIG,
     )
-    _attr_options = ["platform", "software"]
-    _attr_current_option = "platform"
+    _attr_options = ["hardware", "speex", "webrtc"]
+    _attr_current_option = "hardware"
 
     def send_to_device(self, option: str) -> None:
         """Send setting to device."""

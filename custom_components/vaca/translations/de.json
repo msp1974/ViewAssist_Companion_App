@@ -103,8 +103,9 @@
             "echo_cancellation_mode": {
                 "name": "Echounterdrückungsmodus",
                 "state": {
-                    "platform": "Plattform (Android AEC)",
-                    "software": "Software (Speex)"
+                    "hardware": "Hardware (Android Built-in AEC)",
+                    "speex": "Software (Speex Legacy)",
+                    "webrtc": "Software (WebRTC Native APM)"
                 }
             },
             "pipeline": {
@@ -195,8 +196,9 @@
             "active_echo_mode": {
                 "name": "Audioeingabe-Diagnose",
                 "state": {
-                    "platform": "Plattform-AEC",
-                    "software": "Software-Echounterdrückung",
+                    "hardware": "Hardware AEC",
+                    "speex": "Software Speex",
+                    "webrtc": "Software WebRTC APM",
                     "none": "Keine aktive Echounterdrückung"
                 }
             },

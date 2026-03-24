@@ -100,8 +100,9 @@
             "echo_cancellation_mode": {
                 "name": "Yankı engelleme modu",
                 "state": {
-                    "platform": "Platform (Android AEC)",
-                    "software": "Yazılım (Speex)"
+                    "hardware": "Donanım (Android Yerleşik AEC)",
+                    "speex": "Yazılım (Speex Mirası)",
+                    "webrtc": "Yazılım (WebRTC Doğal APM)"
                 }
             },
             "pipeline": {
@@ -192,8 +193,9 @@
             "active_echo_mode": {
                 "name": "Ses girişi tanılama",
                 "state": {
-                    "platform": "Platform AEC",
-                    "software": "Yazılım yankı bastırma",
+                    "hardware": "Donanım AEC",
+                    "speex": "Yazılım Speex",
+                    "webrtc": "Yazılım WebRTC APM",
                     "none": "Etkin yankı engelleme yok"
                 }
             },
