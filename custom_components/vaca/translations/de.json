@@ -205,8 +205,8 @@
             }
         },
         "switch": {
-            "mute": {
-                "name": "Stumm"
+            "mic_mute": {
+                "name": "Mikrofon stummgeschaltet"
             },
             "swipe_refresh": {
                 "name": "Wischen zum Aktualisieren"

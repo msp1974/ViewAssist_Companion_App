@@ -36,7 +36,7 @@ async def async_setup_entry(
     # Setup is only forwarded for satellites
     assert device is not None
     entities = [
-        VACAMicSwitch(device),
+        VACAMicMuteSwitch(device),
         VACAScreenSwitch(device),
         VACASwipeToRefreshSwitch(device),
         VACAScreenAutoBrightnessSwitch(device),
@@ -183,16 +183,16 @@ class VACAScreenSwitch(BaseFeedbackSwitch):
                 self._device.send_custom_action(CustomActions.SCREEN_SLEEP)
 
 
-class VACAMicSwitch(BaseSwitch):
-    """Entity to represent if VACA satellite microphone is enabled (HA mastered)."""
+class VACAMicMuteSwitch(BaseSwitch):
+    """Entity to represent if VACA satellite microphone is muted (HA mastered)."""
 
-    entity_description = SwitchEntityDescription(key="mic", translation_key="mic")
-    default_on = True
+    entity_description = SwitchEntityDescription(key="mic_mute", translation_key="mic_mute")
+    default_on = False
 
     @property
     def icon(self) -> str:
         """Return the icon to use in the frontend."""
-        return "mdi:microphone" if self._attr_is_on else "mdi:microphone-off"
+        return "mdi:microphone-off" if self._attr_is_on else "mdi:microphone"
 
 
 class VACASwipeToRefreshSwitch(BaseSwitch):

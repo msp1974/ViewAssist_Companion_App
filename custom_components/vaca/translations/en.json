@@ -222,8 +222,8 @@
             }
         },
         "switch": {
-            "mic": {
-                "name": "Microphone"
+            "mic_mute": {
+                "name": "Mic mute"
             },
             "screen_on": {
                 "name": "Screen"

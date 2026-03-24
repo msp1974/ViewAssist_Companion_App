@@ -202,8 +202,8 @@
             }
         },
         "switch": {
-            "mute": {
-                "name": "Sessiz"
+            "mic_mute": {
+                "name": "Mikrofon sessiz"
             },
             "swipe_refresh": {
                 "name": "Kaydırarak yenile"
