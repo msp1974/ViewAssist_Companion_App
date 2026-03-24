@@ -62,11 +62,8 @@
       }
     },
     "number": {
-      "auto_gain": {
-        "name": "Auto gain"
-      },
-      "volume_multiplier": {
-        "name": "Mic volume"
+      "mic_gain": {
+        "name": "Mic gain"
       },
       "screen_brightness": {
         "name": "Screen brightness"
