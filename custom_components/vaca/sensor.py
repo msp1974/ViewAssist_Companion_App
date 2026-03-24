@@ -6,6 +6,7 @@ from functools import reduce
 import logging
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.components.sensor import (
     RestoreSensor,
     SensorDeviceClass,
@@ -189,11 +190,14 @@ class _VACADeviceSensorBase(VASatelliteEntity, RestoreSensor):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (
+            STATE_UNAVAILABLE,
+            STATE_UNKNOWN,
+        ):
             if self.entity_description.device_class == SensorDeviceClass.TIMESTAMP:
                 self._attr_native_value = self._get_timestamp_from_string(state.state)
             else:
-                self._attr_native_value = state.state
+                self._attr_native_value = self._get_native_value(state.state)
             self.async_write_ha_state()
 
         self.async_on_remove(
@@ -211,7 +215,15 @@ class _VACADeviceSensorBase(VASatelliteEntity, RestoreSensor):
         if isinstance(value, str):
             if value.isdigit():
                 return int(value)
-            return value
+            try:
+                return float(value)
+            except ValueError:
+                # Sensors with a unit of measurement expect numeric values.
+                # Return None for non-numeric strings (e.g. 'unavailable')
+                # so HA treats the sensor as unavailable instead of crashing.
+                if self.entity_description.native_unit_of_measurement:
+                    return None
+                return value
         return value
 
     def _get_timestamp_from_string(self, timestamp_str: str) -> Any:
@@ -303,7 +315,7 @@ class VACABrowserPathSensor(_VACADeviceSensorBase):
 class VACALastMotionSensor(_VACADeviceSensorBase):
     """Entity to represent last motion timestamp for VACA satellite."""
 
-    _attr_native_value = UNKNOWN
+    _attr_native_value = None
     entity_description = SensorEntityDescription(
         key="last_motion",
         translation_key="last_motion",

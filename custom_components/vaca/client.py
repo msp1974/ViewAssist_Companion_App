@@ -4,6 +4,8 @@ import asyncio
 from wyoming.client import AsyncTcpClient
 from wyoming.event import Event
 
+_READ_EVENT_TIMEOUT_SECONDS = 30.0
+
 
 class VAAsyncTcpClient(AsyncTcpClient):
     """Custom TCP client for Wyoming events."""
@@ -44,10 +46,12 @@ class VAAsyncTcpClient(AsyncTcpClient):
         while not forward_event:
             try:
                 # Add a timeout to read_event to detect ghost connections.
-                # If we don't receive anything for 5 seconds, assume connection is dead.
+                # If we don't receive anything for 30 seconds, assume connection is dead.
                 # Note: The satellite sends a ping every 2 seconds by default.
                 try:
-                    event = await asyncio.wait_for(super().read_event(), timeout=5.0)
+                    event = await asyncio.wait_for(
+                        super().read_event(), timeout=_READ_EVENT_TIMEOUT_SECONDS
+                    )
                 except asyncio.TimeoutError:
                     # Connection timed out
                     return None

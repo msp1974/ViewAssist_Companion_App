@@ -101,10 +101,22 @@ class VACAMediaPlayer(VASatelliteEntity, MediaPlayerEntity, RestoreEntity):
         """Handle status update."""
         if not data:
             return
-        if settings := data.get("settings"):
-            if "media_player_gain" in settings:
-                self._attr_volume_level = float(settings["media_player_gain"]) / 100.0
-                self.async_write_ha_state()
+        settings = data.get("settings")
+        if not isinstance(settings, dict):
+            return
+
+        if "media_player_gain" not in settings:
+            return
+
+        try:
+            self._attr_volume_level = float(settings["media_player_gain"]) / 100.0
+            self.async_write_ha_state()
+        except (ValueError, TypeError):
+            _LOGGER.warning(
+                "Ignoring non-numeric setting update: key=%s value=%s",
+                "media_player_gain",
+                settings["media_player_gain"],
+            )
 
     async def async_play_media(
         self,

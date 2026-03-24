@@ -189,10 +189,23 @@ class BaseFeedbackNumber(BaseNumberEntity):
         """Handle status update."""
         if not data:
             return
-        if settings := data.get("settings"):
-            if self.entity_description.key in settings:
-                setting_value = settings[self.entity_description.key]
-                self.update_number(float(setting_value), send_to_device=False)
+        settings = data.get("settings")
+        if not isinstance(settings, dict):
+            return
+
+        setting_key = self.entity_description.key
+        if setting_key not in settings:
+            return
+
+        setting_value = settings[setting_key]
+        try:
+            self.update_number(float(setting_value), send_to_device=False)
+        except (ValueError, TypeError):
+            _LOGGER.warning(
+                "Ignoring non-numeric setting update: key=%s value=%s",
+                setting_key,
+                setting_value,
+            )
 
     @callback
     def capabilities_update(self, data: dict[str, Any]) -> None:
@@ -234,7 +247,17 @@ class VACAVolumeNumber(BaseFeedbackNumber):
     def update_native_max_value(self) -> None:
         """Update max value from device capabilities."""
         max_vol = self._device.get_max_stream_volume(self._capability_key)
-        self._attr_native_max_value = float(max_vol) if max_vol is not None else None
+        if max_vol is None:
+            self._attr_native_max_value = None
+            return
+        try:
+            self._attr_native_max_value = float(max_vol)
+        except (ValueError, TypeError):
+            _LOGGER.warning(
+                "Ignoring non-numeric max stream volume: key=%s value=%s",
+                self._capability_key,
+                max_vol,
+            )
 
 
 class VACAMicGainNumber(BaseNumberEntity):
@@ -286,16 +309,30 @@ class VACAScreenBrightnessNumber(BaseFeedbackNumber):
         # Check if we already have it in capabilities
         if self._device.capabilities and (
             brightness := self._device.capabilities.get("screen_brightness")
-        ):
-            self._attr_native_value = float(brightness)
+        ) is not None:
+            try:
+                self._attr_native_value = float(brightness)
+            except (ValueError, TypeError):
+                _LOGGER.warning(
+                    "Ignoring non-numeric initial capability: key=%s value=%s",
+                    self.entity_description.key,
+                    brightness,
+                )
 
         await super().async_added_to_hass()
 
     @callback
     def capabilities_update(self, data: dict[str, Any]) -> None:
         """Handle capabilities update."""
-        if data and (brightness := data.get("screen_brightness")):
-            self._attr_native_value = float(brightness)
+        if data and (brightness := data.get("screen_brightness")) is not None:
+            try:
+                self._attr_native_value = float(brightness)
+            except (ValueError, TypeError):
+                _LOGGER.warning(
+                    "Ignoring non-numeric capability update: key=%s value=%s",
+                    self.entity_description.key,
+                    brightness,
+                )
         super().capabilities_update(data)
 
 

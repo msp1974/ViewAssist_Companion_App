@@ -51,7 +51,7 @@ _LOGGER = logging.getLogger(__name__)
 
 _SAMPLES_PER_CHUNK: Final = 1024
 _RECONNECT_SECONDS: Final = 5
-_RESTART_SECONDS: Final = 3
+_RESTART_SECONDS: Final = 5
 _MAX_RECONNECT_SECONDS: Final = 30
 _PIPELINE_FINISH_TIMEOUT: Final = 1
 _TTS_SAMPLE_RATE: Final = 22050
@@ -206,7 +206,7 @@ class VACASatelliteAssistEntity(WyomingAssistSatellite, VASatelliteEntity):
                     self._client.write_event(Event("pong", data={"text": ""})),
                     "send VACA pong",
                 )
-            return False, None
+            return True, event
 
         if event and CustomEvent.is_type(event.type):
             evt = CustomEvent.from_event(event)

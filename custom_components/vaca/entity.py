@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from homeassistant.core import callback
 from homeassistant.helpers import entity
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
@@ -7,6 +9,8 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 
 from .const import DOMAIN
 from .devices import VASatelliteDevice
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class VASatelliteEntity(entity.Entity):
@@ -38,7 +42,14 @@ class VASatelliteEntity(entity.Entity):
     @callback
     def _update_connectivity(self) -> None:
         """Update entity availability."""
-        self.async_write_ha_state()
+        try:
+            self.async_write_ha_state()
+        except (ValueError, AttributeError) as err:
+            _LOGGER.warning(
+                "Error writing state during connectivity update: key=%s value=%s",
+                self.entity_id,
+                err,
+            )
 
     @property
     def available(self) -> bool:
