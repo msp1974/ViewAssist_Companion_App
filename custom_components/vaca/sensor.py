@@ -49,6 +49,7 @@ async def async_setup_entry(
         VACAIntentSensor(device),
         VACAOrientationSensor(device),
         VACABrowserPathSensor(device),
+        VACAAudioInputDiagnosticsSensor(device),
     ]
 
     if capabilities := device.capabilities:
@@ -367,3 +368,30 @@ class VACAAppVersionSensor(_VACADeviceSensorBase):
         ):
             return [sensor.get("name") for sensor in sensors]
         return None
+
+
+class VACAAudioInputDiagnosticsSensor(_VACADeviceSensorBase):
+    """Entity to represent active audio input diagnostics for VACA satellite."""
+
+    _attr_native_value = UNKNOWN
+    entity_description = SensorEntityDescription(
+        key="active_echo_mode",
+        translation_key="active_echo_mode",
+        icon="mdi:waveform",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity and include detailed audio-input attributes."""
+        if sensors := data.get("sensors"):
+            active_echo_mode = sensors.get("active_echo_mode")
+            if active_echo_mode is not None:
+                self._attr_native_value = str(active_echo_mode)
+                self._attr_extra_state_attributes = {
+                    "mic_audio_source": sensors.get("mic_audio_source", UNKNOWN),
+                    "requested_echo_mode": sensors.get("requested_echo_mode", UNKNOWN),
+                    "platform_aec_available": sensors.get("platform_aec_available"),
+                    "platform_aec_enabled": sensors.get("platform_aec_enabled"),
+                }
+                self.async_write_ha_state()

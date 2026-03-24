@@ -69,6 +69,7 @@ async def async_setup_entry(
         [
             VACAPipelineSelect(hass, device),
             VACANoiseSuppressionLevelSelect(device),
+            VACAEchoCancellationModeSelect(device),
             VACAVadSensitivitySelect(hass, device),
             VACAWakeWordEngineSelect(device),
             VACAWakeWordSelect(device),
@@ -78,6 +79,7 @@ async def async_setup_entry(
             VACAStopWordSoundSelect(device),
             VACAMicOnSoundSelect(device),
             VACAMicOffSoundSelect(device),
+            VACAMicAudioSourceSelect(device),
             VACAScreenTimeoutSelect(device),
             VACAScreenOrientationModeSelect(device),
         ]
@@ -186,6 +188,22 @@ class VACANoiseSuppressionLevelSelect(BaseSelect):
     def send_to_device(self, option: str) -> None:
         """Send setting to device."""
         self._device.set_custom_setting(self.entity_description.key, _NOISE_SUPPRESSION_LEVEL[option])
+
+
+class VACAEchoCancellationModeSelect(BaseSelect):
+    """Entity to select echo cancellation mode."""
+
+    entity_description = SelectEntityDescription(
+        key="echo_cancellation_mode",
+        translation_key="echo_cancellation_mode",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_options = ["platform", "software"]
+    _attr_current_option = "platform"
+
+    def send_to_device(self, option: str) -> None:
+        """Send setting to device."""
+        self._device.set_custom_setting(self.entity_description.key, option)
 
 
 class VACAVadSensitivitySelect(VASatelliteEntity, VadSensitivitySelect):
@@ -325,6 +343,22 @@ class VACAMicOffSoundSelect(BaseSelect):
     )
     _attr_options = _SOUND_OPTIONS
     _attr_current_option = "havpe_mic_off"
+
+
+class VACAMicAudioSourceSelect(BaseSelect):
+    """Entity to represent microphone capture source."""
+
+    entity_description = SelectEntityDescription(
+        key="mic_audio_source",
+        translation_key="mic_audio_source",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_options = ["voice_recognition", "voice_communication"]
+    _attr_current_option = "voice_recognition"
+
+    def send_to_device(self, option: str) -> None:
+        """Send setting to device."""
+        self._device.set_custom_setting(self.entity_description.key, option)
 
 
 class VACAScreenTimeoutSelect(BaseSelect):

@@ -100,6 +100,13 @@
                     "off": "Aus"
                 }
             },
+            "echo_cancellation_mode": {
+                "name": "Echounterdrückungsmodus",
+                "state": {
+                    "platform": "Plattform (Android AEC)",
+                    "software": "Software (Speex)"
+                }
+            },
             "pipeline": {
                 "name": "Assistent",
                 "state": {
@@ -134,6 +141,13 @@
             },
             "mic_off_sound": {
                 "name": "Mikrofon aus Ton"
+            },
+            "mic_audio_source": {
+                "name": "Mikrofon-Audioquelle",
+                "state": {
+                    "voice_recognition": "Spracherkennung",
+                    "voice_communication": "Sprachkommunikation"
+                }
             },
             "screen_timeout": {
                 "name": "Bildschirm-Timeout",
@@ -177,6 +191,14 @@
             },
             "current_path": {
                 "name": "Aktueller Pfad"
+            },
+            "active_echo_mode": {
+                "name": "Audioeingabe-Diagnose",
+                "state": {
+                    "platform": "Plattform-AEC",
+                    "software": "Software-Echounterdrückung",
+                    "none": "Keine aktive Echounterdrückung"
+                }
             },
             "last_motion": {
                 "name": "Letzte Bewegung"

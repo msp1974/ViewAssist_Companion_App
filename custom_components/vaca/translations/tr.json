@@ -97,6 +97,13 @@
                     "off": "Kapalı"
                 }
             },
+            "echo_cancellation_mode": {
+                "name": "Yankı engelleme modu",
+                "state": {
+                    "platform": "Platform (Android AEC)",
+                    "software": "Yazılım (Speex)"
+                }
+            },
             "pipeline": {
                 "name": "Asistan",
                 "state": {
@@ -131,6 +138,13 @@
             },
             "mic_off_sound": {
                 "name": "Mikrofon kapalı sesi"
+            },
+            "mic_audio_source": {
+                "name": "Mikrofon ses kaynağı",
+                "state": {
+                    "voice_recognition": "Ses tanıma",
+                    "voice_communication": "Sesli iletişim"
+                }
             },
             "screen_timeout": {
                 "name": "Ekran zaman aşımı",
@@ -174,6 +188,14 @@
             },
             "current_path": {
                 "name": "Mevcut yol"
+            },
+            "active_echo_mode": {
+                "name": "Ses girişi tanılama",
+                "state": {
+                    "platform": "Platform AEC",
+                    "software": "Yazılım yankı bastırma",
+                    "none": "Etkin yankı engelleme yok"
+                }
             },
             "last_motion": {
                 "name": "Son hareket"

@@ -100,6 +100,13 @@
                     "off": "Off"
                 }
             },
+            "echo_cancellation_mode": {
+                "name": "Echo cancellation mode",
+                "state": {
+                    "platform": "Platform (Android AEC)",
+                    "software": "Software (Speex)"
+                }
+            },
             "pipeline": {
                 "name": "Assistant",
                 "state": {
@@ -141,6 +148,13 @@
             },
             "mic_off_sound": {
                 "name": "Mic off sound"
+            },
+            "mic_audio_source": {
+                "name": "Mic audio source",
+                "state": {
+                    "voice_recognition": "Voice recognition",
+                    "voice_communication": "Voice communication"
+                }
             },
             "screen_timeout": {
                 "name": "Screen timeout",
@@ -194,6 +208,14 @@
             },
             "current_path": {
                 "name": "Current path"
+            },
+            "active_echo_mode": {
+                "name": "Audio input diagnostics",
+                "state": {
+                    "platform": "Platform AEC",
+                    "software": "Software echo suppression",
+                    "none": "No active echo cancellation"
+                }
             },
             "last_motion": {
                 "name": "Last motion"
