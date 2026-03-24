@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 # Constants for volume and gain limits
-_MAX_MIC_GAIN: Final = 100
+_MAX_MIC_GAIN: Final = 20
 _MIN_SOUND_VOLUME: Final = 0
 
 
@@ -238,16 +238,17 @@ class VACAVolumeNumber(BaseFeedbackNumber):
 
 
 class VACAMicGainNumber(BaseNumberEntity):
-    """Entity to represent mic gain amount."""
+    """Entity to represent mic gain amount in dB (0 = unity, 20 = 10x boost)."""
 
     entity_description = NumberEntityDescription(
         key="mic_gain",
         translation_key="mic_gain",
         icon="mdi:microphone-plus",
+        native_unit_of_measurement="dB",
         entity_category=EntityCategory.CONFIG,
     )
-    _attr_native_min_value: float = -10.0
-    _attr_native_max_value: float | None = 10.0
+    _attr_native_min_value: float = 0.0
+    _attr_native_max_value: float | None = 20.0
     _attr_native_value: float | None = 0.0
 
 
