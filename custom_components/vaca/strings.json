@@ -54,6 +54,11 @@
           "aggressive": "[%key:component::assist_pipeline::entity::select::vad_sensitivity::state::aggressive%]",
           "relaxed": "[%key:component::assist_pipeline::entity::select::vad_sensitivity::state::relaxed%]"
         }
+      },
+      "wake_word": {
+        "state": {
+          "none": "[%key:common::state::none%]"
+        }
       }
     },
     "switch": {

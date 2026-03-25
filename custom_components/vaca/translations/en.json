@@ -100,8 +100,8 @@
                     "off": "Off"
                 }
             },
-            "echo_cancellation_mode": {
-                "name": "Echo cancellation mode",
+            "audio_input_processing_mode": {
+                "name": "Audio input processing mode",
                 "state": {
                     "hardware": "Hardware (Android Built-in AEC)",
                     "speex": "Software (Speex Legacy)",
@@ -210,13 +210,27 @@
             "current_path": {
                 "name": "Current path"
             },
-            "active_echo_mode": {
+            "active_processing_pipeline": {
                 "name": "Audio input diagnostics",
                 "state": {
                     "hardware": "Hardware AEC",
                     "speex": "Software Speex",
                     "webrtc": "Software WebRTC APM",
-                    "none": "No active echo cancellation"
+                    "none": "No active input processing"
+                }
+            },
+            "audio_output_diagnostics": {
+                "name": "Audio output diagnostics",
+                "state": {
+                    "active": "Active",
+                    "inactive": "Inactive"
+                }
+            },
+            "audio_engine_diagnostics": {
+                "name": "Audio engine diagnostics",
+                "state": {
+                    "started": "Started",
+                    "stopped": "Stopped"
                 }
             },
             "last_motion": {

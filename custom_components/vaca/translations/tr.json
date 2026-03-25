@@ -97,8 +97,8 @@
                     "off": "Kapalı"
                 }
             },
-            "echo_cancellation_mode": {
-                "name": "Yankı engelleme modu",
+            "audio_input_processing_mode": {
+                "name": "Ses girişi işleme modu",
                 "state": {
                     "hardware": "Donanım (Android Yerleşik AEC)",
                     "speex": "Yazılım (Speex Mirası)",
@@ -190,13 +190,27 @@
             "current_path": {
                 "name": "Mevcut yol"
             },
-            "active_echo_mode": {
+            "active_processing_pipeline": {
                 "name": "Ses girişi tanılama",
                 "state": {
                     "hardware": "Donanım AEC",
                     "speex": "Yazılım Speex",
                     "webrtc": "Yazılım WebRTC APM",
-                    "none": "Etkin yankı engelleme yok"
+                    "none": "Etkin giriş işleme yok"
+                }
+            },
+            "audio_output_diagnostics": {
+                "name": "Ses çıkışı tanılama",
+                "state": {
+                    "active": "Etkin",
+                    "inactive": "Etkin değil"
+                }
+            },
+            "audio_engine_diagnostics": {
+                "name": "Ses motoru tanılama",
+                "state": {
+                    "started": "Başlatıldı",
+                    "stopped": "Durduruldu"
                 }
             },
             "last_motion": {

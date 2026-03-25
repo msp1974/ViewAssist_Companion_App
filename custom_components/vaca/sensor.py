@@ -48,7 +48,9 @@ async def async_setup_entry(
         VACAIntentSensor(device),
         VACAOrientationSensor(device),
         VACABrowserPathSensor(device),
-        VACAAudioInputDiagnosticsSensor(device),
+        VACAAudioInputProcessingDiagnosticsSensor(device),
+        VACAAudioOutputDiagnosticsSensor(device),
+        VACAAudioEngineDiagnosticsSensor(device),
     ]
 
     if capabilities := device.capabilities:
@@ -370,13 +372,13 @@ class VACAAppVersionSensor(_VACADeviceSensorBase):
         return None
 
 
-class VACAAudioInputDiagnosticsSensor(_VACADeviceSensorBase):
+class VACAAudioInputProcessingDiagnosticsSensor(_VACADeviceSensorBase):
     """Entity to represent active audio input diagnostics for VACA satellite."""
 
     _attr_native_value = UNKNOWN
     entity_description = SensorEntityDescription(
-        key="active_echo_mode",
-        translation_key="active_echo_mode",
+        key="active_processing_pipeline",
+        translation_key="active_processing_pipeline",
         icon="mdi:waveform",
         entity_category=EntityCategory.DIAGNOSTIC,
     )
@@ -385,13 +387,92 @@ class VACAAudioInputDiagnosticsSensor(_VACADeviceSensorBase):
     def status_update(self, data: dict[str, Any]) -> None:
         """Update entity and include detailed audio-input attributes."""
         if sensors := data.get("sensors"):
-            active_echo_mode = sensors.get("active_echo_mode")
-            if active_echo_mode is not None:
-                self._attr_native_value = str(active_echo_mode)
+            active_processing_pipeline = sensors.get("active_processing_pipeline")
+            if active_processing_pipeline is not None:
+                self._attr_native_value = str(active_processing_pipeline)
                 self._attr_extra_state_attributes = {
                     "mic_audio_source": sensors.get("mic_audio_source", UNKNOWN),
-                    "requested_echo_mode": sensors.get("requested_echo_mode", UNKNOWN),
-                    "platform_aec_available": sensors.get("platform_aec_available"),
-                    "platform_aec_enabled": sensors.get("platform_aec_enabled"),
+                    "configured_input_processing_mode": sensors.get(
+                        "configured_input_processing_mode", UNKNOWN
+                    ),
+                    "hardware_aec_available": sensors.get("hardware_aec_available"),
+                    "hardware_aec_enabled": sensors.get("hardware_aec_enabled"),
+                    "active_pipeline_aec_enabled": sensors.get(
+                        "active_pipeline_aec_enabled"
+                    ),
+                    "active_pipeline_agc_enabled": sensors.get(
+                        "active_pipeline_agc_enabled"
+                    ),
+                    "active_pipeline_ns_enabled": sensors.get(
+                        "active_pipeline_ns_enabled"
+                    ),
+                    "webrtc_apm_ready": sensors.get("webrtc_apm_ready"),
+                    "current_apm_stream_delay_ms": sensors.get(
+                        "current_apm_stream_delay_ms"
+                    ),
+                    "render_feed_age_ms": sensors.get("render_feed_age_ms"),
+                }
+                self.async_write_ha_state()
+
+
+class VACAAudioOutputDiagnosticsSensor(_VACADeviceSensorBase):
+    """Entity to represent active audio output diagnostics for VACA satellite."""
+
+    _attr_native_value = UNKNOWN
+    entity_description = SensorEntityDescription(
+        key="audio_output_diagnostics",
+        translation_key="audio_output_diagnostics",
+        icon="mdi:volume-high",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity and include detailed audio-output attributes."""
+        if sensors := data.get("sensors"):
+            output_playback_active = sensors.get("output_playback_active")
+            render_tap_sink_active = sensors.get("render_tap_sink_active")
+            if output_playback_active is not None or render_tap_sink_active is not None:
+                is_active = bool(
+                    output_playback_active
+                    if output_playback_active is not None
+                    else render_tap_sink_active
+                )
+                self._attr_native_value = "active" if is_active else "inactive"
+                self._attr_extra_state_attributes = {
+                    "output_playback_active": bool(output_playback_active)
+                    if output_playback_active is not None
+                    else None,
+                    "render_tap_sink_active": bool(render_tap_sink_active),
+                    "audio_streaming_to_server": sensors.get("audio_streaming_to_server"),
+                    "wake_word_audio_route": sensors.get("wake_word_audio_route", UNKNOWN),
+                }
+                self.async_write_ha_state()
+
+
+class VACAAudioEngineDiagnosticsSensor(_VACADeviceSensorBase):
+    """Entity to represent active audio engine diagnostics for VACA satellite."""
+
+    _attr_native_value = UNKNOWN
+    entity_description = SensorEntityDescription(
+        key="audio_engine_diagnostics",
+        translation_key="audio_engine_diagnostics",
+        icon="mdi:chip",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity and include detailed audio-engine attributes."""
+        if sensors := data.get("sensors"):
+            engine_started = sensors.get("audio_engine_started")
+            if engine_started is not None:
+                self._attr_native_value = "started" if bool(engine_started) else "stopped"
+                self._attr_extra_state_attributes = {
+                    "audio_engine": sensors.get("audio_engine", UNKNOWN),
+                    "audio_engine_started": bool(engine_started),
+                    "audio_engine_muted": sensors.get("audio_engine_muted"),
+                    "audio_streaming_to_server": sensors.get("audio_streaming_to_server"),
+                    "wake_word_audio_route": sensors.get("wake_word_audio_route", UNKNOWN),
                 }
                 self.async_write_ha_state()

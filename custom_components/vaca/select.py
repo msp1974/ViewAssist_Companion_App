@@ -69,7 +69,7 @@ async def async_setup_entry(
         [
             VACAPipelineSelect(hass, device),
             VACANoiseSuppressionLevelSelect(device),
-            VACAEchoCancellationModeSelect(device),
+            VACAAudioInputProcessingModeSelect(device),
             VACAVadSensitivitySelect(hass, device),
             VACAWakeWordEngineSelect(device),
             VACAWakeWordSelect(device),
@@ -190,12 +190,12 @@ class VACANoiseSuppressionLevelSelect(BaseSelect):
         self._device.set_custom_setting(self.entity_description.key, _NOISE_SUPPRESSION_LEVEL[option])
 
 
-class VACAEchoCancellationModeSelect(BaseSelect):
-    """Entity to select echo cancellation mode."""
+class VACAAudioInputProcessingModeSelect(BaseSelect):
+    """Entity to select audio input processing mode."""
 
     entity_description = SelectEntityDescription(
-        key="echo_cancellation_mode",
-        translation_key="echo_cancellation_mode",
+        key="audio_input_processing_mode",
+        translation_key="audio_input_processing_mode",
         entity_category=EntityCategory.CONFIG,
     )
     _attr_options = ["hardware", "speex", "webrtc"]
@@ -230,11 +230,12 @@ class VACAWakeWordSelect(BaseSelect):
         translation_key="wake_word",
         entity_category=EntityCategory.CONFIG,
     )
+    _attr_current_option = "none"
 
     @property
     def options(self) -> list[str]:
         """Return the list of available wake word options."""
-        options = ["None"]
+        options = ["none"]
         options.extend(self.get_wake_word_options())
         return options
 

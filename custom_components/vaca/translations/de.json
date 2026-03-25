@@ -100,8 +100,8 @@
                     "off": "Aus"
                 }
             },
-            "echo_cancellation_mode": {
-                "name": "Echounterdrückungsmodus",
+            "audio_input_processing_mode": {
+                "name": "Audioeingabe-Verarbeitungsmodus",
                 "state": {
                     "hardware": "Hardware (Android Built-in AEC)",
                     "speex": "Software (Speex Legacy)",
@@ -193,13 +193,27 @@
             "current_path": {
                 "name": "Aktueller Pfad"
             },
-            "active_echo_mode": {
+            "active_processing_pipeline": {
                 "name": "Audioeingabe-Diagnose",
                 "state": {
                     "hardware": "Hardware AEC",
                     "speex": "Software Speex",
                     "webrtc": "Software WebRTC APM",
-                    "none": "Keine aktive Echounterdrückung"
+                    "none": "Keine aktive Eingabeverarbeitung"
+                }
+            },
+            "audio_output_diagnostics": {
+                "name": "Audioausgabe-Diagnose",
+                "state": {
+                    "active": "Aktiv",
+                    "inactive": "Inaktiv"
+                }
+            },
+            "audio_engine_diagnostics": {
+                "name": "Audio-Engine-Diagnose",
+                "state": {
+                    "started": "Gestartet",
+                    "stopped": "Gestoppt"
                 }
             },
             "last_motion": {
