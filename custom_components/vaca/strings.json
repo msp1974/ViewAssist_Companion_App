@@ -54,19 +54,21 @@
           "aggressive": "[%key:component::assist_pipeline::entity::select::vad_sensitivity::state::aggressive%]",
           "relaxed": "[%key:component::assist_pipeline::entity::select::vad_sensitivity::state::relaxed%]"
         }
+      },
+      "wake_word": {
+        "state": {
+          "none": "[%key:common::state::none%]"
+        }
       }
     },
     "switch": {
-      "mute": {
-        "name": "Mute"
+      "mic_mute": {
+        "name": "Microphone muted"
       }
     },
     "number": {
-      "auto_gain": {
-        "name": "Auto gain"
-      },
-      "volume_multiplier": {
-        "name": "Mic volume"
+      "mic_gain": {
+        "name": "Mic gain"
       },
       "screen_brightness": {
         "name": "Screen brightness"

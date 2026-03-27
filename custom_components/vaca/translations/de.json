@@ -67,14 +67,17 @@
             "screen_brightness": {
                 "name": "Bildschirmhelligkeit"
             },
-            "notification_volume": {
+            "voice_volume": {
                 "name": "Sprachlautstärke"
             },
             "motion_detection_sensitivity": {
                 "name": "Bewegungserkennungsempfindlichkeit"
             },
-            "music_volume": {
-                "name": "Musiklautstärke"
+            "media_volume": {
+                "name": "Medienlautstärke"
+            },
+            "alarm_volume": {
+                "name": "Alarmlautstärke"
             },
             "ducking_volume": {
                 "name": "Lautstärkeabsenkung"
@@ -97,6 +100,14 @@
                     "off": "Aus"
                 }
             },
+            "audio_input_processing_mode": {
+                "name": "Audioeingabe-Verarbeitungsmodus",
+                "state": {
+                    "hardware": "Hardware (Android Built-in AEC)",
+                    "speex": "Software (Speex Legacy)",
+                    "webrtc": "Software (WebRTC Native APM)"
+                }
+            },
             "pipeline": {
                 "name": "Assistent",
                 "state": {
@@ -115,13 +126,28 @@
                 "name": "Weckwort"
             },
             "wake_word_sound": {
-                "name": "Weckwort-Ton",
+                "name": "Weckwort-Ton"
+            },
+            "processing_sound": {
+                "name": "Verarbeitungston"
+            },
+            "error_sound": {
+                "name": "Fehlerton"
+            },
+            "stop_word_sound": {
+                "name": "Stop-Ton"
+            },
+            "mic_on_sound": {
+                "name": "Mikrofon an Ton"
+            },
+            "mic_off_sound": {
+                "name": "Mikrofon aus Ton"
+            },
+            "mic_audio_source": {
+                "name": "Mikrofon-Audioquelle",
                 "state": {
-                    "none": "Kein",
-                    "havpe": "Home Assistant",
-                    "alexa": "Alexa",
-                    "bubble": "Blase",
-                    "ding": "Ding"
+                    "voice_recognition": "Spracherkennung",
+                    "voice_communication": "Sprachkommunikation"
                 }
             },
             "screen_timeout": {
@@ -167,13 +193,36 @@
             "current_path": {
                 "name": "Aktueller Pfad"
             },
+            "active_processing_pipeline": {
+                "name": "Audioeingabe-Diagnose",
+                "state": {
+                    "hardware": "Hardware AEC",
+                    "speex": "Software Speex",
+                    "webrtc": "Software WebRTC APM",
+                    "none": "Keine aktive Eingabeverarbeitung"
+                }
+            },
+            "audio_output_diagnostics": {
+                "name": "Audioausgabe-Diagnose",
+                "state": {
+                    "active": "Aktiv",
+                    "inactive": "Inaktiv"
+                }
+            },
+            "audio_engine_diagnostics": {
+                "name": "Audio-Engine-Diagnose",
+                "state": {
+                    "started": "Gestartet",
+                    "stopped": "Gestoppt"
+                }
+            },
             "last_motion": {
                 "name": "Letzte Bewegung"
             }
         },
         "switch": {
-            "mute": {
-                "name": "Stumm"
+            "mic_mute": {
+                "name": "Mikrofon stummgeschaltet"
             },
             "swipe_refresh": {
                 "name": "Wischen zum Aktualisieren"
@@ -192,9 +241,6 @@
             },
             "diagnostics_enabled": {
                 "name": "Bildschirmdiagnose"
-            },
-            "continue_conversation": {
-                "name": "Unterhaltung fortsetzen"
             },
             "alarm": {
                 "name": "Alarm"

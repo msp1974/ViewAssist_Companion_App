@@ -1,4 +1,4 @@
-"""Binary Sensor for Wyoming."""
+"""Binary Sensor for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -42,22 +43,20 @@ async def async_setup_entry(
 
     entities = []
 
-    entities.append(WyomingSatelliteScreenOnBinarySensor(device))
-
     if capabilities := device.capabilities:
         if capabilities.get("has_battery"):
-            entities.append(WyomingSatelliteBatteryChargingBinarySensor(device))
+            entities.append(VACABatteryChargingBinarySensor(device))
         if capabilities.get("has_front_camera"):
-            entities.append(WyomingSatelliteMotionDetectedSensor(device))
+            entities.append(VACAMotionDetectedSensor(device))
 
     if entities:
         async_add_entities(entities)
 
 
-class _WyomingSatelliteDeviceBinarySensorBase(
+class _VACADeviceBinarySensorBase(
     VASatelliteEntity, BinarySensorEntity, RestoreEntity
 ):
-    """Base class for device sensors."""
+    """Base class for VACA device sensors."""
 
     _attr_is_on = False
     _listener_class = "status_update"
@@ -70,7 +69,7 @@ class _WyomingSatelliteDeviceBinarySensorBase(
             state = await self.async_get_last_state()
             if state is not None:
                 # Restore the state of the binary sensor
-                self._attr_is_on = bool(state.state)
+                self._attr_is_on = state.state == STATE_ON
                 self.async_write_ha_state()
 
         self.async_on_remove(
@@ -98,10 +97,10 @@ class _WyomingSatelliteDeviceBinarySensorBase(
                 self.async_write_ha_state()
 
 
-class WyomingSatelliteBatteryChargingBinarySensor(
-    _WyomingSatelliteDeviceBinarySensorBase
+class VACABatteryChargingBinarySensor(
+    _VACADeviceBinarySensorBase
 ):
-    """Entity to represent battery charging sensor for satellite."""
+    """Entity to represent battery charging sensor for VACA satellite."""
 
     entity_description = BinarySensorEntityDescription(
         key="battery_charging",
@@ -110,16 +109,8 @@ class WyomingSatelliteBatteryChargingBinarySensor(
     )
 
 
-class WyomingSatelliteScreenOnBinarySensor(_WyomingSatelliteDeviceBinarySensorBase):
-    """Entity to represent screen on status sensor for satellite."""
-
-    entity_description = BinarySensorEntityDescription(
-        key="screen_on", translation_key="screen_on", icon="mdi:monitor"
-    )
-
-
-class WyomingSatelliteMotionDetectedSensor(_WyomingSatelliteDeviceBinarySensorBase):
-    """Entity to represent screen on status sensor for satellite."""
+class VACAMotionDetectedSensor(_VACADeviceBinarySensorBase):
+    """Entity to represent motion detected sensor for VACA satellite."""
 
     detection_reset_task: Task | None = None
     _dont_restore_state = True

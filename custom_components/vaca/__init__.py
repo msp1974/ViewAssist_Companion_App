@@ -1,4 +1,4 @@
-"""The Wyoming integration."""
+"""The ViewAssist Companion App (VACA) integration."""
 
 from __future__ import annotations
 
@@ -47,19 +47,19 @@ __all__ = [
 ]
 
 
-class WyomingError(HomeAssistantError):
-    """Base class for Wyoming errors."""
+class VACAError(HomeAssistantError):
+    """Base class for VACA errors."""
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Set up the Wyoming integration."""
+    """Set up the VACA integration."""
     async_register_websocket_api(hass)
 
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Load Wyoming."""
+    """Load VACA."""
     service = await WyomingService.create(entry.data["host"], entry.data["port"])
 
     if service is None:
@@ -91,6 +91,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
         item.device.capabilities = await get_device_capabilities(item)
 
+        # Update device info with capabilities
+        if item.device.capabilities:
+            app_version = item.device.capabilities.get("app_version")
+            android_version = item.device.capabilities.get("release")
+            manufacturer = item.device.capabilities.get("manufacturer")
+            model = item.device.capabilities.get("model")
+
+            sw_version = (
+                f"View Assist Companion App {app_version}" if app_version else None
+            )
+            hw_version = f"Android {android_version}" if android_version else None
+
+            dev_reg.async_update_device(
+                device.id,
+                manufacturer=manufacturer,
+                model=model,
+                sw_version=sw_version,
+                hw_version=hw_version,
+            )
+
         # Set up satellite entity, sensors, switches, etc.
         await hass.config_entries.async_forward_entry_setups(entry, SATELLITE_PLATFORMS)
 
@@ -103,7 +123,7 @@ async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload Wyoming."""
+    """Unload VACA."""
     item: DomainDataItem = hass.data[DOMAIN][entry.entry_id]
 
     platforms = list(item.service.platforms)
@@ -121,18 +141,18 @@ async def get_device_capabilities(item: DomainDataItem):
     """Get device capabilities."""
     capabilities: dict[str, Any] | None = None
 
-    for _ in range(4):
+    for attempt in range(4):
         try:
             async with (
                 AsyncTcpClient(item.service.host, item.service.port) as client,
-                asyncio.timeout(1),
+                asyncio.timeout(2),
             ):
                 # Describe -> Info
                 await client.write_event(CustomEvent("capabilities").event())
                 while True:
                     event = await client.read_event()
                     if event is None:
-                        raise WyomingError(  # noqa: TRY301
+                        raise VACAError(  # noqa: TRY301
                             "Connection closed unexpectedly",
                         )
 
@@ -144,11 +164,22 @@ async def get_device_capabilities(item: DomainDataItem):
 
                 if capabilities is not None:
                     break  # for
-        except (TimeoutError, OSError, WyomingError) as ex:
-            _LOGGER.warning(
-                "Error getting device capabilities: %s, %s", ex, capabilities
+        except (TimeoutError, OSError, VACAError) as ex:
+            _LOGGER.debug(
+                "Attempt %s/4: Error getting device capabilities at %s:%s: %s",
+                attempt + 1,
+                item.service.host,
+                item.service.port,
+                ex,
             )
             # Sleep and try again
-            await asyncio.sleep(2)
+            await asyncio.sleep(1)
+
+    if capabilities is None:
+        _LOGGER.warning(
+            "Failed to get device capabilities for satellite at %s:%s after 4 attempts",
+            item.service.host,
+            item.service.port,
+        )
 
     return capabilities

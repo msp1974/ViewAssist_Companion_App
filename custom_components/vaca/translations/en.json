@@ -40,12 +40,6 @@
             "refresh": {
                 "name": "Refresh"
             },
-            "screen_wake": {
-                "name": "Wake screen"
-            },
-            "screen_sleep": {
-                "name": "Sleep screen"
-            },
             "wake": {
                 "name": "Wake"
             }
@@ -67,17 +61,20 @@
             "screen_brightness": {
                 "name": "Screen brightness"
             },
-            "notification_volume": {
+            "voice_volume": {
                 "name": "Voice volume"
             },
             "motion_detection_sensitivity": {
                 "name": "Motion detection sensitivity"
             },
-            "music_volume": {
-                "name": "Music volume"
+            "media_volume": {
+                "name": "Media volume"
+            },
+            "alarm_volume": {
+                "name": "Alarm volume"
             },
             "ducking_volume": {
-                "name": "Ducking volume"
+                "name": "Ducking reduction"
             },
             "wake_word_threshold": {
                 "name": "Wake word threshold"
@@ -86,7 +83,7 @@
                 "name": "Zoom level"
             },
             "raw_proximity_threshold": {
-              "name": "Proximity threshold"
+                "name": "Proximity threshold"
             },
             "bump_sensitivity": {
                 "name": "Bump sensitivity"
@@ -101,6 +98,14 @@
                     "max": "Max",
                     "medium": "Medium",
                     "off": "Off"
+                }
+            },
+            "audio_input_processing_mode": {
+                "name": "Audio input processing mode",
+                "state": {
+                    "hardware": "Hardware (Android Built-in AEC)",
+                    "speex": "Software (Speex Legacy)",
+                    "webrtc": "Software (WebRTC Native APM)"
                 }
             },
             "pipeline": {
@@ -128,13 +133,28 @@
                 "name": "Wake word"
             },
             "wake_word_sound": {
-                "name": "Wake word sound",
+                "name": "Wake word sound"
+            },
+            "processing_sound": {
+                "name": "Processing sound"
+            },
+            "error_sound": {
+                "name": "Error sound"
+            },
+            "stop_word_sound": {
+                "name": "Stop sound"
+            },
+            "mic_on_sound": {
+                "name": "Mic on sound"
+            },
+            "mic_off_sound": {
+                "name": "Mic off sound"
+            },
+            "mic_audio_source": {
+                "name": "Mic audio source",
                 "state": {
-                    "none": "None",
-                    "havpe": "Home Assistant",
-                    "alexa": "Alexa",
-                    "bubble": "Bubble",
-                    "ding": "Ding"
+                    "voice_recognition": "Voice recognition",
+                    "voice_communication": "Voice communication"
                 }
             },
             "screen_timeout": {
@@ -190,13 +210,36 @@
             "current_path": {
                 "name": "Current path"
             },
+            "active_processing_pipeline": {
+                "name": "Audio input diagnostics",
+                "state": {
+                    "hardware": "Hardware AEC",
+                    "speex": "Software Speex",
+                    "webrtc": "Software WebRTC APM",
+                    "none": "No active input processing"
+                }
+            },
+            "audio_output_diagnostics": {
+                "name": "Audio output diagnostics",
+                "state": {
+                    "active": "Active",
+                    "inactive": "Inactive"
+                }
+            },
+            "audio_engine_diagnostics": {
+                "name": "Audio engine diagnostics",
+                "state": {
+                    "started": "Started",
+                    "stopped": "Stopped"
+                }
+            },
             "last_motion": {
                 "name": "Last motion"
             }
         },
         "switch": {
-            "mute": {
-                "name": "Mute"
+            "mic_mute": {
+                "name": "Mic mute"
             },
             "screen_on": {
                 "name": "Screen"
@@ -218,9 +261,6 @@
             },
             "diagnostics_enabled": {
                 "name": "On screen diagnostics"
-            },
-            "continue_conversation": {
-                "name": "Continue conversation"
             },
             "alarm": {
                 "name": "Alarm"

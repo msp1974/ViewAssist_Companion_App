@@ -1,4 +1,4 @@
-"""Support for Wyoming wake-word-detection services."""
+"""Support for VACA wake-word-detection services via Wyoming protocol."""
 
 import asyncio
 from collections.abc import AsyncIterable
@@ -30,17 +30,17 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up Wyoming wake-word-detection."""
+    """Set up VACA wake-word-detection."""
     item: DomainDataItem = hass.data[DOMAIN][config_entry.entry_id]
     async_add_entities(
         [
-            WyomingWakeWordProvider(hass, config_entry, item.service),
+            VACAWakeWordProvider(hass, config_entry, item.service),
         ]
     )
 
 
-class WyomingWakeWordProvider(wake_word.WakeWordDetectionEntity):
-    """Wyoming wake-word-detection provider."""
+class VACAWakeWordProvider(wake_word.WakeWordDetectionEntity):
+    """VACA wake-word-detection provider."""
 
     def __init__(
         self,
@@ -84,10 +84,7 @@ class WyomingWakeWordProvider(wake_word.WakeWordDetectionEntity):
     async def _async_process_audio_stream(
         self, stream: AsyncIterable[tuple[bytes, int]], wake_word_id: str | None
     ) -> wake_word.DetectionResult | None:
-        """Try to detect one or more wake words in an audio stream.
-
-        Audio must be 16Khz sample rate with 16-bit mono PCM samples.
-        """
+        """Try to detect one or more wake words in an audio stream."""
 
         async def next_chunk():
             """Get the next chunk from audio stream."""
@@ -148,7 +145,7 @@ class WyomingWakeWordProvider(wake_word.WakeWordDetectionEntity):
                                     # Save queued audio
                                     await audio_task
                                     pending.remove(audio_task)
-                                    queued_audio = [audio_task.result()]  # pyright: ignore[reportAssignmentType]
+                                    queued_audio = [audio_task.result()]  # type: ignore[list-item]
 
                                 return wake_word.DetectionResult(
                                     wake_word_id=detection.name or "",

@@ -1,10 +1,6 @@
-"""Class to manage satellite devices."""
-
-from __future__ import annotations
-
-from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
+from collections.abc import Callable
 
 from wyoming.info import Info
 
@@ -23,11 +19,22 @@ class VASatelliteDevice(SatelliteDevice):
     custom_settings: dict[str, Any] | None = None
     capabilities: dict[str, Any] | None = None
     wakeword_engine: str | None = None
+    _is_connected: bool = field(default=False, init=False)
 
-    _custom_settings_listener: Callable[[str | None, Any | None], None] | None = None
-    _custom_action_listener: Callable[[Any, Any], None] | None = None
-    stt_listener: Callable[[str], None] | None = None
-    tts_listener: Callable[[str], None] | None = None
+    @property
+    def is_connected(self) -> bool:
+        """Return if the device is connected."""
+        return self._is_connected
+
+    @callback
+    def set_is_connected(self, is_connected: bool) -> None:
+        """Set connection state."""
+        self._is_connected = is_connected
+
+    _custom_settings_listener: Any = None
+    _custom_action_listener: Any = None
+    stt_listener: Any = None
+    tts_listener: Any = None
 
     def get_pipeline_entity_id(self, hass: HomeAssistant) -> str | None:
         """Return entity id for pipeline select."""
@@ -122,14 +129,20 @@ class VASatelliteDevice(SatelliteDevice):
                     return True
         return False
 
-    def getMaxMusicVolume(self) -> int | None:
-        """Get max music volume."""
-        if self.capabilities and (audio := self.capabilities.get("audio")):
-            return audio.get("max_music_volume")
-        return 10
+    def getMaxMediaVolume(self) -> int | None:
+        """Get max media volume."""
+        return self.get_max_stream_volume("max_media_volume")
 
-    def getMaxNotificationVolume(self) -> int | None:
-        """Get max notification volume."""
+    def getMaxVoiceVolume(self) -> int | None:
+        """Get max voice volume."""
+        return self.get_max_stream_volume("max_voice_volume")
+
+    def getMaxAlarmVolume(self) -> int | None:
+        """Get max alarm volume."""
+        return self.get_max_stream_volume("max_alarm_volume")
+
+    def get_max_stream_volume(self, key: str) -> int | None:
+        """Get max volume for a specific stream from capabilities."""
         if self.capabilities and (audio := self.capabilities.get("audio")):
-            return audio.get("max_notification_volume")
-        return 10
+            return audio.get(key)
+        return None

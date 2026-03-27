@@ -64,17 +64,20 @@
             "screen_brightness": {
                 "name": "Ekran parlaklığı"
             },
-            "notification_volume": {
+            "voice_volume": {
                 "name": "Konuşma ses seviyesi"
             },
             "motion_detection_sensitivity": {
                 "name": "Hareket algılama hassasiyeti"
             },
-            "music_volume": {
-                "name": "Müzik ses seviyesi"
+            "media_volume": {
+                "name": "Medya ses seviyesi"
+            },
+            "alarm_volume": {
+                "name": "Alarm ses seviyesi"
             },
             "ducking_volume": {
-                "name": "Ses kısma seviyesi"
+                "name": "Ses kısma oranı"
             },
             "wake_word_threshold": {
                 "name": "Uyandırma kelimesi eşiği"
@@ -92,6 +95,14 @@
                     "max": "Maksimum",
                     "medium": "Orta",
                     "off": "Kapalı"
+                }
+            },
+            "audio_input_processing_mode": {
+                "name": "Ses girişi işleme modu",
+                "state": {
+                    "hardware": "Donanım (Android Yerleşik AEC)",
+                    "speex": "Yazılım (Speex Mirası)",
+                    "webrtc": "Yazılım (WebRTC Doğal APM)"
                 }
             },
             "pipeline": {
@@ -112,13 +123,28 @@
                 "name": "Uyandırma kelimesi"
             },
             "wake_word_sound": {
-                "name": "Uyandırma kelimesi sesi",
+                "name": "Uyandırma kelimesi sesi"
+            },
+            "processing_sound": {
+                "name": "İşleme sesi"
+            },
+            "error_sound": {
+                "name": "Hata sesi"
+            },
+            "stop_word_sound": {
+                "name": "Durdurma sesi"
+            },
+            "mic_on_sound": {
+                "name": "Mikrofon açık sesi"
+            },
+            "mic_off_sound": {
+                "name": "Mikrofon kapalı sesi"
+            },
+            "mic_audio_source": {
+                "name": "Mikrofon ses kaynağı",
                 "state": {
-                    "none": "Yok",
-                    "havpe": "Home Assistant",
-                    "alexa": "Alexa",
-                    "bubble": "Baloncuk",
-                    "ding": "Zil"
+                    "voice_recognition": "Ses tanıma",
+                    "voice_communication": "Sesli iletişim"
                 }
             },
             "screen_timeout": {
@@ -164,13 +190,36 @@
             "current_path": {
                 "name": "Mevcut yol"
             },
+            "active_processing_pipeline": {
+                "name": "Ses girişi tanılama",
+                "state": {
+                    "hardware": "Donanım AEC",
+                    "speex": "Yazılım Speex",
+                    "webrtc": "Yazılım WebRTC APM",
+                    "none": "Etkin giriş işleme yok"
+                }
+            },
+            "audio_output_diagnostics": {
+                "name": "Ses çıkışı tanılama",
+                "state": {
+                    "active": "Etkin",
+                    "inactive": "Etkin değil"
+                }
+            },
+            "audio_engine_diagnostics": {
+                "name": "Ses motoru tanılama",
+                "state": {
+                    "started": "Başlatıldı",
+                    "stopped": "Durduruldu"
+                }
+            },
             "last_motion": {
                 "name": "Son hareket"
             }
         },
         "switch": {
-            "mute": {
-                "name": "Sessiz"
+            "mic_mute": {
+                "name": "Mikrofon sessiz"
             },
             "swipe_refresh": {
                 "name": "Kaydırarak yenile"
@@ -189,9 +238,6 @@
             },
             "diagnostics_enabled": {
                 "name": "Ekran üstü tanılama"
-            },
-            "continue_conversation": {
-                "name": "Konuşmaya devam et"
             },
             "alarm": {
                 "name": "Alarm"

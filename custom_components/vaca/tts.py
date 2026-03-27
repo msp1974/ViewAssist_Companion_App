@@ -1,4 +1,4 @@
-"""Support for Wyoming text-to-speech services."""
+"""Support for VACA text-to-speech services via Wyoming protocol."""
 
 from collections import defaultdict
 import io
@@ -28,17 +28,17 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up Wyoming speech-to-text."""
+    """Set up VACA text-to-speech."""
     item: DomainDataItem = hass.data[DOMAIN][config_entry.entry_id]
     async_add_entities(
         [
-            WyomingTtsProvider(config_entry, item.service),
+            VACATtsProvider(config_entry, item.service),
         ]
     )
 
 
-class WyomingTtsProvider(tts.TextToSpeechEntity):
-    """Wyoming text-to-speech provider."""
+class VACATtsProvider(tts.TextToSpeechEntity):
+    """VACA text-to-speech provider."""
 
     def __init__(
         self,
@@ -47,7 +47,7 @@ class WyomingTtsProvider(tts.TextToSpeechEntity):
     ) -> None:
         """Set up provider."""
         self.service = service
-        self._tts_service = next(tts for tts in service.info.tts if tts.installed)
+        self._tts_service = next(tts_info for tts_info in service.info.tts if tts_info.installed)
 
         voice_languages: set[str] = set()
         self._voices: dict[str, list[tts.Voice]] = defaultdict(list)

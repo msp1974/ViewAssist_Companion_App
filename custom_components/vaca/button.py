@@ -1,4 +1,4 @@
-"""Wyoming button entities."""
+"""Button entities for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up switch entities."""
+    """Set up button entities."""
     item: DomainDataItem = hass.data[DOMAIN][config_entry.entry_id]
     device: VASatelliteDevice = item.device  # type: ignore[assignment]
 
@@ -32,16 +32,14 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            WyomingSatelliteWakeButton(device),
-            WyomingSatelliteRefreshButton(device),
-            WyomingScreenSleepButton(device),
-            WyomingScreenWakeButton(device),
+            VACAWakeButton(device),
+            VACARefreshButton(device),
         ]
     )
 
 
-class WyomingSatelliteWakeButton(VASatelliteEntity, ButtonEntity):
-    """Entity to represent if satellite is muted."""
+class VACAWakeButton(VASatelliteEntity, ButtonEntity):
+    """Button to wake the satellite (send wake event)."""
 
     entity_description = ButtonEntityDescription(
         key="wake", translation_key="wake", icon="mdi:account-voice"
@@ -52,8 +50,8 @@ class WyomingSatelliteWakeButton(VASatelliteEntity, ButtonEntity):
         self._device.send_custom_action(CustomActions.WAKE)
 
 
-class WyomingSatelliteRefreshButton(VASatelliteEntity, ButtonEntity):
-    """Entity to represent if satellite is muted."""
+class VACARefreshButton(VASatelliteEntity, ButtonEntity):
+    """Button to refresh the satellite UI."""
 
     entity_description = ButtonEntityDescription(
         key="refresh", translation_key="refresh", icon="mdi:web-refresh"
@@ -62,27 +60,3 @@ class WyomingSatelliteRefreshButton(VASatelliteEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Press the button."""
         self._device.send_custom_action(CustomActions.REFRESH)
-
-
-class WyomingScreenSleepButton(VASatelliteEntity, ButtonEntity):
-    """Entity to represent if screen is put to sleep."""
-
-    entity_description = ButtonEntityDescription(
-        key="screen_sleep", translation_key="screen_sleep", icon="mdi:monitor-off"
-    )
-
-    async def async_press(self) -> None:
-        """Press the button."""
-        self._device.send_custom_action(CustomActions.SCREEN_SLEEP)
-
-
-class WyomingScreenWakeButton(VASatelliteEntity, ButtonEntity):
-    """Entity to represent if screen is woken up."""
-
-    entity_description = ButtonEntityDescription(
-        key="screen_wake", translation_key="screen_wake", icon="mdi:monitor-shimmer"
-    )
-
-    async def async_press(self) -> None:
-        """Press the button."""
-        self._device.send_custom_action(CustomActions.SCREEN_WAKE)

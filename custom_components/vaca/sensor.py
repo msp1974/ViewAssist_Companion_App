@@ -1,11 +1,11 @@
-"""Sensor for Wyoming."""
+"""Sensor for ViewAssist Companion App (VACA)."""
 
 from __future__ import annotations
-
 from functools import reduce
 import logging
 from typing import TYPE_CHECKING, Any
 
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.components.sensor import (
     RestoreSensor,
     SensorDeviceClass,
@@ -43,28 +43,31 @@ async def async_setup_entry(
     assert item.device is not None
 
     entities = [
-        WyomingSatelliteSTTSensor(device),
-        WyomingSatelliteTTSSensor(device),
-        WyomingSatelliteIntentSensor(device),
-        WyomingSatelliteOrientationSensor(device),
-        WyomingSatelliteBrowserPathSensor(device),
+        VACASTTSensor(device),
+        VACATTSSensor(device),
+        VACAIntentSensor(device),
+        VACAOrientationSensor(device),
+        VACABrowserPathSensor(device),
+        VACAAudioInputProcessingDiagnosticsSensor(device),
+        VACAAudioOutputDiagnosticsSensor(device),
+        VACAAudioEngineDiagnosticsSensor(device),
     ]
 
     if capabilities := device.capabilities:
         if capabilities.get("app_version"):
-            entities.append(WyomingSatelliteAppVersionSensor(device))
+            entities.append(VACAAppVersionSensor(device))
         if capabilities.get("has_battery"):
-            entities.append(WyomingSatelliteBatteryLevelSensor(device))
+            entities.append(VACABatteryLevelSensor(device))
         if device.has_light_sensor():
-            entities.append(WyomingSatelliteLightSensor(device))
+            entities.append(VACALightLevelSensor(device))
         if capabilities.get("has_front_camera"):
-            entities.append(WyomingSatelliteLastMotionSensor(device))
+            entities.append(VACALastMotionSensor(device))
 
     async_add_entities(entities)
 
 
-class WyomingSatelliteSTTSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent STT sensor for satellite."""
+class VACASTTSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent STT sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="stt",
@@ -94,8 +97,8 @@ class WyomingSatelliteSTTSensor(VASatelliteEntity, RestoreSensor):
             self.async_write_ha_state()
 
 
-class WyomingSatelliteTTSSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent TTS sensor for satellite."""
+class VACATTSSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent TTS sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="tts", translation_key="tts", icon="mdi:speaker-message"
@@ -123,11 +126,11 @@ class WyomingSatelliteTTSSensor(VASatelliteEntity, RestoreSensor):
             self.async_write_ha_state()
 
 
-class WyomingSatelliteIntentSensor(VASatelliteEntity, RestoreSensor):
-    """Entity to represent intent sensor for satellite."""
+class VACAIntentSensor(VASatelliteEntity, RestoreSensor):
+    """Entity to represent intent sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
-        key="intent", translation_key="intent", icon="mdi:message-bulleted"
+        key="intent", translation_key="intent", icon="mdi:message-cog"
     )
     _attr_native_value = UNKNOWN
 
@@ -174,15 +177,15 @@ class WyomingSatelliteIntentSensor(VASatelliteEntity, RestoreSensor):
                 dn_list = dot_notation_path.split(".")
             else:
                 dn_list = [dot_notation_path]
-            return reduce(dict.get, dn_list, data)  # type: ignore[return-value]
+            return reduce(dict.get, dn_list, data)  # type: ignore[return-value, arg-type]
         except (TypeError, KeyError):
             return None
 
 
-class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
-    """Base class for device sensors."""
+class _VACADeviceSensorBase(VASatelliteEntity, RestoreSensor):
+    """Base class for VACA device sensors."""
 
-    _attr_native_value = 0
+    _attr_native_value: Any = 0
     _listener_class = "status_update"
 
     async def async_added_to_hass(self) -> None:
@@ -190,11 +193,14 @@ class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (
+            STATE_UNAVAILABLE,
+            STATE_UNKNOWN,
+        ):
             if self.entity_description.device_class == SensorDeviceClass.TIMESTAMP:
                 self._attr_native_value = self._get_timestamp_from_string(state.state)
             else:
-                self._attr_native_value = state.state
+                self._attr_native_value = self._get_native_value(state.state)
             self.async_write_ha_state()
 
         self.async_on_remove(
@@ -212,12 +218,24 @@ class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
         if isinstance(value, str):
             if value.isdigit():
                 return int(value)
-            return value
+            try:
+                return float(value)
+            except ValueError:
+                # Sensors with a unit of measurement expect numeric values.
+                # Return None for non-numeric strings (e.g. 'unavailable')
+                # so HA treats the sensor as unavailable instead of crashing.
+                if self.entity_description.native_unit_of_measurement:
+                    return None
+                return value
         return value
 
     def _get_timestamp_from_string(self, timestamp_str: str) -> Any:
         """Convert timestamp string to datetime object."""
-        if timestamp_str.startswith("1970-01-01"):
+        if (
+            not timestamp_str
+            or timestamp_str.startswith("1970-01-01")
+            or timestamp_str == UNKNOWN
+        ):
             return None
         if parsed_time := parse_datetime(timestamp_str):
             if parsed_time > now(parsed_time.tzinfo):
@@ -255,8 +273,8 @@ class _WyomingSatelliteDeviceSensorBase(VASatelliteEntity, RestoreSensor):
                 self.async_write_ha_state()
 
 
-class WyomingSatelliteLightSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent light sensor for satellite."""
+class VACALightLevelSensor(_VACADeviceSensorBase):
+    """Entity to represent light level sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="light",
@@ -267,17 +285,19 @@ class WyomingSatelliteLightSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteOrientationSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent orientation sensor for satellite."""
+class VACAOrientationSensor(_VACADeviceSensorBase):
+    """Entity to represent orientation sensor for VACA satellite."""
 
     _attr_native_value = UNKNOWN
     entity_description = SensorEntityDescription(
-        key="orientation", translation_key="orientation", icon="mdi:screen-rotation"
+        key="orientation",
+        translation_key="orientation",
+        icon="mdi:screen-rotation",
     )
 
 
-class WyomingSatelliteBatteryLevelSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent battery level sensor for satellite."""
+class VACABatteryLevelSensor(_VACADeviceSensorBase):
+    """Entity to represent battery level sensor for VACA satellite."""
 
     entity_description = SensorEntityDescription(
         key="battery_level",
@@ -287,8 +307,8 @@ class WyomingSatelliteBatteryLevelSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteBrowserPathSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent browser path sensor for satellite."""
+class VACABrowserPathSensor(_VACADeviceSensorBase):
+    """Entity to represent browser path sensor for VACA satellite."""
 
     _attr_native_value = UNKNOWN
     entity_description = SensorEntityDescription(
@@ -296,10 +316,10 @@ class WyomingSatelliteBrowserPathSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteLastMotionSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent last motion for satellite."""
+class VACALastMotionSensor(_VACADeviceSensorBase):
+    """Entity to represent last motion timestamp for VACA satellite."""
 
-    _attr_native_value = UNKNOWN
+    _attr_native_value = None
     entity_description = SensorEntityDescription(
         key="last_motion",
         translation_key="last_motion",
@@ -308,8 +328,8 @@ class WyomingSatelliteLastMotionSensor(_WyomingSatelliteDeviceSensorBase):
     )
 
 
-class WyomingSatelliteAppVersionSensor(_WyomingSatelliteDeviceSensorBase):
-    """Entity to represent app version sensor for satellite."""
+class VACAAppVersionSensor(_VACADeviceSensorBase):
+    """Entity to represent app version sensor for VACA satellite."""
 
     _listener_class = "capabilities_update"
     _attr_native_value = UNKNOWN
@@ -328,25 +348,131 @@ class WyomingSatelliteAppVersionSensor(_WyomingSatelliteDeviceSensorBase):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return entity attributes."""
         return {
-            "device_signature": self.get_capability("device_signature"),
-            "android_version": self.get_capability("release"),
-            "webview_version": self.get_capability("webview_version"),
-            "has_battery": self.get_capability("has_battery"),
-            "has_front_camera": self.get_capability("has_front_camera"),
+            "device_signature": self._get_capability("device_signature"),
+            "android_version": self._get_capability("release"),
+            "webview_version": self._get_capability("webview_version"),
+            "has_battery": self._get_capability("has_battery"),
+            "has_front_camera": self._get_capability("has_front_camera"),
             "has_light_sensor": self._device.has_light_sensor(),
-            "sensors": self.get_sensor_names(),
+            "sensors": self._get_sensor_names(),
         }
 
-    def get_capability(self, capability: str) -> Any:
+    def _get_capability(self, capability: str) -> Any:
         """Get a specific capability from the device."""
         if self._device.capabilities is None:
             return UNKNOWN
         return self._device.capabilities.get(capability, UNKNOWN)
 
-    def get_sensor_names(self) -> list[str] | None:
+    def _get_sensor_names(self) -> list[str] | None:
         """Get the names of all sensors."""
         if self._device.capabilities and (
             sensors := self._device.capabilities.get("sensors")
         ):
             return [sensor.get("name") for sensor in sensors]
         return None
+
+
+class VACAAudioInputProcessingDiagnosticsSensor(_VACADeviceSensorBase):
+    """Entity to represent active audio input diagnostics for VACA satellite."""
+
+    _attr_native_value = UNKNOWN
+    entity_description = SensorEntityDescription(
+        key="active_processing_pipeline",
+        translation_key="active_processing_pipeline",
+        icon="mdi:waveform",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity and include detailed audio-input attributes."""
+        if sensors := data.get("sensors"):
+            active_processing_pipeline = sensors.get("active_processing_pipeline")
+            if active_processing_pipeline is not None:
+                self._attr_native_value = str(active_processing_pipeline)
+                self._attr_extra_state_attributes = {
+                    "mic_audio_source": sensors.get("mic_audio_source", UNKNOWN),
+                    "configured_input_processing_mode": sensors.get(
+                        "configured_input_processing_mode", UNKNOWN
+                    ),
+                    "hardware_aec_available": sensors.get("hardware_aec_available"),
+                    "hardware_aec_enabled": sensors.get("hardware_aec_enabled"),
+                    "active_pipeline_aec_enabled": sensors.get(
+                        "active_pipeline_aec_enabled"
+                    ),
+                    "active_pipeline_agc_enabled": sensors.get(
+                        "active_pipeline_agc_enabled"
+                    ),
+                    "active_pipeline_ns_enabled": sensors.get(
+                        "active_pipeline_ns_enabled"
+                    ),
+                    "webrtc_apm_ready": sensors.get("webrtc_apm_ready"),
+                    "current_apm_stream_delay_ms": sensors.get(
+                        "current_apm_stream_delay_ms"
+                    ),
+                    "render_feed_age_ms": sensors.get("render_feed_age_ms"),
+                }
+                self.async_write_ha_state()
+
+
+class VACAAudioOutputDiagnosticsSensor(_VACADeviceSensorBase):
+    """Entity to represent active audio output diagnostics for VACA satellite."""
+
+    _attr_native_value = UNKNOWN
+    entity_description = SensorEntityDescription(
+        key="audio_output_diagnostics",
+        translation_key="audio_output_diagnostics",
+        icon="mdi:volume-high",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity and include detailed audio-output attributes."""
+        if sensors := data.get("sensors"):
+            output_playback_active = sensors.get("output_playback_active")
+            render_tap_sink_active = sensors.get("render_tap_sink_active")
+            if output_playback_active is not None or render_tap_sink_active is not None:
+                is_active = bool(
+                    output_playback_active
+                    if output_playback_active is not None
+                    else render_tap_sink_active
+                )
+                self._attr_native_value = "active" if is_active else "inactive"
+                self._attr_extra_state_attributes = {
+                    "output_playback_active": bool(output_playback_active)
+                    if output_playback_active is not None
+                    else None,
+                    "render_tap_sink_active": bool(render_tap_sink_active),
+                    "audio_streaming_to_server": sensors.get("audio_streaming_to_server"),
+                    "wake_word_audio_route": sensors.get("wake_word_audio_route", UNKNOWN),
+                }
+                self.async_write_ha_state()
+
+
+class VACAAudioEngineDiagnosticsSensor(_VACADeviceSensorBase):
+    """Entity to represent active audio engine diagnostics for VACA satellite."""
+
+    _attr_native_value = UNKNOWN
+    entity_description = SensorEntityDescription(
+        key="audio_engine_diagnostics",
+        translation_key="audio_engine_diagnostics",
+        icon="mdi:chip",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    @callback
+    def status_update(self, data: dict[str, Any]) -> None:
+        """Update entity and include detailed audio-engine attributes."""
+        if sensors := data.get("sensors"):
+            engine_started = sensors.get("audio_engine_started")
+            if engine_started is not None:
+                self._attr_native_value = "started" if bool(engine_started) else "stopped"
+                self._attr_extra_state_attributes = {
+                    "audio_engine": sensors.get("audio_engine", UNKNOWN),
+                    "audio_engine_started": bool(engine_started),
+                    "audio_engine_muted": sensors.get("audio_engine_muted"),
+                    "audio_streaming_to_server": sensors.get("audio_streaming_to_server"),
+                    "wake_word_audio_route": sensors.get("wake_word_audio_route", UNKNOWN),
+                }
+                self.async_write_ha_state()
