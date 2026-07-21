@@ -147,7 +147,7 @@ class WyomingSatelliteScreenSwitch(BaseFeedbackSwitch):
         return "mdi:monitor" if self._attr_is_on else "mdi:monitor-off"
 
 
-class WyomingSatelliteMuteSwitch(BaseSwitch):
+class WyomingSatelliteMuteSwitch(BaseFeedbackSwitch):
     """Entity to represent if satellite is muted."""
 
     entity_description = SwitchEntityDescription(key="mute", translation_key="mute")
