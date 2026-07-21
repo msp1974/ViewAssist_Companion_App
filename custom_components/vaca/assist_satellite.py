@@ -12,6 +12,7 @@ from wyoming.handle import Handled
 from wyoming.info import Describe, Info
 from wyoming.pipeline import PipelineStage, RunPipeline
 from wyoming.satellite import RunSatellite
+from wyoming.wake import Detection
 
 from homeassistant.components import assist_pipeline, ffmpeg, intent
 from homeassistant.components.assist_pipeline import PipelineEvent
@@ -169,9 +170,29 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             # Send config event
             self._custom_settings_changed()
 
+    @property
+    def is_muted(self) -> bool:
+        """Return true if satellite is muted."""
+        if self.device and self.device.custom_settings:
+            return bool(self.device.custom_settings.get("mute", False))
+        return False
+
     @callback
     def on_receive_event_callback(self, event: Event) -> tuple[bool, Event | None]:
         """Handle received custom events."""
+        if self.is_muted and event:
+            if (
+                AudioStart.is_type(event.type)
+                or AudioChunk.is_type(event.type)
+                or AudioStop.is_type(event.type)
+                or RunPipeline.is_type(event.type)
+                or Detection.is_type(event.type)
+            ):
+                _LOGGER.debug(
+                    "Dropping %s event because satellite is muted", event.type
+                )
+                return False, None
+
         if event and AudioStop.is_type(event.type):
             self.stream_tts = False
             return not self.stream_tts, event
