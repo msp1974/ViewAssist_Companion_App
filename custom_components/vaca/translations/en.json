@@ -255,6 +255,9 @@
             },
             "screen_saver": {
                 "name": "Screen saver"
+            },
+            "prefer_external_url": {
+                "name": "Prefer external URL"
             }
         }
     }

@@ -46,6 +46,7 @@ async def async_setup_entry(
         WyomingSatelliteAlarmSwitch(device),
         WyomingSatelliteScreenOnWakeWordSwitch(device),
         WyomingSatelliteScreenSaverSwitch(device),
+        WyomingSatellitePreferExternalUrlSwitch(device),
     ]
 
     if capabilities := device.capabilities:
@@ -321,5 +322,22 @@ class WyomingSatelliteScreenSaverSwitch(BaseFeedbackSwitch):
         key="screen_saver",
         translation_key="screen_saver",
         icon="mdi:monitor-shimmer",
+    )
+    default_on = False
+
+
+class WyomingSatellitePreferExternalUrlSwitch(BaseSwitch):
+    """Entity to control whether the satellite is given the external HA URL.
+
+    Enable this only when the satellite reaches Home Assistant through
+    Tailscale, another VPN, or a remote/DDNS address rather than the local
+    network, since the internal URL will not be reachable from it.
+    """
+
+    entity_description = SwitchEntityDescription(
+        key="prefer_external_url",
+        translation_key="prefer_external_url",
+        icon="mdi:vpn",
+        entity_category=EntityCategory.CONFIG,
     )
     default_on = False

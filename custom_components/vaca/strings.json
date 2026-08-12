@@ -59,6 +59,9 @@
     "switch": {
       "mute": {
         "name": "Mute"
+      },
+      "prefer_external_url": {
+        "name": "Prefer external URL"
       }
     },
     "number": {

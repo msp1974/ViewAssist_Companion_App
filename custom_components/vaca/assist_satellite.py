@@ -153,9 +153,21 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 self.device.custom_settings["ha_port"] = (
                     self.hass.config.api.port if self.hass.config.api else 8123
                 )
-                self.device.custom_settings["ha_url"] = (
-                    self.hass.config.internal_url or ""
+                prefer_external = bool(
+                    self.device.custom_settings.get("prefer_external_url", False)
                 )
+                if prefer_external:
+                    self.device.custom_settings["ha_url"] = (
+                        self.hass.config.external_url
+                        or self.hass.config.internal_url
+                        or ""
+                    )
+                else:
+                    self.device.custom_settings["ha_url"] = (
+                        self.hass.config.internal_url
+                        or self.hass.config.external_url
+                        or ""
+                    )
                 home = getVADashboardPath(self.hass, self.device.satellite_id)
                 self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
 
