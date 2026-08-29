@@ -169,6 +169,19 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             # Send config event
             self._custom_settings_changed()
 
+    async def on_handle_settings_request(self) -> None:
+        """Handle settings request from satellite."""
+        _LOGGER.debug(
+            "Satellite %s requested settings update",
+            self.entity_id.replace("assist_satellite.", ""),
+        )
+        # Add custom files data - commented out awaiting implementation
+        self.device.custom_settings[
+            "custom_files"
+        ] = await self.hass.async_add_executor_job(get_custom_files_data, self.hass)
+        # Send config event
+        self._custom_settings_changed()
+
     @callback
     def on_receive_event_callback(self, event: Event) -> tuple[bool, Event | None]:
         """Handle received custom events."""
@@ -200,13 +213,14 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
             if evt.event_type in (STATUS_EVENT_TYPE, SETTINGS_EVENT_TYPE):
                 _LOGGER.debug(
-                    "Received %s event: %s",
+                    "Received %s event from %s: %s",
                     evt.event_type,
+                    self.device.info.satellite.name,
                     evt.event_data,
                 )
                 if evt.event_type == SETTINGS_EVENT_TYPE and not evt.event_data:
-                    # Send config event
-                    self._custom_settings_changed()
+                    # Handle settings request from satellite
+                    self.hass.async_create_task(self.on_handle_settings_request())
 
             async_dispatcher_send(
                 self.hass,
