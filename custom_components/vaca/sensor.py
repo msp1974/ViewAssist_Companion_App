@@ -58,7 +58,7 @@ async def async_setup_entry(
             entities.append(WyomingSatelliteBatteryLevelSensor(device))
         if device.has_light_sensor():
             entities.append(WyomingSatelliteLightSensor(device))
-        if capabilities.get("has_front_camera"):
+        if device.supports_motion_detection():
             entities.append(WyomingSatelliteLastMotionSensor(device))
 
     async_add_entities(entities)
