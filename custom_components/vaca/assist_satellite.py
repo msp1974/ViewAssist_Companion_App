@@ -30,7 +30,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .client import VAAsyncTcpClient
-from .const import DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
+from .const import CONF_HA_URL, DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
 from .custom import (
     ACTION_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
@@ -154,7 +154,9 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     self.hass.config.api.port if self.hass.config.api else 8123
                 )
                 self.device.custom_settings["ha_url"] = (
-                    self.hass.config.internal_url or ""
+                    self.config_entry.options.get(CONF_HA_URL)
+                    or self.hass.config.internal_url
+                    or ""
                 )
                 home = getVADashboardPath(self.hass, self.device.satellite_id)
                 self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
@@ -168,6 +170,19 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
             # Send config event
             self._custom_settings_changed()
+
+    async def on_handle_settings_request(self) -> None:
+        """Handle settings request from satellite."""
+        _LOGGER.debug(
+            "Satellite %s requested settings update",
+            self.entity_id.replace("assist_satellite.", ""),
+        )
+        # Add custom files data - commented out awaiting implementation
+        self.device.custom_settings[
+            "custom_files"
+        ] = await self.hass.async_add_executor_job(get_custom_files_data, self.hass)
+        # Send config event
+        self._custom_settings_changed()
 
     @callback
     def on_receive_event_callback(self, event: Event) -> tuple[bool, Event | None]:
@@ -200,13 +215,14 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
             if evt.event_type in (STATUS_EVENT_TYPE, SETTINGS_EVENT_TYPE):
                 _LOGGER.debug(
-                    "Received %s event: %s",
+                    "Received %s event from %s: %s",
                     evt.event_type,
+                    self.device.info.satellite.name,
                     evt.event_data,
                 )
                 if evt.event_type == SETTINGS_EVENT_TYPE and not evt.event_data:
-                    # Send config event
-                    self._custom_settings_changed()
+                    # Handle settings request from satellite
+                    self.hass.async_create_task(self.on_handle_settings_request())
 
             async_dispatcher_send(
                 self.hass,

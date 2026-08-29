@@ -135,3 +135,9 @@ class VASatelliteDevice(SatelliteDevice):
         if self.capabilities and (audio := self.capabilities.get("audio")):
             return audio.get("max_notification_volume")
         return 10
+
+    def getMaxAlarmVolume(self) -> int | None:
+        """Get max alarm volume."""
+        if self.capabilities and (audio := self.capabilities.get("audio")):
+            return audio.get("max_alarm_volume")
+        return 10

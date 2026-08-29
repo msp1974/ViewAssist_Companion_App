@@ -20,6 +20,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN
 from .custom import CustomActions
@@ -47,7 +48,7 @@ async def async_setup_entry(
     async_add_entities([WyomingMediaPlayer(device)])
 
 
-class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
+class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity, RestoreEntity):
     """Represents a hassmic media player."""
 
     _listener_class = "status_update"
@@ -70,6 +71,7 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
         | MediaPlayerEntityFeature.STOP
         | MediaPlayerEntityFeature.VOLUME_SET
         | MediaPlayerEntityFeature.BROWSE_MEDIA
+        | MediaPlayerEntityFeature.SEARCH_MEDIA
         # | MediaPlayerEntityFeature.MEDIA_ENQUEUE
         # | MediaPlayerEntityFeature.NEXT_TRACK
     )
@@ -77,6 +79,10 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
+
+        if last_state := await self.async_get_last_state():
+            if "volume_level" in last_state.attributes:
+                self._attr_volume_level = last_state.attributes["volume_level"]
 
         self.async_on_remove(
             async_dispatcher_connect(
@@ -199,11 +205,19 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
             content_filter=lambda item: item.media_content_type.startswith("audio/"),
         )
 
+    async def async_search_media(
+        self,
+        query: str,
+        media_content_type: str | None = None,
+        media_content_id: str | None = None,
+    ) -> list[BrowseMedia]:
+        """Implement the websocket media search helper."""
+        return []
+
     async def async_process_metadata(self, metadata: dict[str, Any]) -> None:
         """Process metadata from the media player."""
-        _LOGGER.info("Processing metadata: %s", metadata)
         self._attr_media_title = metadata.get("title")
         self._attr_media_artist = metadata.get("artist")
         self._attr_media_album_name = metadata.get("albumName")
-        self._attr_entity_picture = metadata.get("imageURL")
+        self._attr_media_image_url = metadata.get("imageUrl")
         self.async_write_ha_state()

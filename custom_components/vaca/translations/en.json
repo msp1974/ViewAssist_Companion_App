@@ -24,6 +24,18 @@
             }
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "ha_url": "Home Assistant URL"
+                },
+                "data_description": {
+                    "ha_url": "The URL passed to the device to connect back to Home Assistant. Leave blank to use the internal network URL configured in Home Assistant."
+                }
+            }
+        }
+    },
     "entity": {
         "binary_sensor": {
             "battery_charging": {
@@ -80,6 +92,9 @@
             },
             "music_volume": {
                 "name": "Music volume"
+            },
+            "alarm_volume": {
+                "name": "Alarm volume"
             },
             "ducking_volume": {
                 "name": "Ducking volume"

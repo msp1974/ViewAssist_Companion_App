@@ -252,10 +252,53 @@ class WyomingSatelliteAlarmSwitch(BaseFeedbackSwitch):
     )
     default_on = False
 
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+
+        self.async_on_remove(
+            self.hass.bus.async_listen(
+                "va_alarm_start",
+                self._handle_alarm_start_event,
+            ),
+        )
+        self.async_on_remove(
+            self.hass.bus.async_listen(
+                "va_alarm_stop",
+                self._handle_alarm_stop_event,
+            ),
+        )
+
+    async def _handle_alarm_start_event(self, event) -> None:
+        """Handle alarm event."""
+        _LOGGER.debug("Received alarm sound event: %s", event.data)
+        device_id = event.data.get("device_id")
+        if device_id != self._device.device_id:
+            return
+
+        await self.do_switch(True, send_to_device=True)
+
+    async def _handle_alarm_stop_event(self, event) -> None:
+        """Handle alarm event."""
+        _LOGGER.debug("Received alarm stop event: %s", event.data)
+        device_id = event.data.get("device_id")
+        if device_id != self._device.device_id:
+            return
+
+        await self.do_switch(False, send_to_device=True)
+
     async def do_switch(self, value: bool, send_to_device: bool = True) -> None:
         """Perform the switch action."""
         self._attr_is_on = value
         self.async_write_ha_state()
+        if not value:
+            self.hass.bus.async_fire(
+                "vaca_alarm_stop",
+                {
+                    "device_id": self._device.device_id,
+                },
+            )
+
         if send_to_device:
             self._device.send_custom_action(
                 self.entity_description.key,

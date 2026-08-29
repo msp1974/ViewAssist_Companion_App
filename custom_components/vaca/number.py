@@ -42,6 +42,7 @@ async def async_setup_entry(
             WyomingSatelliteMicGainNumber(device),
             WyomingSatelliteNotificationVolumeNumber(device),
             WyomingSatelliteMusicVolumeNumber(device),
+            WyomingSatelliteAlarmVolumeNumber(device),
             WyomingSatelliteDuckingVolumeNumber(device),
             WyomingSatelliteScreenBrightnessNumber(device),
             WyomingSatelliteWakeWordThresholdNumber(device),
@@ -80,7 +81,10 @@ class BaseNumberEntity(VASatelliteEntity, RestoreNumber):
     async def update_number(self, value: float, send_to_device: bool = True) -> None:
         """Update number value."""
         self._attr_native_value = int(
-            max(self._attr_native_min_value, min(self._attr_native_max_value, value))
+            max(
+                self._attr_native_min_value or 0,
+                min(self._attr_native_max_value or 10, value),
+            )
         )
         self.async_write_ha_state()
 
@@ -195,6 +199,37 @@ class WyomingSatelliteMusicVolumeNumber(BaseFeedbackNumber):
     async def async_set_native_value(self, value: float) -> None:
         """Set new value."""
         self._attr_native_max_value = self._device.getMaxMusicVolume()
+        await super().async_set_native_value(value)
+
+
+class WyomingSatelliteAlarmVolumeNumber(BaseFeedbackNumber):
+    """Entity to represent alarm volume multiplier."""
+
+    entity_description = NumberEntityDescription(
+        key="alarm_volume",
+        translation_key="alarm_volume",
+        icon="mdi:alarm-bell",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = _MIN_SOUND_VOLUME
+    _attr_native_max_value = _MAX_SOUND_VOLUME
+    _attr_native_step = 1
+    _attr_native_value = 5
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+        self._attr_native_max_value = self._device.getMaxAlarmVolume()
+        last_number_data = await self.async_get_last_number_data()
+        if (last_number_data is not None) and (
+            last_number_data.native_value is not None
+        ):
+            await self.async_set_native_value(last_number_data.native_value)
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        self._attr_native_max_value = self._device.getMaxAlarmVolume()
         await super().async_set_native_value(value)
 
 
