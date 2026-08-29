@@ -153,7 +153,7 @@ class WyomingSatelliteMotionDetectionModeSelect(
 
         state = await self.async_get_last_state()
         if state is not None and state.state in self.options:
-            self._attr_current_option = state.state
+            await self.async_select_option(state.state)
 
     async def async_select_option(self, option: str) -> None:
         """Select an option."""
