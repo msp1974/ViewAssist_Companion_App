@@ -20,6 +20,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import DOMAIN
 from .custom import CustomActions
@@ -47,7 +48,7 @@ async def async_setup_entry(
     async_add_entities([WyomingMediaPlayer(device)])
 
 
-class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
+class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity, RestoreEntity):
     """Represents a hassmic media player."""
 
     _listener_class = "status_update"
@@ -78,6 +79,10 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
         await super().async_added_to_hass()
+
+        if last_state := await self.async_get_last_state():
+            if "volume_level" in last_state.attributes:
+                self._attr_volume_level = last_state.attributes["volume_level"]
 
         self.async_on_remove(
             async_dispatcher_connect(

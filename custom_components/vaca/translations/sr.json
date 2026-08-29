@@ -1,0 +1,237 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Услуга је већ конфигурисана",
+            "no_port": "Нема порта за крајњу тачку",
+            "no_services": "Није пронађена ниједна услуга на крајњој тачки"
+        },
+        "error": {
+            "cannot_connect": "Повезивање није успело"
+        },
+        "step": {
+            "hassio_confirm": {
+                "description": "Да ли желите да конфигуришете Кућног асистента да се повеже са Вајоминг сервисом коју пружа додатак?"
+            },
+            "user": {
+                "data": {
+                    "host": "Хост",
+                    "port": "Порт"
+                }
+            },
+            "zeroconf_confirm": {
+                "description": "Да ли желите да конфигуришете Кућног асистента да се повеже са Вајоминг сервисом  {name}?",
+                "title": "Откривен Вајоминг сервис"
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "battery_charging": {
+                "name": "Пуњење батерије"
+            },
+            "screen_on": {
+                "name": "Екран"
+            },
+            "motion_detected": {
+                "name": "Покрет"
+            }
+        },
+        "button": {
+            "refresh": {
+                "name": "Освежи"
+            },
+            "screen_wake": {
+                "name": "Буђење екрана"
+            },
+            "screen_sleep": {
+                "name": "Екран у режим спавања"
+            },
+            "wake": {
+                "name": "Буђење"
+            }
+        },
+        "media_player": {
+            "media_player": {
+                "name": "Медија плејер",
+                "state": {
+                    "playing": "Репродукција",
+                    "paused": "Паузирано",
+                    "idle": "Мировање"
+                }
+            }
+        },
+        "number": {
+            "mic_gain": {
+                "name": "Појачање микрофона"
+            },
+            "screen_brightness": {
+                "name": "Осветљеност екрана"
+            },
+            "notification_volume": {
+                "name": "Јачина звука гласа"
+            },
+            "motion_detection_sensitivity": {
+                "name": "Осетљивост детекције покрета"
+            },
+            "music_volume": {
+                "name": "Јачина звука музике"
+            },
+            "ducking_volume": {
+                "name": "Смањење јачине звука"
+            },
+            "wake_word_threshold": {
+                "name": "Праг речи за буђење"
+            },
+            "zoom_level": {
+                "name": "Ниво зумирања"
+            },
+            "raw_proximity_threshold": {
+              "name": "Праг близине"
+            },
+            "bump_sensitivity": {
+                "name": "Осетљивост на ударце"
+            }
+        },
+        "select": {
+            "noise_suppression_level": {
+                "name": "Ниво сузбијања буке",
+                "state": {
+                    "high": "Високо",
+                    "low": "Ниско",
+                    "max": "Максимално",
+                    "medium": "Средње",
+                    "off": "Искључено"
+                }
+            },
+            "pipeline": {
+                "name": "Асистент",
+                "state": {
+                    "preferred": "Преферирано"
+                }
+            },
+            "vad_sensitivity": {
+                "name": "Детекција говора завршена",
+                "state": {
+                    "aggressive": "Агресивно",
+                    "default": "Подразумевано",
+                    "relaxed": "Опуштено"
+                }
+            },
+            "wake_word": {
+                "name": "Реч за буђење"
+            },
+            "wake_word_sound": {
+                "name": "Звук речи за буђење",
+                "state": {
+                    "none": "Ниједан",
+                    "havpe": "Кућни асистент",
+                    "alexa": " Алекса ",
+                    "bubble": "Балон",
+                    "ding": "Динг"
+                }
+            },
+            "screen_timeout": {
+                "name": "Временско гашење екрана",
+                "state": {
+                    "15": "15 секунди",
+                    "30": "30 секунди",
+                    "60": "1 минут",
+                    "120": "2 минута",
+                    "300": "5 минута",
+                    "600": "10 минута",
+                    "1800": "30 минута"
+                }
+            }
+        },
+        "sensor": {
+            "stt": {
+                "name": "СТТ"
+            },
+            "tts": {
+                "name": "ТТС"
+            },
+            "intent": {
+                "name": "Интент"
+            },
+            "light_level": {
+                "name": "Ниво светлости"
+            },
+            "orientation": {
+                "name": "Оријентација",
+                "state": {
+                    "unknown": "Непознато",
+                    "portrait": "Портрет",
+                    "landscape": "Пејзаж"
+                }
+            },
+            "battery_level": {
+                "name": "Батерија"
+            },
+            "app_version": {
+                "name": "Верзија апликације"
+            },
+            "current_path": {
+                "name": "Тренутна путања"
+            },
+            "last_motion": {
+                "name": "Последњи покрет"
+            }
+        },
+        "switch": {
+            "mute": {
+                "name": "Искључи звук"
+            },
+            "screen_on": {
+                "name": "Екран"
+            },
+            "swipe_refresh": {
+                "name": "Превуците да бисте освежили"
+            },
+            "screen_auto_brightness": {
+                "name": "Аутоматска осветљеност"
+            },
+            "screen_always_on": {
+                "name": "Екран увек укључен"
+            },
+            "do_not_disturb": {
+                "name": "Не узнемиравај"
+            },
+            "dark_mode": {
+                "name": "Тамни режим"
+            },
+            "diagnostics_enabled": {
+                "name": "Дијагностика на екрану"
+            },
+            "continue_conversation": {
+                "name": "Настави разговор"
+            },
+            "alarm": {
+                "name": "Аларм"
+            },
+            "enable_motion_detection": {
+                "name": "Детекција покрета"
+            },
+            "screen_on_wake_word": {
+                "name": "Екран се укључује речју за буђење"
+            },
+            "screen_on_bump": {
+                "name": "Екран се укључује ударцем"
+            },
+            "screen_on_proximity": {
+                "name": "Екран се укључује близином"
+            },
+            "screen_on_motion": {
+                "name": "Екран се укључује покретом"
+            },
+            "advanced_gain": {
+                "name": "Напредна контрола појачања"
+            },
+            "voice_enhancer": {
+                "name": "Појачивач гласа"
+            },
+            "screen_saver": {
+                "name": "Чувар екрана"
+            }
+        }
+    }
+}
