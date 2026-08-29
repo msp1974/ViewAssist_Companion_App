@@ -70,6 +70,7 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
         | MediaPlayerEntityFeature.STOP
         | MediaPlayerEntityFeature.VOLUME_SET
         | MediaPlayerEntityFeature.BROWSE_MEDIA
+        | MediaPlayerEntityFeature.SEARCH_MEDIA
         # | MediaPlayerEntityFeature.MEDIA_ENQUEUE
         # | MediaPlayerEntityFeature.NEXT_TRACK
     )
@@ -199,11 +200,19 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity):
             content_filter=lambda item: item.media_content_type.startswith("audio/"),
         )
 
+    async def async_search_media(
+        self,
+        query: str,
+        media_content_type: str | None = None,
+        media_content_id: str | None = None,
+    ) -> list[BrowseMedia]:
+        """Implement the websocket media search helper."""
+        return []
+
     async def async_process_metadata(self, metadata: dict[str, Any]) -> None:
         """Process metadata from the media player."""
-        _LOGGER.info("Processing metadata: %s", metadata)
         self._attr_media_title = metadata.get("title")
         self._attr_media_artist = metadata.get("artist")
         self._attr_media_album_name = metadata.get("albumName")
-        self._attr_entity_picture = metadata.get("imageURL")
+        self._attr_media_image_url = metadata.get("imageUrl")
         self.async_write_ha_state()
