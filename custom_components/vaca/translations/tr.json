@@ -78,6 +78,9 @@
             "music_volume": {
                 "name": "Müzik ses seviyesi"
             },
+            "alarm_volume": {
+                "name": "Alarm ses seviyesi"
+            },
             "ducking_volume": {
                 "name": "Ses kısma seviyesi"
             },

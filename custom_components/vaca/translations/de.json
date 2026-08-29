@@ -81,6 +81,9 @@
             "music_volume": {
                 "name": "Musiklautstärke"
             },
+            "alarm_volume": {
+                "name": "Alarmlautstärke"
+            },
             "ducking_volume": {
                 "name": "Lautstärkeabsenkung"
             },
