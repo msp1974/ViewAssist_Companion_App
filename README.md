@@ -2,6 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![downloads](https://shields.io/github/downloads/msp1974/ViewAssist_Companion_App/latest/total?style=for-the-badge)](https://github.com/msp1974/ViewAssist_Companion_App)
+[![downloads](https://shields.io/github/downloads/msp1974/ViewAssist_Companion_App/total?style=for-the-badge)](https://github.com/msp1974/ViewAssist_Companion_App)
 [![version](https://shields.io/github/v/release/msp1974/ViewAssist_Companion_App?style=for-the-badge)](https://github.com/msp1974/ViewAssist_Companion_App)
 [![Latest Release](https://img.shields.io/badge/dynamic/json?style=for-the-badge&color=41BDF5&logo=home-assistant&label=integration%20usage&suffix=%20installs&cacheSeconds=15600&url=https://analytics.home-assistant.io/custom_integrations.json&query=$.vaca.total)](https://analytics.home-assistant.io/custom_integrations.json)
 
