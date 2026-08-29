@@ -30,7 +30,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .client import VAAsyncTcpClient
-from .const import DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
+from .const import CONF_HA_URL, DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
 from .custom import (
     ACTION_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
@@ -154,7 +154,9 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     self.hass.config.api.port if self.hass.config.api else 8123
                 )
                 self.device.custom_settings["ha_url"] = (
-                    self.hass.config.internal_url or ""
+                    self.config_entry.options.get(CONF_HA_URL)
+                    or self.hass.config.internal_url
+                    or ""
                 )
                 home = getVADashboardPath(self.hass, self.device.satellite_id)
                 self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
