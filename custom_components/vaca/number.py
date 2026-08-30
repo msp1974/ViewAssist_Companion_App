@@ -53,6 +53,10 @@ async def async_setup_entry(
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
         entities.append(WyomingSatelliteMotionDetectionSensitivityNumber(device))
+        entities.append(WyomingSatelliteRTSPStreamPortNumber(device))
+        entities.append(WyomingSatelliteRTSPStreamWidthNumber(device))
+        entities.append(WyomingSatelliteRTSPStreamHeightNumber(device))
+        entities.append(WyomingSatelliteRTSPStreamFpsNumber(device))
     if (
         device.capabilities
         and device.capabilities.get("proximity_sensor_type") == "raw"
@@ -458,6 +462,138 @@ class WyomingSatelliteBumpDetectionSensitivityNumber(VASatelliteEntity, RestoreN
         self.async_write_ha_state()
         # Sensitivity is sent as 1-10 scale
         self._device.set_custom_setting(self.entity_description.key, 11 - value)
+
+
+class WyomingSatelliteRTSPStreamPortNumber(VASatelliteEntity, RestoreNumber):
+    """Entity to represent the RTSP camera stream port."""
+
+    entity_description = NumberEntityDescription(
+        key="rtsp_stream_port",
+        translation_key="rtsp_stream_port",
+        icon="mdi:lan-connect",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = 1024
+    _attr_native_max_value = 65535
+    _attr_native_step = 1
+    _attr_native_value = 8554
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None:
+            await self.async_set_native_value(float(state.state))
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        value = int(
+            max(self._attr_native_min_value, min(self._attr_native_max_value, value))
+        )
+        self._attr_native_value = value
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, value)
+
+
+class WyomingSatelliteRTSPStreamWidthNumber(VASatelliteEntity, RestoreNumber):
+    """Entity to represent the RTSP camera stream width."""
+
+    entity_description = NumberEntityDescription(
+        key="rtsp_stream_width",
+        translation_key="rtsp_stream_width",
+        icon="mdi:arrow-expand-horizontal",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = 160
+    _attr_native_max_value = 1920
+    _attr_native_step = 1
+    _attr_native_value = 640
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None:
+            await self.async_set_native_value(float(state.state))
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        value = int(
+            max(self._attr_native_min_value, min(self._attr_native_max_value, value))
+        )
+        self._attr_native_value = value
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, value)
+
+
+class WyomingSatelliteRTSPStreamHeightNumber(VASatelliteEntity, RestoreNumber):
+    """Entity to represent the RTSP camera stream height."""
+
+    entity_description = NumberEntityDescription(
+        key="rtsp_stream_height",
+        translation_key="rtsp_stream_height",
+        icon="mdi:arrow-expand-vertical",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = 120
+    _attr_native_max_value = 1080
+    _attr_native_step = 1
+    _attr_native_value = 480
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None:
+            await self.async_set_native_value(float(state.state))
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        value = int(
+            max(self._attr_native_min_value, min(self._attr_native_max_value, value))
+        )
+        self._attr_native_value = value
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, value)
+
+
+class WyomingSatelliteRTSPStreamFpsNumber(VASatelliteEntity, RestoreNumber):
+    """Entity to represent the RTSP camera stream frame rate."""
+
+    entity_description = NumberEntityDescription(
+        key="rtsp_stream_fps",
+        translation_key="rtsp_stream_fps",
+        icon="mdi:filmstrip",
+        entity_category=EntityCategory.CONFIG,
+    )
+    _attr_should_poll = False
+    _attr_native_min_value = 1
+    _attr_native_max_value = 30
+    _attr_native_step = 1
+    _attr_native_value = 15
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None:
+            await self.async_set_native_value(float(state.state))
+
+    async def async_set_native_value(self, value: float) -> None:
+        """Set new value."""
+        value = int(
+            max(self._attr_native_min_value, min(self._attr_native_max_value, value))
+        )
+        self._attr_native_value = value
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, value)
 
 
 class WyomingSatelliteRawProximityThresholdNumber(VASatelliteEntity, RestoreNumber):

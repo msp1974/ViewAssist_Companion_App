@@ -60,6 +60,8 @@ async def async_setup_entry(
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
         entities.append(WyomingSatelliteScreenOnMotionSwitch(device))
+        entities.append(WyomingSatelliteRTSPStreamEnabledSwitch(device))
+        entities.append(WyomingSatelliteRTSPStreamMirrorSwitch(device))
 
     if entities:
         async_add_entities(entities)
@@ -364,5 +366,29 @@ class WyomingSatelliteScreenSaverSwitch(BaseFeedbackSwitch):
         key="screen_saver",
         translation_key="screen_saver",
         icon="mdi:monitor-shimmer",
+    )
+    default_on = False
+
+
+class WyomingSatelliteRTSPStreamEnabledSwitch(BaseSwitch):
+    """Entity to control the RTSP camera stream on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="rtsp_stream_enabled",
+        translation_key="rtsp_stream_enabled",
+        icon="mdi:cctv",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteRTSPStreamMirrorSwitch(BaseSwitch):
+    """Entity to control horizontal mirroring of the RTSP camera stream."""
+
+    entity_description = SwitchEntityDescription(
+        key="rtsp_stream_mirror",
+        translation_key="rtsp_stream_mirror",
+        icon="mdi:flip-horizontal",
+        entity_category=EntityCategory.CONFIG,
     )
     default_on = False
