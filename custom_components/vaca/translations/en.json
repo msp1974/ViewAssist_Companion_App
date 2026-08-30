@@ -113,6 +113,18 @@
             },
             "bump_sensitivity": {
                 "name": "Bump sensitivity"
+            },
+            "rtsp_stream_port": {
+                "name": "RTSP stream port"
+            },
+            "rtsp_stream_width": {
+                "name": "RTSP stream width"
+            },
+            "rtsp_stream_height": {
+                "name": "RTSP stream height"
+            },
+            "rtsp_stream_fps": {
+                "name": "RTSP stream FPS"
             }
         },
         "select": {
@@ -185,6 +197,15 @@
                     "none": "Off",
                     "motion": "Motion",
                     "face": "Face"
+                }
+            },
+            "rtsp_stream_rotation": {
+                "name": "RTSP stream rotation",
+                "state": {
+                    "0": "0°",
+                    "90": "90°",
+                    "180": "180°",
+                    "270": "270°"
                 }
             }
         },
@@ -270,6 +291,12 @@
             },
             "screen_saver": {
                 "name": "Screen saver"
+            },
+            "rtsp_stream_enabled": {
+                "name": "RTSP stream"
+            },
+            "rtsp_stream_mirror": {
+                "name": "RTSP stream mirror"
             }
         }
     }
