@@ -45,7 +45,7 @@ async def async_setup_entry(
     if capabilities := device.capabilities:
         if capabilities.get("has_battery"):
             entities.append(WyomingSatelliteBatteryChargingBinarySensor(device))
-        if capabilities.get("has_front_camera"):
+        if device.supports_motion_detection():
             entities.append(WyomingSatelliteMotionDetectedSensor(device))
 
     if entities:

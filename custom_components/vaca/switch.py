@@ -58,7 +58,7 @@ async def async_setup_entry(
     if device.supportProximity():
         entities.append(WyomingSatelliteScreenOnProximitySwitch(device))
 
-    if device.capabilities and device.capabilities.get("has_front_camera"):
+    if device.supports_motion_detection():
         entities.append(WyomingSatelliteScreenOnMotionSwitch(device))
 
     if entities:
