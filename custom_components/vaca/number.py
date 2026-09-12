@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Final, Any
 
 from homeassistant.components.number import NumberEntityDescription, RestoreNumber
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
+from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -75,7 +75,7 @@ class BaseNumberEntity(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -289,7 +289,7 @@ class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -320,7 +320,7 @@ class WyomingSatelliteWakeWordThresholdNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -352,7 +352,7 @@ class WyomingSatelliteZoomLevelNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -385,7 +385,7 @@ class WyomingSatelliteTextSizeNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -420,7 +420,7 @@ class WyomingSatelliteMotionDetectionSensitivityNumber(
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -452,7 +452,7 @@ class WyomingSatelliteBumpDetectionSensitivityNumber(VASatelliteEntity, RestoreN
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -484,7 +484,7 @@ class WyomingSatelliteRTSPStreamPortNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -517,7 +517,7 @@ class WyomingSatelliteRTSPStreamWidthNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -550,7 +550,7 @@ class WyomingSatelliteRTSPStreamHeightNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -583,7 +583,7 @@ class WyomingSatelliteRTSPStreamFpsNumber(VASatelliteEntity, RestoreNumber):
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
@@ -615,7 +615,7 @@ class WyomingSatelliteRawProximityThresholdNumber(VASatelliteEntity, RestoreNumb
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None:
+        if state is not None and state.state not in (STATE_UNAVAILABLE, STATE_UNKNOWN):
             await self.async_set_native_value(float(state.state))
 
     async def async_set_native_value(self, value: float) -> None:
