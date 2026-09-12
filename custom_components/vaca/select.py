@@ -66,6 +66,7 @@ async def async_setup_entry(
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
         entities.append(WyomingSatelliteMotionDetectionModeSelect(device))
+        entities.append(WyomingSatelliteRTSPStreamRotationSelect(device))
 
     if entities:
         async_add_entities(entities)
@@ -456,3 +457,33 @@ class WyomingSatelliteScreenOrientationModeSelect(
         self._attr_current_option = option
         self.async_write_ha_state()
         self._device.set_custom_setting("screen_orientation_mode", option)
+
+
+class WyomingSatelliteRTSPStreamRotationSelect(
+    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
+):
+    """Entity to represent RTSP camera stream rotation setting."""
+
+    entity_description = SelectEntityDescription(
+        key="rtsp_stream_rotation",
+        translation_key="rtsp_stream_rotation",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:rotate-right",
+    )
+    _attr_should_poll = False
+    _attr_current_option = "0"
+    _attr_options = ["0", "90", "180", "270"]
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to Home Assistant."""
+        await super().async_added_to_hass()
+
+        state = await self.async_get_last_state()
+        if state is not None and state.state in self.options:
+            await self.async_select_option(state.state)
+
+    async def async_select_option(self, option: str) -> None:
+        """Select an option."""
+        self._attr_current_option = option
+        self.async_write_ha_state()
+        self._device.set_custom_setting(self.entity_description.key, int(option))
