@@ -1,7 +1,9 @@
 {
   "domain": "vaca",
   "name": "View Assist Companion App",
-  "codeowners": ["@msp1974"],
+  "codeowners": [
+    "@msp1974"
+  ],
   "config_flow": true,
   "dependencies": [
     "assist_satellite",
@@ -19,7 +21,11 @@
     "custom_components.vaca",
     "wyoming"
   ],
-  "requirements": ["wyoming>=1.7.1"],
-  "version": "0.13.2",
-  "zeroconf": ["_vaca._tcp.local."]
+  "requirements": [
+    "wyoming>=1.7.1"
+  ],
+  "version": "0.13.3",
+  "zeroconf": [
+    "_vaca._tcp.local."
+  ]
 }
