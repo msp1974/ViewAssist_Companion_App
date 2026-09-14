@@ -51,7 +51,7 @@ async def async_setup_entry(
         ]
     )
 
-    if device.capabilities and device.capabilities.get("has_front_camera"):
+    if device.supports_camera_motion():
         entities.append(WyomingSatelliteMotionDetectionSensitivityNumber(device))
     if (
         device.capabilities

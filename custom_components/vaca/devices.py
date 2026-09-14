@@ -124,6 +124,21 @@ class VASatelliteDevice(SatelliteDevice):
                     return True
         return False
 
+    def supports_camera_motion(self) -> bool:
+        """Check if the device supports camera-based motion / face detection."""
+        return bool(self.capabilities and self.capabilities.get("has_front_camera"))
+
+    def supports_motion_detection(self) -> bool:
+        """Check if the device can produce any motion signal."""
+        return self.supports_camera_motion()
+
+    def motion_detection_mode_options(self) -> list[str]:
+        """Return supported motion-detection mode options for this device."""
+        options = ["none"]
+        if self.supports_camera_motion():
+            options.extend(["motion", "face"])
+        return options
+
     def getMaxMusicVolume(self) -> int | None:
         """Get max music volume."""
         if self.capabilities and (audio := self.capabilities.get("audio")):

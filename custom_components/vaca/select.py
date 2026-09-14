@@ -64,7 +64,7 @@ async def async_setup_entry(
         WyomingSatelliteScreenOrientationModeSelect(device),
     ]
 
-    if device.capabilities and device.capabilities.get("has_front_camera"):
+    if device.supports_motion_detection():
         entities.append(WyomingSatelliteMotionDetectionModeSelect(device))
 
     if entities:
@@ -145,7 +145,11 @@ class WyomingSatelliteMotionDetectionModeSelect(
     )
     _attr_should_poll = False
     _attr_current_option = "none"
-    _attr_options = ["none", "motion", "face"]
+
+    @property
+    def options(self) -> list[str]:
+        """Return the supported mode options for this device."""
+        return self._device.motion_detection_mode_options()
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to Home Assistant."""
