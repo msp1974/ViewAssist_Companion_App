@@ -4,6 +4,7 @@ DOMAIN = "vaca"
 MIN_APK_VERSION = "0.13.3"
 
 CONF_HA_URL = "ha_url"
+CONF_HA_DASHBOARD = "ha_dashboard"
 
 SAMPLE_RATE = 16000
 SAMPLE_WIDTH = 2
