@@ -24,7 +24,7 @@
   "requirements": [
     "wyoming>=1.7.1"
   ],
-  "version": "0.13.3",
+  "version": "0.13.4",
   "zeroconf": [
     "_vaca._tcp.local."
   ]
