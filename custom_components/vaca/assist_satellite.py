@@ -1,7 +1,5 @@
 """Assist satellite entity for Wyoming integration."""
 
-from __future__ import annotations
-
 import asyncio
 import logging
 from typing import Any, Final
@@ -21,8 +19,6 @@ from homeassistant.components.assist_satellite import (
     AssistSatelliteEntityFeature,
 )
 from homeassistant.components.wyoming import DomainDataItem, WyomingService
-
-# pylint: disable-next=hass-component-root-import
 from homeassistant.components.wyoming.assist_satellite import WyomingAssistSatellite
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -109,10 +105,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
     async def on_restart(self) -> None:
         """Block until pipeline loop will be restarted."""
-        _LOGGER.warning(
+        _LOGGER.debug(
             "Satellite %s has been disconnected. Reconnecting in %s second(s)",
             self.entity_id.replace("assist_satellite.", ""),
-            _RECONNECT_SECONDS,
+            _RESTART_SECONDS,
         )
         await asyncio.sleep(_RESTART_SECONDS)
 
@@ -330,7 +326,8 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         Should block until the announcement is done playing.
         MSP - Fixes that Wyoming announce does not play preannounce sound
         """
-        assert self._client is not None
+        if self._client is None:
+            raise ConnectionError("Satellite is not connected")
 
         if self._ffmpeg_manager is None:
             self._ffmpeg_manager = ffmpeg.get_ffmpeg_manager(self.hass)
