@@ -30,7 +30,14 @@ from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .client import VAAsyncTcpClient
-from .const import CONF_HA_URL, DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
+from .const import (
+    CONF_HA_DASHBOARD,
+    CONF_HA_URL,
+    DOMAIN,
+    MIN_APK_VERSION,
+    SAMPLE_CHANNELS,
+    SAMPLE_WIDTH,
+)
 from .custom import (
     ACTION_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
@@ -42,6 +49,7 @@ from .custom import (
     getIntegrationVersion,
     getVADashboardPath,
 )
+from .dashboard import resolve_dashboard_path
 from .devices import VASatelliteDevice
 from .entity import VASatelliteEntity
 
@@ -159,7 +167,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     or ""
                 )
                 home = getVADashboardPath(self.hass, self.device.satellite_id)
-                self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
+                self.device.custom_settings["ha_dashboard"] = resolve_dashboard_path(
+                    home,
+                    self.config_entry.options.get(CONF_HA_DASHBOARD),
+                )
 
                 # Add custom files data - commented out awaiting implementation
                 self.device.custom_settings[
