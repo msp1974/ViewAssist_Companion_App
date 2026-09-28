@@ -11,6 +11,7 @@ import voluptuous as vol
 from homeassistant.components.wyoming.config_flow import WyomingConfigFlow
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, OptionsFlow
 from homeassistant.core import callback
+from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from .const import CONF_HA_URL, DOMAIN
 
@@ -19,6 +20,18 @@ _LOGGER = logging.getLogger(__name__)
 
 class VAWyomingConfigFlow(WyomingConfigFlow, domain=DOMAIN):
     """Handle a config flow for Wyoming integration."""
+
+    async def async_step_zeroconf(
+        self, discovery_info: ZeroconfServiceInfo
+    ) -> ConfigFlowResult:
+        """Handle discovery without treating an mDNS rename as a new device."""
+        if discovery_info.port is not None:
+            for _entry in self._iter_entries(
+                discovery_info.host, discovery_info.port
+            ):
+                return self.async_abort(reason="already_configured")
+
+        return await super().async_step_zeroconf(discovery_info)
 
     @staticmethod
     @callback
