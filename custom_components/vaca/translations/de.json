@@ -53,6 +53,9 @@
         "event": {
             "gesture": {
                 "name": "Geste"
+            },
+            "proximity": {
+                "name": "Nähe"
             }
         },
         "media_player": {

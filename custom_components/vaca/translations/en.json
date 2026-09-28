@@ -65,6 +65,9 @@
         "event": {
             "gesture": {
                 "name": "Gesture"
+            },
+            "proximity": {
+                "name": "Proximity"
             }
         },
         "media_player": {

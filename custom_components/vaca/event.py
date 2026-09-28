@@ -41,13 +41,15 @@ async def async_setup_entry(
     entities = [
         WyomingGestureEvent(device),
     ]
+    if device.has_proximity_sensor():
+        entities.append(WyomingProximityEvent(device))
 
     if entities:
         async_add_entities(entities)
 
 
 class WyomingGestureEvent(VASatelliteEntity, EventEntity):
-    """Base class for device sensors."""
+    """Gesture event for Wyoming satellites."""
 
     _listener_class = "gesture_update"
     entity_description = EventEntityDescription(
@@ -56,7 +58,20 @@ class WyomingGestureEvent(VASatelliteEntity, EventEntity):
         icon="mdi:gesture-swipe",
     )
     _touch_points = [1, 2, 3]
-    _gestures = ["left", "right", "up", "down", "up_right", "up_left", "down_right", "down_left", "left_up", "right_up", "left_down", "right_down"]
+    _gestures = [
+        "left",
+        "right",
+        "up",
+        "down",
+        "up_right",
+        "up_left",
+        "down_right",
+        "down_left",
+        "left_up",
+        "right_up",
+        "left_down",
+        "right_down",
+    ]
 
     async def async_added_to_hass(self) -> None:
         """Call when entity about to be added to hass."""
@@ -95,6 +110,47 @@ class WyomingGestureEvent(VASatelliteEntity, EventEntity):
                 "touch_points": touch_points,
                 "startX": data.get("startX"),
                 "startY": data.get("startY"),
+            },
+        )
+        self.async_write_ha_state()
+
+
+class WyomingProximityEvent(VASatelliteEntity, EventEntity):
+    """Proximity event for Wyoming satellites."""
+
+    _listener_class = "proximity_update"
+    entity_description = EventEntityDescription(
+        key="proximity",
+        translation_key="proximity",
+        icon="mdi:gesture-swipe",
+    )
+
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_{self._listener_class}",
+                self._async_handle_event,
+            )
+        )
+
+    @property
+    def event_types(self) -> list[str]:
+        """Return a list of possible events."""
+        return ["proximity_near", "proximity_far"]
+
+    @callback
+    def _async_handle_event(self, data: dict[str, Any]) -> None:
+        """Handle the proximity event."""
+        is_near = data.get("near")
+        _LOGGER.debug("Received proximity event: %s", is_near)
+        self._trigger_event(
+            f"proximity_{'near' if is_near else 'far'}",
+            {
+                "proximity": data.get("proximity"),
             },
         )
         self.async_write_ha_state()
