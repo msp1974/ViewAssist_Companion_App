@@ -50,6 +50,14 @@
                 "name": "Буђење"
             }
         },
+        "event": {
+            "gesture": {
+                "name": "Геста"
+            },
+            "proximity": {
+                "name": "Близина"
+            }
+        },
         "media_player": {
             "media_player": {
                 "name": "Медија плејер",

@@ -50,6 +50,9 @@
         "event": {
             "gesture": {
                 "name": "Jest"
+            },
+            "proximity": {
+                "name": "Yakınlık"
             }
         },
         "media_player": {

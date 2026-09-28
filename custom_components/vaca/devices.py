@@ -108,6 +108,14 @@ class VASatelliteDevice(SatelliteDevice):
                     return True
         return False
 
+    def has_proximity_sensor(self) -> bool:
+        """Check if the device has a proximity sensor."""
+        if self.capabilities and (sensors := self.capabilities.get("sensors")):
+            for sensor in sensors:
+                if sensor.get("type") == 8:  # Proximity sensor type
+                    return True
+        return False
+
     def supportBump(self) -> bool:
         """Check if the device supports bump proximity feature."""
         if self.capabilities and (sensors := self.capabilities.get("sensors")):
