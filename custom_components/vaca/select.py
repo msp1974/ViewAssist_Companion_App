@@ -201,7 +201,9 @@ class WyomingSatelliteWakeWordSelect(
         await super().async_added_to_hass()
 
         state = await self.async_get_last_state()
-        if state is not None and state.state in self.options:
+        # Options depend on the wake word engine, which may not be restored
+        # yet; restore the saved word anyway instead of falling back to None.
+        if state is not None and state.state not in ("unknown", "unavailable"):
             await self.async_select_option(state.state)
         # Default to the first available option if no state is found
         elif self.options:
