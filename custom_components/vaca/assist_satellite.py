@@ -97,8 +97,10 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         # Make info accessible from entities
         self.device.info = service.info
 
-        # Init custom settings
-        self.device.custom_settings = {}
+        # Init custom settings. Select/number entities restore their state
+        # into this dict concurrently; do not wipe what they already wrote.
+        if self.device.custom_settings is None:
+            self.device.custom_settings = {}
 
         # stream tts var to allow interupt and cancel remaining response
         self.stream_tts = False
