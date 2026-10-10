@@ -28,10 +28,12 @@
     "step": {
       "init": {
         "data": {
-          "ha_url": "Home Assistant URL"
+          "ha_url": "Home Assistant URL",
+          "ha_dashboard": "Home Assistant dashboard path"
         },
         "data_description": {
-          "ha_url": "The URL passed to the device to connect back to Home Assistant. Leave blank to use the internal network URL configured in Home Assistant."
+          "ha_url": "The URL passed to the device to connect back to Home Assistant. Leave blank to use the internal network URL configured in Home Assistant.",
+          "ha_dashboard": "The dashboard path opened when the device connects. Leave blank to use a linked View Assist dashboard or Home Assistant's default dashboard."
         }
       }
     }

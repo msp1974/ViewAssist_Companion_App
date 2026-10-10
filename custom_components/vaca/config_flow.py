@@ -13,7 +13,8 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, OptionsF
 from homeassistant.core import callback
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from .const import CONF_HA_URL, DOMAIN
+from .const import CONF_HA_DASHBOARD, CONF_HA_URL, DOMAIN
+from .dashboard import merge_options
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,7 +49,9 @@ class VAOptionsFlowHandler(OptionsFlow):
     ) -> ConfigFlowResult:
         """Manage the options."""
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
+            return self.async_create_entry(
+                data=merge_options(self.config_entry.options, user_input)
+            )
 
         schema = vol.Schema(
             {
@@ -56,6 +59,14 @@ class VAOptionsFlowHandler(OptionsFlow):
                     CONF_HA_URL,
                     description={
                         "suggested_value": self.config_entry.options.get(CONF_HA_URL)
+                    },
+                ): str,
+                vol.Optional(
+                    CONF_HA_DASHBOARD,
+                    description={
+                        "suggested_value": self.config_entry.options.get(
+                            CONF_HA_DASHBOARD
+                        )
                     },
                 ): str,
             }
