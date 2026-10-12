@@ -19,6 +19,7 @@ Extending the already amazing voice capabilities of Home Assistant, you can now 
 - Many built in controls for your device (screen on/off, brightness, dark mode, dnd, mic mute and more)
 - Built in sensors for your device (battery level, charging, light level, orientation, last command, last response and more)
 - Motion detection for camera enabled devices
+- RTSP camera stream with rotation and mirror controls for camera enabled devices
 
 It has been built from the ground up to make the first steps into making your own smart display quick and simple but also allow you to progress to much more advanced functionality as you grow.
 
