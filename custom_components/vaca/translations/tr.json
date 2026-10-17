@@ -128,6 +128,9 @@
             "wake_word": {
                 "name": "Uyandırma kelimesi"
             },
+            "sendspin_preferred_server": {
+                "name": "Sendspin Music Assistant Server"
+            },
             "wake_word_sound": {
                 "name": "Uyandırma kelimesi sesi",
                 "state": {

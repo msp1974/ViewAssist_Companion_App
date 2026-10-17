@@ -134,6 +134,9 @@
             "wake_word": {
                 "name": "Weckwort"
             },
+            "sendspin_preferred_server": {
+                "name": "Sendspin Music Assistant Server"
+            },
             "wake_word_sound": {
                 "name": "Weckwort-Ton",
                 "state": {

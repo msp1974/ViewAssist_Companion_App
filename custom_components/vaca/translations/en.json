@@ -165,6 +165,9 @@
             "alarm_sound": {
                 "name": "Alarm sound"
             },
+            "sendspin_preferred_server": {
+                "name": "Sendspin Music Assistant Server"
+            },
             "screen_timeout": {
                 "name": "Screen timeout",
                 "state": {

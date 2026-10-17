@@ -10,7 +10,7 @@ from homeassistant.components.assist_pipeline import (
 )
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EntityCategory
+from homeassistant.const import CONF_URL, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import restore_state
 from homeassistant.helpers.dispatcher import (
@@ -34,6 +34,7 @@ _NOISE_SUPPRESSION_LEVEL: Final = {
     "max": 4,
 }
 _DEFAULT_NOISE_SUPPRESSION_LEVEL: Final = "off"
+_NO_MUSIC_ASSISTANT: Final = "None"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,6 +61,7 @@ async def async_setup_entry(
         WyomingSatelliteAlarmSoundSelect(device),
         WyomingSatelliteScreenTimeoutSelect(device),
         WyomingSatelliteScreenOrientationModeSelect(device),
+        WyomingSatelliteMusicAssistantServerSelect(device),
     ]
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
@@ -356,6 +358,34 @@ class WyomingSatelliteWakeWordEngineSelect(WyomingRestoreSelectEntityBase):
             {"engine": option},
         )
         await super().async_select_option(option)
+
+
+class WyomingSatelliteMusicAssistantServerSelect(WyomingRestoreSelectEntityBase):
+    """Entity to select the Music Assistant server."""
+
+    entity_description = SelectEntityDescription(
+        key="sendspin_preferred_server",
+        translation_key="sendspin_preferred_server",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:music-box-multiple",
+    )
+    _attr_options = ["Auto"]
+
+    def _get_servers(self) -> dict[str, str]:
+        """Return available Music Assistant servers as name -> url."""
+        return {
+            entry.title: entry.data.get(CONF_URL, "")
+            for entry in self.hass.config_entries.async_entries("music_assistant")
+        }
+
+    @property
+    def options(self) -> list[str]:
+        """Return the list of available Music Assistant servers."""
+        return ["Auto", *self._get_servers()]
+
+    def _option_value_convert(self, option: str) -> str:
+        """Convert the selected server name to its url."""
+        return self._get_servers().get(option, "")
 
 
 class WyomingSatelliteScreenOrientationModeSelect(WyomingRestoreSelectEntityBase):
