@@ -168,6 +168,12 @@
             "sendspin_preferred_server": {
                 "name": "Sendspin Music Assistant Server"
             },
+            "audio_input": {
+                "name": "Audio input"
+            },
+            "audio_output": {
+                "name": "Audio output"
+            },
             "screen_timeout": {
                 "name": "Screen timeout",
                 "state": {
