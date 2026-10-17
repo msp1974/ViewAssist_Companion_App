@@ -48,6 +48,7 @@ _RECONNECT_SECONDS: Final = 10
 _RESTART_SECONDS: Final = 3
 _TTS_SAMPLE_RATE: Final = 22050
 _ANNOUNCE_CHUNK_BYTES: Final = 2048  # 1024 samples
+_HA_START_TIMEOUT_SECONDS: Final = 30  # fallback if HA never reports started
 
 
 async def async_setup_entry(
@@ -103,6 +104,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         # stream tts var to allow interupt and cancel remaining response
         self.stream_tts = False
+        self._full_settings_pending = False
 
     async def on_restart(self) -> None:
         """Block until pipeline loop will be restarted."""
@@ -151,13 +153,33 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         unsub = async_at_started(self.hass, _set_started)
         try:
-            await started.wait()
+            async with asyncio.timeout(_HA_START_TIMEOUT_SECONDS):
+                await started.wait()
+        except TimeoutError:
+            _LOGGER.warning(
+                "Home Assistant not started after %s seconds, sending settings anyway",
+                _HA_START_TIMEOUT_SECONDS,
+            )
         finally:
             if unsub and not started.is_set():
                 unsub()
 
     async def _async_send_full_settings(self, update_device_info: bool = False) -> None:
         """Wait for HA to start, then build and send all settings."""
+        if self._full_settings_pending:
+            _LOGGER.debug("Full settings already pending, ignoring duplicate request")
+            return
+
+        self._full_settings_pending = True
+        try:
+            await self._async_build_and_send_full_settings(update_device_info)
+        finally:
+            self._full_settings_pending = False
+
+    async def _async_build_and_send_full_settings(
+        self, update_device_info: bool
+    ) -> None:
+        """Build and send all settings once HA has started."""
         await self._async_wait_for_ha_started()
 
         if update_device_info and self.device and self.device.custom_settings:
@@ -237,7 +259,11 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                         )
                 if evt.event_type == SETTINGS_EVENT_TYPE and not evt.event_data:
                     # Handle settings request from satellite
-                    self.hass.async_create_task(self.on_handle_settings_request())
+                    self.config_entry.async_create_background_task(
+                        self.hass,
+                        self.on_handle_settings_request(),
+                        "handle settings request",
+                    )
 
             async_dispatcher_send(
                 self.hass,
