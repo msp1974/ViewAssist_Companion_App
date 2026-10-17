@@ -37,6 +37,11 @@
     }
   },
   "entity": {
+    "camera": {
+      "rtsp_camera": {
+        "name": "RTSP camera"
+      }
+    },
     "binary_sensor": {
       "assist_in_progress": {
         "name": "[%key:component::assist_pipeline::entity::binary_sensor::assist_in_progress::name%]"

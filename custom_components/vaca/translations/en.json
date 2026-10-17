@@ -37,6 +37,11 @@
         }
     },
     "entity": {
+        "camera": {
+            "rtsp_camera": {
+                "name": "RTSP camera"
+            }
+        },
         "binary_sensor": {
             "battery_charging": {
                 "name": "Battery charging"
@@ -273,6 +278,9 @@
             },
             "screen_saver": {
                 "name": "Screen saver"
+            },
+            "sendspin_enabled": {
+                "name": "SendSpin"
             }
         }
     }

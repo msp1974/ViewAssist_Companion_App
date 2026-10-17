@@ -121,13 +121,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         )
         await asyncio.sleep(_RECONNECT_SECONDS)
 
-    async def async_will_remove_from_hass(self) -> None:
-        """Run when entity will be removed from hass."""
-        try:
-            await super().async_will_remove_from_hass()
-        except AssertionError as ex:
-            _LOGGER.debug("Assertion error while stopping satellite: %s", ex)
-
     async def on_before_send_event_callback(self, event: Event) -> None:
         """Allow injection of events before event sent."""
 
@@ -216,6 +209,13 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     self.device.info.satellite.name,
                     evt.event_data,
                 )
+                if evt.event_type == STATUS_EVENT_TYPE:
+                    status = evt.event_data or {}
+                    if "rtsp_url" in status:
+                        rtsp_url = status["rtsp_url"]
+                        self.device.rtsp_url = (
+                            rtsp_url if isinstance(rtsp_url, str) and rtsp_url else None
+                        )
                 if evt.event_type == SETTINGS_EVENT_TYPE and not evt.event_data:
                     # Handle settings request from satellite
                     self.hass.async_create_task(self.on_handle_settings_request())

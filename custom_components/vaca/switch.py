@@ -46,6 +46,7 @@ async def async_setup_entry(
         WyomingSatelliteAlarmSwitch(device),
         WyomingSatelliteScreenOnWakeWordSwitch(device),
         WyomingSatelliteScreenSaverSwitch(device),
+        WyomingSatelliteSendSpinSwitch(device),
     ]
 
     if capabilities := device.capabilities:
@@ -364,5 +365,17 @@ class WyomingSatelliteScreenSaverSwitch(BaseFeedbackSwitch):
         key="screen_saver",
         translation_key="screen_saver",
         icon="mdi:monitor-shimmer",
+    )
+    default_on = False
+
+
+class WyomingSatelliteSendSpinSwitch(BaseFeedbackSwitch):
+    """Entity to control SendSpin on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="sendspin_enabled",
+        translation_key="sendspin_enabled",
+        icon="mdi:speaker-wireless",
+        entity_category=EntityCategory.CONFIG,
     )
     default_on = False

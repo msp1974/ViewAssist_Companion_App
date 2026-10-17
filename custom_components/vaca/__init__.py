@@ -27,6 +27,7 @@ SATELLITE_PLATFORMS = [
     Platform.ASSIST_SATELLITE,
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
+    Platform.CAMERA,
     Platform.EVENT,
     Platform.SELECT,
     Platform.SWITCH,
