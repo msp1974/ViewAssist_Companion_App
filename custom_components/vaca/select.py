@@ -62,6 +62,8 @@ async def async_setup_entry(
         WyomingSatelliteScreenTimeoutSelect(device),
         WyomingSatelliteScreenOrientationModeSelect(device),
         WyomingSatelliteMusicAssistantServerSelect(device),
+        WyomingSatelliteAudioInputSelect(device),
+        WyomingSatelliteAudioOutputSelect(device),
     ]
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
@@ -386,6 +388,61 @@ class WyomingSatelliteMusicAssistantServerSelect(WyomingRestoreSelectEntityBase)
     def _option_value_convert(self, option: str) -> str:
         """Convert the selected server name to its url."""
         return self._get_servers().get(option, "")
+
+
+class _WyomingSatelliteAudioDeviceSelect(WyomingRestoreSelectEntityBase):
+    """Base for audio device selects populated from hardware capabilities."""
+
+    _attr_options = []
+    _attr_device_listeners = ["capabilities_update"]
+    _capabilities_key = ""
+
+    def _get_devices(self) -> dict[str, Any]:
+        """Return available audio devices as name -> id."""
+        audio = (self._device.capabilities or {}).get("audio") or {}
+        devices: dict[str, Any] = {}
+        for item in audio.get(self._capabilities_key) or []:
+            if isinstance(item, dict):
+                name = item.get("type_name")
+                device_id = item.get("id", name)
+            else:
+                name = device_id = item
+            if name and str(name) not in devices:
+                devices[str(name)] = device_id
+        return devices
+
+    @property
+    def options(self) -> list[str]:
+        """Return the audio devices reported by the satellite."""
+        return list(self._get_devices())
+
+    def _option_value_convert(self, option: str) -> Any:
+        """Convert the selected name to the device id expected by the satellite."""
+        return self._get_devices().get(option, option)
+
+
+class WyomingSatelliteAudioInputSelect(_WyomingSatelliteAudioDeviceSelect):
+    """Entity to select the audio input."""
+
+    entity_description = SelectEntityDescription(
+        key="audio_input",
+        translation_key="audio_input",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:microphone",
+    )
+    _capabilities_key = "inputs"
+
+
+class WyomingSatelliteAudioOutputSelect(_WyomingSatelliteAudioDeviceSelect):
+    """Entity to select the audio output."""
+
+    entity_description = SelectEntityDescription(
+        key="audio_output",
+        translation_key="audio_output",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:speaker",
+    )
+    _capabilities_key = "outputs"
 
 
 class WyomingSatelliteScreenOrientationModeSelect(WyomingRestoreSelectEntityBase):
