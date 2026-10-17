@@ -241,6 +241,9 @@
             },
             "screen_on_motion": {
                 "name": "Bildschirm an bei Bewegung"
+            },
+            "sendspin_enabled": {
+                "name": "Sendspin Enabled"
             }
         }
     }

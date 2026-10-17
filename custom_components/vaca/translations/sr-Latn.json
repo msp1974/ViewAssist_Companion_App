@@ -242,6 +242,9 @@
             },
             "screen_saver": {
                 "name": "Čuvar ekrana"
+            },
+            "sendspin_enabled": {
+                "name": "Sendspin Enabled"
             }
         }
     }

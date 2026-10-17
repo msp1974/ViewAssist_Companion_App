@@ -235,6 +235,9 @@
             },
             "screen_on_motion": {
                 "name": "Hareket ile ekranı aç"
+            },
+            "sendspin_enabled": {
+                "name": "Sendspin Enabled"
             }
         }
     }

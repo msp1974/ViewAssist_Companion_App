@@ -283,7 +283,7 @@
                 "name": "Screen saver"
             },
             "sendspin_enabled": {
-                "name": "SendSpin"
+                "name": "Sendspin Enabled"
             }
         }
     }
