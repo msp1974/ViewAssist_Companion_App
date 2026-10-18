@@ -21,6 +21,7 @@ from homeassistant.components.assist_satellite import (
 from homeassistant.components.wyoming import DomainDataItem, WyomingService
 from homeassistant.components.wyoming.assist_satellite import WyomingAssistSatellite
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_URL
 from homeassistant.core import CoreState, HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -199,6 +200,12 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             home = getVADashboardPath(self.hass, self.device.satellite_id)
             self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
 
+            # With a single Music Assistant server, pass its url directly
+            ma_entries = self.hass.config_entries.async_entries("music_assistant")
+            if len(ma_entries) == 1:
+                self.device.custom_settings["sendspin_preferred_server"] = (
+                    ma_entries[0].data.get(CONF_URL, "")
+                )
         # Add custom files data
         self.device.custom_settings[
             "custom_files"

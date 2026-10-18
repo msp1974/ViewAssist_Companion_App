@@ -61,10 +61,12 @@ async def async_setup_entry(
         WyomingSatelliteAlarmSoundSelect(device),
         WyomingSatelliteScreenTimeoutSelect(device),
         WyomingSatelliteScreenOrientationModeSelect(device),
-        WyomingSatelliteMusicAssistantServerSelect(device),
         WyomingSatelliteAudioInputSelect(device),
         WyomingSatelliteAudioOutputSelect(device),
     ]
+
+    if len(hass.config_entries.async_entries("music_assistant")) > 1:
+        entities.append(WyomingSatelliteMusicAssistantServerSelect(device))
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
         entities.append(WyomingSatelliteMotionDetectionModeSelect(device))
