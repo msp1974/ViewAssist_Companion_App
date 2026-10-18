@@ -134,9 +134,7 @@ class WyomingSatelliteVadSensitivitySelect(VASatelliteEntity, VadSensitivitySele
         self.device.set_vad_sensitivity(VadSensitivity(option))
 
 
-class WyomingRestoreSelectEntityBase(
-    VASatelliteEntity, SelectEntity, restore_state.RestoreEntity
-):
+class BaseSelectEntity(VASatelliteEntity, SelectEntity, restore_state.RestoreEntity):
     """Base class for Wyoming satellite select entities that restore state."""
 
     _attr_should_poll = False
@@ -151,7 +149,8 @@ class WyomingRestoreSelectEntityBase(
         state = await self.async_get_last_state()
         attributes = state.attributes if state else {}
         # Restore available options
-        self._attr_options = attributes.get("options", [])
+        if stored_options := attributes.get("options"):
+            self._attr_options = stored_options
 
         if state is not None and state.state in self.options:
             await self.async_select_option(state.state)
@@ -184,13 +183,16 @@ class WyomingRestoreSelectEntityBase(
             return self.entity_description.options
         return []
 
-    async def async_select_option(self, option: str) -> None:
+    async def async_select_option(
+        self, option: str, send_to_device: bool = True
+    ) -> None:
         """Select an option."""
         self._attr_current_option = option
         self.async_write_ha_state()
-        self._device.set_custom_setting(
-            self.entity_description.key, self._option_value_convert(option)
-        )
+        if send_to_device:
+            self._device.set_custom_setting(
+                self.entity_description.key, self._option_value_convert(option)
+            )
 
     def _option_value_convert(self, option: str) -> str:
         """Convert the option value to the format expected by the device."""
@@ -208,7 +210,34 @@ class WyomingRestoreSelectEntityBase(
         )
 
 
-class WyomingSatelliteMotionDetectionModeSelect(WyomingRestoreSelectEntityBase):
+class BaseFeedbackSelectEntity(BaseSelectEntity):
+    """Base class for select entities that receive feedback from device."""
+
+    _listener_class = "settings_update"
+
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_{self._listener_class}",
+                self.setting_update,
+            )
+        )
+
+    async def setting_update(self, data: dict[str, Any]) -> None:
+        """Handle status update."""
+        settings = data.get("settings")
+        if self.entity_description.key in settings:
+            setting_value = settings[self.entity_description.key]
+            if hasattr(self, "_option_setting_value_convert"):
+                setting_value = self._option_setting_value_convert(setting_value)
+            await self.async_select_option(setting_value, send_to_device=False)
+
+
+class WyomingSatelliteMotionDetectionModeSelect(BaseSelectEntity):
     """Entity to represent motion detection mode setting."""
 
     entity_description = SelectEntityDescription(
@@ -220,7 +249,7 @@ class WyomingSatelliteMotionDetectionModeSelect(WyomingRestoreSelectEntityBase):
     _attr_options = ["none", "motion", "face"]
 
 
-class WyomingSatelliteWakeWordSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteWakeWordSelect(BaseSelectEntity):
     """Entity to represent wake word setting."""
 
     entity_description = SelectEntityDescription(
@@ -254,7 +283,7 @@ class WyomingSatelliteWakeWordSelect(WyomingRestoreSelectEntityBase):
         return option.lower().replace(" ", "_")
 
 
-class WyomingSatelliteWakeWordSoundSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteWakeWordSoundSelect(BaseSelectEntity):
     """Entity to represent wake word sound setting."""
 
     entity_description = SelectEntityDescription(
@@ -288,7 +317,7 @@ class WyomingSatelliteWakeWordSoundSelect(WyomingRestoreSelectEntityBase):
         return option.lower().replace(" ", "_")
 
 
-class WyomingSatelliteScreenTimeoutSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteScreenTimeoutSelect(BaseSelectEntity):
     """Entity to represent screen timeout setting."""
 
     entity_description = SelectEntityDescription(
@@ -305,7 +334,7 @@ class WyomingSatelliteScreenTimeoutSelect(WyomingRestoreSelectEntityBase):
         return int(option)
 
 
-class WyomingSatelliteAlarmSoundSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteAlarmSoundSelect(BaseSelectEntity):
     """Entity to represent alarm sound setting."""
 
     entity_description = SelectEntityDescription(
@@ -340,7 +369,7 @@ class WyomingSatelliteAlarmSoundSelect(WyomingRestoreSelectEntityBase):
         return option.lower().replace(" ", "_")
 
 
-class WyomingSatelliteWakeWordEngineSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteWakeWordEngineSelect(BaseSelectEntity):
     """Entity to represent wake word engine setting."""
 
     entity_description = SelectEntityDescription(
@@ -362,7 +391,7 @@ class WyomingSatelliteWakeWordEngineSelect(WyomingRestoreSelectEntityBase):
         await super().async_select_option(option)
 
 
-class WyomingSatelliteMusicAssistantServerSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteMusicAssistantServerSelect(BaseSelectEntity):
     """Entity to select the Music Assistant server."""
 
     entity_description = SelectEntityDescription(
@@ -390,35 +419,44 @@ class WyomingSatelliteMusicAssistantServerSelect(WyomingRestoreSelectEntityBase)
         return self._get_servers().get(option, "")
 
 
-class _WyomingSatelliteAudioDeviceSelect(WyomingRestoreSelectEntityBase):
+class _WyomingSatelliteAudioDeviceSelect(BaseFeedbackSelectEntity):
     """Base for audio device selects populated from hardware capabilities."""
 
     _attr_options = []
     _attr_device_listeners = ["capabilities_update"]
     _capabilities_key = ""
+    _known_devices: dict[str, Any] = {}
 
-    def _get_devices(self) -> dict[str, Any]:
-        """Return available audio devices as name -> id."""
+    def _get_known_devices(self) -> dict[int, Any]:
+        """Return available audio devices as id -> name."""
         audio = (self._device.capabilities or {}).get("audio") or {}
-        devices: dict[str, Any] = {}
+        devices: dict[int, Any] = {}
         for item in audio.get(self._capabilities_key) or []:
             if isinstance(item, dict):
-                name = item.get("type_name")
-                device_id = item.get("id", name)
-            else:
-                name = device_id = item
-            if name and str(name) not in devices:
-                devices[str(name)] = device_id
+                device_id = item.get("id", 0)
+                device_type = item.get("type", "0")
+                if device_type == 15:
+                    # Build in mic - diff name structure
+                    name = f"Built-in Mic ({item.get('address')})"
+                else:
+                    name = f"{item.get('product_name')} ({item.get('type_name')})"
+
+                if name and device_id not in devices:
+                    devices[device_id] = name
         return devices
 
     @property
     def options(self) -> list[str]:
         """Return the audio devices reported by the satellite."""
-        return list(self._get_devices())
+        return list(self._get_known_devices().values())
 
     def _option_value_convert(self, option: str) -> Any:
-        """Convert the selected name to the device id expected by the satellite."""
-        return self._get_devices().get(option, option)
+        """Get the id of the audio device corresponding to the selected name."""
+        return {v: k for k, v in self._get_known_devices().items()}.get(option, option)
+
+    def _option_setting_value_convert(self, setting_value: int) -> str:
+        """Convert the setting value to the corresponding option value."""
+        return self._get_known_devices().get(setting_value, setting_value)
 
 
 class WyomingSatelliteAudioInputSelect(_WyomingSatelliteAudioDeviceSelect):
@@ -445,7 +483,7 @@ class WyomingSatelliteAudioOutputSelect(_WyomingSatelliteAudioDeviceSelect):
     _capabilities_key = "outputs"
 
 
-class WyomingSatelliteScreenOrientationModeSelect(WyomingRestoreSelectEntityBase):
+class WyomingSatelliteScreenOrientationModeSelect(BaseSelectEntity):
     """Entity to represent screen orientation mode setting."""
 
     entity_description = SelectEntityDescription(
