@@ -13,7 +13,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_ON
+from homeassistant.const import STATE_ON, EntityCategory
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -41,7 +41,7 @@ async def async_setup_entry(
     # Setup is only forwarded for satellites
     assert item.device is not None
 
-    entities = []
+    entities = [WyomingSatelliteConnectedBinarySensor(device)]
 
     if capabilities := device.capabilities:
         if capabilities.get("has_battery"):
@@ -95,6 +95,35 @@ class _WyomingSatelliteDeviceBinarySensorBase(
                     sensors[self.entity_description.key]
                 )
                 self.async_write_ha_state()
+
+
+class WyomingSatelliteConnectedBinarySensor(VASatelliteEntity, BinarySensorEntity):
+    """Entity to represent whether the device is connected via Wyoming."""
+
+    entity_description = BinarySensorEntityDescription(
+        key="connected",
+        translation_key="connected",
+        device_class=BinarySensorDeviceClass.CONNECTIVITY,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    )
+
+    async def async_added_to_hass(self) -> None:
+        """Call when entity about to be added to hass."""
+        await super().async_added_to_hass()
+        self._attr_is_on = self._device.connected
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_connection_update",
+                self._connection_update,
+            )
+        )
+
+    @callback
+    def _connection_update(self, connected: bool) -> None:
+        """Update entity."""
+        self._attr_is_on = connected
+        self.async_write_ha_state()
 
 
 class WyomingSatelliteBatteryChargingBinarySensor(

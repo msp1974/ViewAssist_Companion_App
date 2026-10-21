@@ -298,6 +298,25 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             on_receive_callback=self.on_receive_event_callback,
         )
         await self._client.connect()
+        self._set_connected(True)
+
+    async def _disconnect(self) -> None:
+        """Disconnect from satellite and update connected state."""
+        try:
+            await super()._disconnect()
+        finally:
+            self._set_connected(False)
+
+    def _set_connected(self, connected: bool) -> None:
+        """Update device connected state and notify listeners."""
+        if self.device.connected == connected:
+            return
+        self.device.connected = connected
+        async_dispatcher_send(
+            self.hass,
+            f"{DOMAIN}_{self.device.device_id}_connection_update",
+            connected,
+        )
 
     def on_pipeline_event(self, event: PipelineEvent) -> None:
         """Handle pipeline events from the assist pipeline.

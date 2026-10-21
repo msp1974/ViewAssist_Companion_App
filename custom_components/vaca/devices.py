@@ -24,6 +24,7 @@ class VASatelliteDevice(SatelliteDevice):
     capabilities: dict[str, Any] | None = None
     wakeword_engine: str | None = None
     rtsp_url: str | None = None
+    connected: bool = False
 
     _custom_settings_listener: Callable[[str | None, Any | None], None] | None = None
     _custom_action_listener: Callable[[Any, Any], None] | None = None
