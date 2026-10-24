@@ -47,11 +47,16 @@ async def async_setup_entry(
         WyomingSatelliteScreenOnWakeWordSwitch(device),
         WyomingSatelliteScreenSaverSwitch(device),
         WyomingSatelliteSendSpinSwitch(device),
+        WyomingSatelliteSendSpinOverlaySwitch(device),
+        WyomingSatelliteBluetoothProxySwitch(device),
     ]
 
     if capabilities := device.capabilities:
         if capabilities.get("has_dnd"):
             entities.append(WyomingSatelliteDNDSwitch(device))
+
+        if capabilities.get("has_front_camera"):
+            entities.append(WyomingSatelliteRTSPServerSwitch(device))
 
     if device.supportBump():
         entities.append(WyomingSatelliteScreenOnBumpSwitch(device))
@@ -376,6 +381,42 @@ class WyomingSatelliteSendSpinSwitch(BaseFeedbackSwitch):
         key="sendspin_enabled",
         translation_key="sendspin_enabled",
         icon="mdi:speaker-wireless",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteSendSpinOverlaySwitch(BaseFeedbackSwitch):
+    """Entity to control SendSpin overlay on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="sendspin_overlay_enabled",
+        translation_key="sendspin_overlay_enabled",
+        icon="mdi:multimedia",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteBluetoothProxySwitch(BaseFeedbackSwitch):
+    """Entity to control Bluetooth proxy on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="bluetooth_proxy_enabled",
+        translation_key="bluetooth_proxy_enabled",
+        icon="mdi:bluetooth",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteRTSPServerSwitch(BaseFeedbackSwitch):
+    """Entity to control RTSP server on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="rtsp_enabled",
+        translation_key="rtsp_enabled",
+        icon="mdi:video",
         entity_category=EntityCategory.CONFIG,
     )
     default_on = False
