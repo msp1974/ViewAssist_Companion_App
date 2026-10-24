@@ -1,7 +1,5 @@
 """Camera entity for VA Wyoming."""
 
-from __future__ import annotations
-
 import logging
 from typing import TYPE_CHECKING, Any
 
@@ -41,18 +39,18 @@ async def async_setup_entry(
     entities = []
 
     if device.capabilities and device.capabilities.get("has_rtsp"):
-        entities.append(WyomingRTSPCamera(device))
+        entities.append(WyomingStreamCamera(device))
 
     if entities:
         async_add_entities(entities)
 
 
-class WyomingRTSPCamera(VASatelliteEntity, Camera):
-    """Represents an RTSP camera stream from the satellite."""
+class WyomingStreamCamera(VASatelliteEntity, Camera):
+    """Represents a camera stream from the satellite."""
 
     entity_description = CameraEntityDescription(
-        key="rtsp_camera",
-        translation_key="rtsp_camera",
+        key="camera",
+        translation_key="camera",
     )
 
     _attr_supported_features = CameraEntityFeature.STREAM
@@ -73,24 +71,33 @@ class WyomingRTSPCamera(VASatelliteEntity, Camera):
                 self.capabilities_update,
             )
         )
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self._device.device_id}_status_update",
+                self.status_update,
+            )
+        )
 
     async def capabilities_update(self, data: dict[str, Any]) -> None:
         """Handle capabilities updates from the device."""
-        rtsp_url = await self.stream_source()
-
-        # Restart any running stream on the new source
-        if self.stream and rtsp_url and self.stream.source != rtsp_url:
-            self.stream.update_source(rtsp_url)
-
         # WebRTC provider (go2rtc) is only selected if it supports the stream
         # source, so re-evaluate in case it has changed.
         await self.async_refresh_providers()
 
+    async def status_update(self, data: dict[str, Any]) -> None:
+        """Handle status updates from the device."""
+        if "rtsp_url" in data:
+            await self.async_refresh_providers()
+            self.async_write_ha_state()
+
     async def stream_source(self) -> str | None:
         """Return the source of the stream."""
-        if not self._device.capabilities:
-            return None
-        return self._device.capabilities.get("rtsp_url")
+        if rtsp_url := self._device.rtsp_url:
+            return rtsp_url
+        if capabilities := self._device.capabilities:
+            return capabilities.get("rtsp_url") or None
+        return None
 
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
@@ -102,6 +109,7 @@ class WyomingRTSPCamera(VASatelliteEntity, Camera):
         ) is not None:
             return image
 
-        if not (rtsp_url := await self.stream_source()):
-            return None
-        return await async_get_image(self.hass, rtsp_url, width=width, height=height)
+        if source := await self.stream_source():
+            return await async_get_image(self.hass, source, width=width, height=height)
+
+        return None
