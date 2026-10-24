@@ -51,7 +51,7 @@
                 "toast-message": "Toast message",
                 "refresh": "Refresh",
                 "wake": "Wake",
-                "stop": "Stop"
+                "interrupt": "Interrupt"
             }
         }
     },
@@ -307,6 +307,9 @@
             },
             "dark_mode": {
                 "name": "Dark mode"
+            },
+            "show_status_bar": {
+                "name": "Show status bar"
             },
             "diagnostics_enabled": {
                 "name": "On screen diagnostics"

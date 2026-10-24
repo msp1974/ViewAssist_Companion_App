@@ -41,6 +41,7 @@ async def async_setup_entry(
         WyomingSatelliteScreenAutoBrightnessSwitch(device),
         WyomingSatelliteScreenAlwaysOnSwitch(device),
         WyomingSatelliteDarkModeSwitch(device),
+        WyomingSatelliteShowStatusBarSwitch(device),
         WyomingSatelliteDiagnosticsSwitch(device),
         WyomingSatelliteContinueConversationSwitch(device),
         WyomingSatelliteAlarmSwitch(device),
@@ -211,6 +212,18 @@ class WyomingSatelliteDarkModeSwitch(BaseSwitch):
         entity_category=EntityCategory.CONFIG,
     )
     default_on = True
+
+
+class WyomingSatelliteShowStatusBarSwitch(BaseSwitch):
+    """Entity to control showing the status bar."""
+
+    entity_description = SwitchEntityDescription(
+        key="show_status_bar",
+        translation_key="show_status_bar",
+        icon="mdi:dock-top",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
 
 
 class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
