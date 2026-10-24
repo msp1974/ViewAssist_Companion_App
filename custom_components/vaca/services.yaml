@@ -1,0 +1,24 @@
+send_event:
+  target:
+    device:
+      integration: vaca
+    entity:
+      integration: vaca
+  fields:
+    event_name:
+      required: true
+      selector:
+        select:
+          translation_key: event_name
+          options:
+            - navigate
+            - alarm
+            - toast-message
+            - refresh
+            - wake
+            - interrupt
+    event_value:
+      required: true
+      example: '{"path": "/view-assist/clock"}'
+      selector:
+        object:

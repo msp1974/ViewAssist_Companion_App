@@ -12,6 +12,18 @@ SAMPLE_CHANNELS = 1
 # For multi-speaker voices, this is the name of the selected speaker.
 ATTR_SPEAKER = "speaker"
 
+SERVICE_SEND_EVENT = "send_event"
+ATTR_EVENT_NAME = "event_name"
+ATTR_EVENT_VALUE = "event_value"
+SEND_EVENT_NAMES = [
+    "navigate",
+    "alarm",
+    "toast-message",
+    "refresh",
+    "wake",
+    "interrupt",
+]
+
 INTENT_EVENT = f"{DOMAIN}_intent_event"
 
 URL_BASE = DOMAIN

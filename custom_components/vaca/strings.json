@@ -36,6 +36,39 @@
       }
     }
   },
+  "exceptions": {
+    "no_target_devices": {
+      "message": "No View Assist Companion App devices found in the target"
+    }
+  },
+  "selector": {
+    "event_name": {
+      "options": {
+        "navigate": "Navigate",
+        "alarm": "Alarm",
+        "toast-message": "Toast message",
+        "refresh": "Refresh",
+        "wake": "Wake",
+        "interrupt": "Interrupt"
+      }
+    }
+  },
+  "services": {
+    "send_event": {
+      "name": "Send event",
+      "description": "Sends a custom event to the targeted devices.",
+      "fields": {
+        "event_name": {
+          "name": "Event name",
+          "description": "The event to send."
+        },
+        "event_value": {
+          "name": "Event value",
+          "description": "The key/value pairs to send with the event (for example path: /view-assist/clock)."
+        }
+      }
+    }
+  },
   "entity": {
     "camera": {
       "rtsp_camera": {

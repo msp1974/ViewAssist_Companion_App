@@ -546,7 +546,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         )
 
     def _send_custom_action(
-        self, command: str, payload: str | float | None = None
+        self, command: str, payload: Any = None
     ) -> None:
         """Send a media player command to the satellite."""
         if self._client is not None and self._client.can_write_event():
