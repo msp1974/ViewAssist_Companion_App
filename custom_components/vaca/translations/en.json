@@ -28,18 +28,53 @@
         "step": {
             "init": {
                 "data": {
-                    "ha_url": "Home Assistant URL"
+                    "ha_url": "Home Assistant URL",
+                    "default_dashboard": "Default dashboard path"
                 },
                 "data_description": {
-                    "ha_url": "The URL passed to the device to connect back to Home Assistant. Leave blank to use the internal network URL configured in Home Assistant."
+                    "ha_url": "The URL passed to the device to connect back to Home Assistant. Leave blank to use the internal network URL configured in Home Assistant.",
+                    "default_dashboard": "Dashboard path sent to the device when View Assist does not provide one, for example lovelace/0. Leave blank for none."
+                }
+            }
+        }
+    },
+    "exceptions": {
+        "no_target_devices": {
+            "message": "No View Assist Companion App devices found in the target"
+        }
+    },
+    "selector": {
+        "event_name": {
+            "options": {
+                "navigate": "Navigate",
+                "alarm": "Alarm",
+                "toast-message": "Toast message",
+                "refresh": "Refresh",
+                "wake": "Wake",
+                "stop": "Stop"
+            }
+        }
+    },
+    "services": {
+        "send_event": {
+            "name": "Send event",
+            "description": "Sends a custom event to the targeted devices.",
+            "fields": {
+                "event_name": {
+                    "name": "Event name",
+                    "description": "The event to send."
+                },
+                "event_value": {
+                    "name": "Event value",
+                    "description": "The key/value pairs to send with the event (for example path: /view-assist/clock)."
                 }
             }
         }
     },
     "entity": {
         "camera": {
-            "rtsp_camera": {
-                "name": "RTSP camera"
+            "camera": {
+                "name": "Camera"
             }
         },
         "binary_sensor": {
@@ -48,6 +83,9 @@
             },
             "screen_on": {
                 "name": "Screen"
+            },
+            "connected": {
+                "name": "Connected"
             },
             "motion_detected": {
                 "name": "Motion"
@@ -117,7 +155,7 @@
                 "name": "Text size"
             },
             "raw_proximity_threshold": {
-              "name": "Proximity threshold"
+                "name": "Proximity threshold"
             },
             "bump_sensitivity": {
                 "name": "Bump sensitivity"
@@ -202,6 +240,15 @@
                     "none": "Off",
                     "motion": "Motion",
                     "face": "Face"
+                }
+            },
+            "camera_rotation_offset": {
+                "name": "Video stream rotation",
+                "state": {
+                    "0": "0",
+                    "90": "90",
+                    "180": "180",
+                    "270": "270"
                 }
             }
         },
@@ -290,6 +337,15 @@
             },
             "sendspin_enabled": {
                 "name": "Sendspin Enabled"
+            },
+            "sendspin_overlay_enabled": {
+                "name": "Sendspin Media Overlay"
+            },
+            "bluetooth_proxy_enabled": {
+                "name": "Bluetooth Proxy"
+            },
+            "rtsp_enabled": {
+                "name": "Video Stream Enabled"
             }
         }
     }
