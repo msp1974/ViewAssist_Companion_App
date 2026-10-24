@@ -70,6 +70,7 @@ async def async_setup_entry(
 
     if device.capabilities and device.capabilities.get("has_front_camera"):
         entities.append(WyomingSatelliteMotionDetectionModeSelect(device))
+        entities.append(WyomingSatelliteCameraOrientationOffsetSelect(device))
 
     if entities:
         async_add_entities(entities)
@@ -172,18 +173,21 @@ class BaseSelectEntity(VASatelliteEntity, SelectEntity, restore_state.RestoreEnt
     @property
     def options(self) -> list[str]:
         """Return the list of available options."""
+        options = []
         if hasattr(self, "_attr_options_fn"):
             options_fn = getattr(self, self._attr_options_fn, None)
             if callable(options_fn):
-                return options_fn()
+                options = options_fn()
         elif hasattr(self, "_attr_options"):
-            return self._attr_options
+            options = self._attr_options
         elif (
             hasattr(self, "entity_description")
             and self.entity_description.options is not None
         ):
-            return self.entity_description.options
-        return []
+            options = self.entity_description.options
+
+        # Ensure options are all str
+        return [str(option) for option in options]
 
     async def async_select_option(
         self, option: str, send_to_device: bool = True
@@ -232,7 +236,7 @@ class BaseFeedbackSelectEntity(BaseSelectEntity):
     async def setting_update(self, data: dict[str, Any]) -> None:
         """Handle status update."""
         settings = data.get("settings")
-        if self.entity_description.key in settings:
+        if settings and self.entity_description.key in settings:
             setting_value = settings[self.entity_description.key]
             if hasattr(self, "_option_setting_value_convert"):
                 setting_value = self._option_setting_value_convert(setting_value)
@@ -501,3 +505,15 @@ class WyomingSatelliteScreenOrientationModeSelect(BaseSelectEntity):
         "reverse_portrait",
         "reverse_landscape",
     ]
+
+
+class WyomingSatelliteCameraOrientationOffsetSelect(BaseSelectEntity):
+    """Entity to represent video stream orientation setting."""
+
+    entity_description = SelectEntityDescription(
+        key="camera_rotation_offset",
+        translation_key="camera_rotation_offset",
+        entity_category=EntityCategory.CONFIG,
+        icon="mdi:screen-rotation",
+    )
+    _attr_options = [0, 90, 180, 270]
