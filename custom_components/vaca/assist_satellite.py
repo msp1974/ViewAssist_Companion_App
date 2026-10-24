@@ -23,12 +23,20 @@ from homeassistant.components.wyoming.assist_satellite import WyomingAssistSatel
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_URL
 from homeassistant.core import CoreState, HomeAssistant, callback
+from homeassistant.helpers import area_registry as ar, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.start import async_at_started
 
 from .client import VAAsyncTcpClient
-from .const import CONF_HA_URL, DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
+from .const import (
+    CONF_DEFAULT_DASHBOARD,
+    CONF_HA_URL,
+    DOMAIN,
+    MIN_APK_VERSION,
+    SAMPLE_CHANNELS,
+    SAMPLE_WIDTH,
+)
 from .custom import (
     ACTION_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
@@ -197,21 +205,42 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 or self.hass.config.internal_url
                 or ""
             )
-            home = getVADashboardPath(self.hass, self.device.satellite_id)
+            home = getVADashboardPath(
+                self.hass, self.device.satellite_id
+            ) or self.config_entry.options.get(CONF_DEFAULT_DASHBOARD, "")
             self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
+            self.device.custom_settings["area"] = self._get_area_name()
 
             # With a single Music Assistant server, pass its url directly
             ma_entries = self.hass.config_entries.async_entries("music_assistant")
             if len(ma_entries) == 1:
-                self.device.custom_settings["sendspin_preferred_server"] = (
-                    ma_entries[0].data.get(CONF_URL, "")
-                )
+                self.device.custom_settings["sendspin_preferred_server"] = ma_entries[
+                    0
+                ].data.get(CONF_URL, "")
         # Add custom files data
         self.device.custom_settings[
             "custom_files"
         ] = await self.hass.async_add_executor_job(get_custom_files_data, self.hass)
 
         await self._async_write_settings()
+
+    def _get_area_name(self) -> str:
+        """Return the name of the area this satellite belongs to, or empty string."""
+        area_id = self.registry_entry.area_id if self.registry_entry else None
+        if (
+            area_id is None
+            and self.registry_entry
+            and self.registry_entry.device_id
+            and (
+                device_entry := dr.async_get(self.hass).async_get(
+                    self.registry_entry.device_id
+                )
+            )
+        ):
+            area_id = device_entry.area_id
+        if area_id and (area := ar.async_get(self.hass).async_get_area(area_id)):
+            return area.name
+        return ""
 
     async def on_handle_settings_request(self) -> None:
         """Handle settings request from satellite."""
@@ -545,9 +574,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             ).event()
         )
 
-    def _send_custom_action(
-        self, command: str, payload: Any = None
-    ) -> None:
+    def _send_custom_action(self, command: str, payload: Any = None) -> None:
         """Send a media player command to the satellite."""
         if self._client is not None and self._client.can_write_event():
             self.config_entry.async_create_background_task(

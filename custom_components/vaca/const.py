@@ -12,6 +12,8 @@ SAMPLE_CHANNELS = 1
 # For multi-speaker voices, this is the name of the selected speaker.
 ATTR_SPEAKER = "speaker"
 
+CONF_DEFAULT_DASHBOARD = "default_dashboard"
+
 SERVICE_SEND_EVENT = "send_event"
 ATTR_EVENT_NAME = "event_name"
 ATTR_EVENT_VALUE = "event_value"
