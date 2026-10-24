@@ -1,7 +1,7 @@
 """Constants for the Wyoming integration."""
 
 DOMAIN = "vaca"
-MIN_APK_VERSION = "0.13.5"
+MIN_APK_VERSION = "0.14.0-beta1"
 
 CONF_HA_URL = "ha_url"
 
