@@ -17,6 +17,7 @@ send_event:
             - refresh
             - wake
             - interrupt
+            - get-logs
     event_value:
       required: true
       example: '{"path": "/view-assist/clock"}'

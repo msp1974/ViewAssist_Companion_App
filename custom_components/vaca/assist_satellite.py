@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from pathlib import Path
 from typing import Any, Final
 
 from wyoming.audio import AudioChunk, AudioStart, AudioStop
@@ -27,18 +28,21 @@ from homeassistant.helpers import area_registry as ar, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.start import async_at_started
+from homeassistant.util import dt as dt_util, slugify
 
 from .client import VAAsyncTcpClient
 from .const import (
     CONF_DEFAULT_DASHBOARD,
     CONF_HA_URL,
     DOMAIN,
+    LOGS_PATH,
     MIN_APK_VERSION,
     SAMPLE_CHANNELS,
     SAMPLE_WIDTH,
 )
 from .custom import (
     ACTION_EVENT_TYPE,
+    LOGS_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
     STATUS_EVENT_TYPE,
     Capabilities,
@@ -242,6 +246,30 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             return area.name
         return ""
 
+    async def _async_save_logs(self, payload: bytes | None) -> None:
+        """Write logs received from the satellite to a file."""
+        name = self.device.info.satellite.name
+        if not payload:
+            _LOGGER.warning("Received empty logs from %s", name)
+            return
+
+        timestamp = dt_util.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+        log_file = Path(
+            self.hass.config.path(DOMAIN, LOGS_PATH),
+            f"logcat_{slugify(name)}_{timestamp}.log",
+        )
+
+        def _write() -> None:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            log_file.write_bytes(payload)
+
+        try:
+            await self.hass.async_add_executor_job(_write)
+        except OSError as err:
+            _LOGGER.error("Unable to save logs from %s: %s", name, err)
+        else:
+            _LOGGER.info("Saved logs from %s to %s", name, log_file)
+
     async def on_handle_settings_request(self) -> None:
         """Handle settings request from satellite."""
         _LOGGER.debug(
@@ -278,6 +306,13 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         if event and CustomEvent.is_type(event.type):
             # Custom event
             evt = CustomEvent.from_event(event)
+
+            if evt.event_type == LOGS_EVENT_TYPE:
+                self.config_entry.async_create_background_task(
+                    self.hass,
+                    self._async_save_logs(event.payload),
+                    "save satellite logs",
+                )
 
             if evt.event_type in (STATUS_EVENT_TYPE, SETTINGS_EVENT_TYPE):
                 _LOGGER.debug(

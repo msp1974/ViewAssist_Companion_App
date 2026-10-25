@@ -24,12 +24,14 @@ SEND_EVENT_NAMES = [
     "refresh",
     "wake",
     "interrupt",
+    "get-logs",
 ]
 
 INTENT_EVENT = f"{DOMAIN}_intent_event"
 
 URL_BASE = DOMAIN
 CUSTOM_PATH = "custom"
+LOGS_PATH = "logs"
 MWW_PATH = "microwakeword"
 OWW_PATH = "openwakeword"
 WW_SOUNDS_PATH = "wakeword_sounds"
