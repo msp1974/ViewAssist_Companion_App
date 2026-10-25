@@ -12,7 +12,14 @@ from homeassistant.core import HomeAssistant
 from .const import CONF_HA_URL, DOMAIN
 from .devices import VASatelliteDevice
 
-TO_REDACT = {CONF_HOST, CONF_URL, CONF_HA_URL, "rtsp_url"}
+TO_REDACT = {
+    CONF_HOST,
+    CONF_URL,
+    CONF_HA_URL,
+    "rtsp_url",
+    "sendspin_preferred_server",
+    "",
+}
 
 
 async def async_get_config_entry_diagnostics(
@@ -30,14 +37,17 @@ async def async_get_config_entry_diagnostics(
     }
 
     if device is not None:
-        diagnostics["device"] = {
-            "connected": device.connected,
-            "info": device.info.event().data if device.info else None,
-            "custom_settings": async_redact_data(
-                device.custom_settings or {}, TO_REDACT
-            ),
-            "capabilities": device.capabilities,
-            "rtsp_url_set": device.rtsp_url is not None,
-        }
+        diagnostics["device"] = async_redact_data(
+            {
+                "connected": device.connected,
+                "info": device.info.event().data if device.info else None,
+                "custom_settings": async_redact_data(
+                    device.custom_settings or {}, TO_REDACT
+                ),
+                "capabilities": device.capabilities,
+                "rtsp_url_set": device.rtsp_url is not None,
+            },
+            TO_REDACT,
+        )
 
     return diagnostics
