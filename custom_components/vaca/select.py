@@ -243,7 +243,7 @@ class BaseFeedbackSelectEntity(BaseSelectEntity):
             await self.async_select_option(setting_value, send_to_device=False)
 
 
-class WyomingSatelliteMotionDetectionModeSelect(BaseSelectEntity):
+class WyomingSatelliteMotionDetectionModeSelect(BaseFeedbackSelectEntity):
     """Entity to represent motion detection mode setting."""
 
     entity_description = SelectEntityDescription(
@@ -255,7 +255,7 @@ class WyomingSatelliteMotionDetectionModeSelect(BaseSelectEntity):
     _attr_options = ["none", "motion", "face"]
 
 
-class WyomingSatelliteWakeWordSelect(BaseSelectEntity):
+class WyomingSatelliteWakeWordSelect(BaseFeedbackSelectEntity):
     """Entity to represent wake word setting."""
 
     entity_description = SelectEntityDescription(
@@ -289,7 +289,7 @@ class WyomingSatelliteWakeWordSelect(BaseSelectEntity):
         return option.lower().replace(" ", "_")
 
 
-class WyomingSatelliteWakeWordSoundSelect(BaseSelectEntity):
+class WyomingSatelliteWakeWordSoundSelect(BaseFeedbackSelectEntity):
     """Entity to represent wake word sound setting."""
 
     entity_description = SelectEntityDescription(
@@ -323,7 +323,7 @@ class WyomingSatelliteWakeWordSoundSelect(BaseSelectEntity):
         return option.lower().replace(" ", "_")
 
 
-class WyomingSatelliteScreenTimeoutSelect(BaseSelectEntity):
+class WyomingSatelliteScreenTimeoutSelect(BaseFeedbackSelectEntity):
     """Entity to represent screen timeout setting."""
 
     entity_description = SelectEntityDescription(
@@ -340,7 +340,7 @@ class WyomingSatelliteScreenTimeoutSelect(BaseSelectEntity):
         return int(option)
 
 
-class WyomingSatelliteAlarmSoundSelect(BaseSelectEntity):
+class WyomingSatelliteAlarmSoundSelect(BaseFeedbackSelectEntity):
     """Entity to represent alarm sound setting."""
 
     entity_description = SelectEntityDescription(
@@ -375,7 +375,7 @@ class WyomingSatelliteAlarmSoundSelect(BaseSelectEntity):
         return option.lower().replace(" ", "_")
 
 
-class WyomingSatelliteWakeWordEngineSelect(BaseSelectEntity):
+class WyomingSatelliteWakeWordEngineSelect(BaseFeedbackSelectEntity):
     """Entity to represent wake word engine setting."""
 
     entity_description = SelectEntityDescription(
@@ -397,7 +397,7 @@ class WyomingSatelliteWakeWordEngineSelect(BaseSelectEntity):
         await super().async_select_option(option)
 
 
-class WyomingSatelliteMusicAssistantServerSelect(BaseSelectEntity):
+class WyomingSatelliteMusicAssistantServerSelect(BaseFeedbackSelectEntity):
     """Entity to select the Music Assistant server."""
 
     entity_description = SelectEntityDescription(
@@ -489,7 +489,7 @@ class WyomingSatelliteAudioOutputSelect(_WyomingSatelliteAudioDeviceSelect):
     _capabilities_key = "outputs"
 
 
-class WyomingSatelliteScreenOrientationModeSelect(BaseSelectEntity):
+class WyomingSatelliteScreenOrientationModeSelect(BaseFeedbackSelectEntity):
     """Entity to represent screen orientation mode setting."""
 
     entity_description = SelectEntityDescription(
@@ -507,7 +507,7 @@ class WyomingSatelliteScreenOrientationModeSelect(BaseSelectEntity):
     ]
 
 
-class WyomingSatelliteCameraOrientationOffsetSelect(BaseSelectEntity):
+class WyomingSatelliteCameraOrientationOffsetSelect(BaseFeedbackSelectEntity):
     """Entity to represent video stream orientation setting."""
 
     entity_description = SelectEntityDescription(

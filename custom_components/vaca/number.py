@@ -118,7 +118,7 @@ class BaseFeedbackNumber(BaseNumberEntity):
                 await self.update_number(setting_value, send_to_device=False)
 
 
-class WyomingSatelliteMicGainNumber(BaseNumberEntity):
+class WyomingSatelliteMicGainNumber(BaseFeedbackNumber):
     """Entity to represent mic gain amount."""
 
     entity_description = NumberEntityDescription(
@@ -233,7 +233,7 @@ class WyomingSatelliteAlarmVolumeNumber(BaseFeedbackNumber):
         await super().async_set_native_value(value)
 
 
-class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
+class WyomingSatelliteDuckingVolumeNumber(BaseFeedbackNumber):
     """Entity to represent media volume multiplier."""
 
     entity_description = NumberEntityDescription(
@@ -266,7 +266,7 @@ class WyomingSatelliteDuckingVolumeNumber(BaseNumberEntity):
         self._device.set_custom_setting(self.entity_description.key, value)
 
 
-class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
+class WyomingSatelliteScreenBrightnessNumber(BaseFeedbackNumber):
     """Entity to represent auto gain amount."""
 
     entity_description = NumberEntityDescription(
@@ -296,7 +296,7 @@ class WyomingSatelliteScreenBrightnessNumber(VASatelliteEntity, RestoreNumber):
         self._device.set_custom_setting(self.entity_description.key, screen_brightness)
 
 
-class WyomingSatelliteWakeWordThresholdNumber(VASatelliteEntity, RestoreNumber):
+class WyomingSatelliteWakeWordThresholdNumber(BaseFeedbackNumber):
     """Entity to represent wake word trigger threshold."""
 
     entity_description = NumberEntityDescription(
@@ -328,7 +328,7 @@ class WyomingSatelliteWakeWordThresholdNumber(VASatelliteEntity, RestoreNumber):
         )
 
 
-class WyomingSatelliteZoomLevelNumber(VASatelliteEntity, RestoreNumber):
+class WyomingSatelliteZoomLevelNumber(BaseFeedbackNumber):
     """Entity to represent zoom level."""
 
     entity_description = NumberEntityDescription(
@@ -361,7 +361,7 @@ class WyomingSatelliteZoomLevelNumber(VASatelliteEntity, RestoreNumber):
         )
 
 
-class WyomingSatelliteTextSizeNumber(VASatelliteEntity, RestoreNumber):
+class WyomingSatelliteTextSizeNumber(BaseFeedbackNumber):
     """Entity to represent text size."""
 
     entity_description = NumberEntityDescription(
@@ -394,9 +394,7 @@ class WyomingSatelliteTextSizeNumber(VASatelliteEntity, RestoreNumber):
         )
 
 
-class WyomingSatelliteMotionDetectionSensitivityNumber(
-    VASatelliteEntity, RestoreNumber
-):
+class WyomingSatelliteMotionDetectionSensitivityNumber(BaseFeedbackNumber):
     """Entity to represent zoom level."""
 
     entity_description = NumberEntityDescription(
@@ -428,7 +426,7 @@ class WyomingSatelliteMotionDetectionSensitivityNumber(
         self._device.set_custom_setting(self.entity_description.key, int(value))
 
 
-class WyomingSatelliteBumpDetectionSensitivityNumber(VASatelliteEntity, RestoreNumber):
+class WyomingSatelliteBumpDetectionSensitivityNumber(BaseFeedbackNumber):
     """Entity to represent bump sensitivity."""
 
     entity_description = NumberEntityDescription(
@@ -460,7 +458,7 @@ class WyomingSatelliteBumpDetectionSensitivityNumber(VASatelliteEntity, RestoreN
         self._device.set_custom_setting(self.entity_description.key, 11 - value)
 
 
-class WyomingSatelliteRawProximityThresholdNumber(VASatelliteEntity, RestoreNumber):
+class WyomingSatelliteRawProximityThresholdNumber(BaseFeedbackNumber):
     """Entity to represent raw proximity threshold."""
 
     entity_description = NumberEntityDescription(
