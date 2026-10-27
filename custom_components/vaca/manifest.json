@@ -1,6 +1,10 @@
 {
   "domain": "vaca",
   "name": "View Assist Companion App",
+  "after_dependencies": [
+    "go2rtc",
+    "stream"
+  ],
   "codeowners": [
     "@msp1974"
   ],
@@ -12,10 +16,6 @@
     "conversation",
     "ffmpeg",
     "wyoming"
-  ],
-  "after_dependencies": [
-    "go2rtc",
-    "stream"
   ],
   "documentation": "https://github.com/msp1974/ViewAssist_Companion_App",
   "integration_type": "service",
