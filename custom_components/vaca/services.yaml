@@ -1,7 +1,5 @@
 send_event:
   target:
-    device:
-      integration: vaca
     entity:
       integration: vaca
   fields:
