@@ -13,7 +13,7 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlowResult, OptionsF
 from homeassistant.core import callback
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
-from .const import CONF_HA_URL, DOMAIN
+from .const import CONF_DEFAULT_DASHBOARD, CONF_HA_URL, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,9 +26,7 @@ class VAWyomingConfigFlow(WyomingConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle discovery without treating an mDNS rename as a new device."""
         if discovery_info.port is not None:
-            for _entry in self._iter_entries(
-                discovery_info.host, discovery_info.port
-            ):
+            for _entry in self._iter_entries(discovery_info.host, discovery_info.port):
                 return self.async_abort(reason="already_configured")
 
         return await super().async_step_zeroconf(discovery_info)
@@ -56,6 +54,14 @@ class VAOptionsFlowHandler(OptionsFlow):
                     CONF_HA_URL,
                     description={
                         "suggested_value": self.config_entry.options.get(CONF_HA_URL)
+                    },
+                ): str,
+                vol.Optional(
+                    CONF_DEFAULT_DASHBOARD,
+                    description={
+                        "suggested_value": self.config_entry.options.get(
+                            CONF_DEFAULT_DASHBOARD
+                        )
                     },
                 ): str,
             }

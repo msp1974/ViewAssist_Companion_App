@@ -1,6 +1,10 @@
 {
   "domain": "vaca",
   "name": "View Assist Companion App",
+  "after_dependencies": [
+    "go2rtc",
+    "stream"
+  ],
   "codeowners": [
     "@msp1974"
   ],
@@ -24,7 +28,7 @@
   "requirements": [
     "wyoming>=1.7.1"
   ],
-  "version": "0.13.5",
+  "version": "0.14.0",
   "zeroconf": [
     "_vaca._tcp.local."
   ]

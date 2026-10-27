@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from pathlib import Path
 from typing import Any, Final
 
 from wyoming.audio import AudioChunk, AudioStart, AudioStop
@@ -21,14 +22,27 @@ from homeassistant.components.assist_satellite import (
 from homeassistant.components.wyoming import DomainDataItem, WyomingService
 from homeassistant.components.wyoming.assist_satellite import WyomingAssistSatellite
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.const import CONF_URL
+from homeassistant.core import CoreState, HomeAssistant, callback
+from homeassistant.helpers import area_registry as ar, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.start import async_at_started
+from homeassistant.util import dt as dt_util, slugify
 
 from .client import VAAsyncTcpClient
-from .const import CONF_HA_URL, DOMAIN, MIN_APK_VERSION, SAMPLE_CHANNELS, SAMPLE_WIDTH
+from .const import (
+    CONF_DEFAULT_DASHBOARD,
+    CONF_HA_URL,
+    DOMAIN,
+    LOGS_PATH,
+    MIN_APK_VERSION,
+    SAMPLE_CHANNELS,
+    SAMPLE_WIDTH,
+)
 from .custom import (
     ACTION_EVENT_TYPE,
+    LOGS_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
     STATUS_EVENT_TYPE,
     Capabilities,
@@ -47,6 +61,7 @@ _RECONNECT_SECONDS: Final = 10
 _RESTART_SECONDS: Final = 3
 _TTS_SAMPLE_RATE: Final = 22050
 _ANNOUNCE_CHUNK_BYTES: Final = 2048  # 1024 samples
+_HA_START_TIMEOUT_SECONDS: Final = 30  # fallback if HA never reports started
 
 
 async def async_setup_entry(
@@ -102,6 +117,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
 
         # stream tts var to allow interupt and cancel remaining response
         self.stream_tts = False
+        self._full_settings_pending = False
 
     async def on_restart(self) -> None:
         """Block until pipeline loop will be restarted."""
@@ -121,13 +137,6 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         )
         await asyncio.sleep(_RECONNECT_SECONDS)
 
-    async def async_will_remove_from_hass(self) -> None:
-        """Run when entity will be removed from hass."""
-        try:
-            await super().async_will_remove_from_hass()
-        except AssertionError as ex:
-            _LOGGER.debug("Assertion error while stopping satellite: %s", ex)
-
     async def on_before_send_event_callback(self, event: Event) -> None:
         """Allow injection of events before event sent."""
 
@@ -137,35 +146,129 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             await self._client.write_event(Capabilities().event())
 
         elif RunSatellite().is_type(event.type):
-            # integration version
-            if self.device and self.device.custom_settings:
-                self.device.custom_settings[
-                    "integration_version"
-                ] = await getIntegrationVersion(self.hass)
-                self.device.custom_settings["min_required_apk_version"] = (
-                    MIN_APK_VERSION
-                )
-                # Update url and port
-                self.device.custom_settings["ha_port"] = (
-                    self.hass.config.api.port if self.hass.config.api else 8123
-                )
-                self.device.custom_settings["ha_url"] = (
-                    self.config_entry.options.get(CONF_HA_URL)
-                    or self.hass.config.internal_url
-                    or ""
-                )
-                home = getVADashboardPath(self.hass, self.device.satellite_id)
-                self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
+            # Don't block the satellite loop while waiting for HA to start
+            self.config_entry.async_create_background_task(
+                self.hass,
+                self._async_send_full_settings(update_device_info=True),
+                "send full settings",
+            )
 
-                # Add custom files data - commented out awaiting implementation
-                self.device.custom_settings[
-                    "custom_files"
-                ] = await self.hass.async_add_executor_job(
-                    get_custom_files_data, self.hass
-                )
+    async def _async_wait_for_ha_started(self) -> None:
+        """Wait until Home Assistant has finished starting."""
+        if self.hass.state is CoreState.running:
+            return
 
-            # Send config event
-            self._custom_settings_changed()
+        started = asyncio.Event()
+
+        @callback
+        def _set_started(_: HomeAssistant) -> None:
+            started.set()
+
+        unsub = async_at_started(self.hass, _set_started)
+        try:
+            async with asyncio.timeout(_HA_START_TIMEOUT_SECONDS):
+                await started.wait()
+        except TimeoutError:
+            _LOGGER.warning(
+                "Home Assistant not started after %s seconds, sending settings anyway",
+                _HA_START_TIMEOUT_SECONDS,
+            )
+        finally:
+            if unsub and not started.is_set():
+                unsub()
+
+    async def _async_send_full_settings(self, update_device_info: bool = False) -> None:
+        """Wait for HA to start, then build and send all settings."""
+        if self._full_settings_pending:
+            _LOGGER.debug("Full settings already pending, ignoring duplicate request")
+            return
+
+        self._full_settings_pending = True
+        try:
+            await self._async_build_and_send_full_settings(update_device_info)
+        finally:
+            self._full_settings_pending = False
+
+    async def _async_build_and_send_full_settings(
+        self, update_device_info: bool
+    ) -> None:
+        """Build and send all settings once HA has started."""
+        await self._async_wait_for_ha_started()
+
+        if update_device_info and self.device and self.device.custom_settings:
+            self.device.custom_settings[
+                "integration_version"
+            ] = await getIntegrationVersion(self.hass)
+            self.device.custom_settings["min_required_apk_version"] = MIN_APK_VERSION
+            # Update url and port
+            self.device.custom_settings["ha_port"] = (
+                self.hass.config.api.port if self.hass.config.api else 8123
+            )
+            self.device.custom_settings["ha_url"] = (
+                self.config_entry.options.get(CONF_HA_URL)
+                or self.hass.config.internal_url
+                or ""
+            )
+            home = getVADashboardPath(
+                self.hass, self.device.satellite_id
+            ) or self.config_entry.options.get(CONF_DEFAULT_DASHBOARD, "")
+            self.device.custom_settings["ha_dashboard"] = home.removeprefix("/")
+            self.device.custom_settings["area"] = self._get_area_name()
+
+            # With a single Music Assistant server, pass its url directly
+            ma_entries = self.hass.config_entries.async_entries("music_assistant")
+            if len(ma_entries) == 1:
+                self.device.custom_settings["sendspin_preferred_server"] = ma_entries[
+                    0
+                ].data.get(CONF_URL, "")
+        # Add custom files data
+        self.device.custom_settings[
+            "custom_files"
+        ] = await self.hass.async_add_executor_job(get_custom_files_data, self.hass)
+
+        await self._async_write_settings()
+
+    def _get_area_name(self) -> str:
+        """Return the name of the area this satellite belongs to, or empty string."""
+        area_id = self.registry_entry.area_id if self.registry_entry else None
+        if (
+            area_id is None
+            and self.registry_entry
+            and self.registry_entry.device_id
+            and (
+                device_entry := dr.async_get(self.hass).async_get(
+                    self.registry_entry.device_id
+                )
+            )
+        ):
+            area_id = device_entry.area_id
+        if area_id and (area := ar.async_get(self.hass).async_get_area(area_id)):
+            return area.name
+        return ""
+
+    async def _async_save_logs(self, payload: bytes | None) -> None:
+        """Write logs received from the satellite to a file."""
+        name = self.device.info.satellite.name
+        if not payload:
+            _LOGGER.warning("Received empty logs from %s", name)
+            return
+
+        timestamp = dt_util.utcnow().strftime("%Y-%m-%dT%H-%M-%SZ")
+        log_file = Path(
+            self.hass.config.path(DOMAIN, LOGS_PATH),
+            f"logcat_{slugify(name)}_{timestamp}.log",
+        )
+
+        def _write() -> None:
+            log_file.parent.mkdir(parents=True, exist_ok=True)
+            log_file.write_bytes(payload)
+
+        try:
+            await self.hass.async_add_executor_job(_write)
+        except OSError as err:
+            _LOGGER.error("Unable to save logs from %s: %s", name, err)
+        else:
+            _LOGGER.info("Saved logs from %s to %s", name, log_file)
 
     async def on_handle_settings_request(self) -> None:
         """Handle settings request from satellite."""
@@ -173,12 +276,7 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             "Satellite %s requested settings update",
             self.entity_id.replace("assist_satellite.", ""),
         )
-        # Add custom files data - commented out awaiting implementation
-        self.device.custom_settings[
-            "custom_files"
-        ] = await self.hass.async_add_executor_job(get_custom_files_data, self.hass)
-        # Send config event
-        self._custom_settings_changed()
+        await self._async_send_full_settings()
 
     @callback
     def on_receive_event_callback(self, event: Event) -> tuple[bool, Event | None]:
@@ -209,6 +307,13 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             # Custom event
             evt = CustomEvent.from_event(event)
 
+            if evt.event_type == LOGS_EVENT_TYPE:
+                self.config_entry.async_create_background_task(
+                    self.hass,
+                    self._async_save_logs(event.payload),
+                    "save satellite logs",
+                )
+
             if evt.event_type in (STATUS_EVENT_TYPE, SETTINGS_EVENT_TYPE):
                 _LOGGER.debug(
                     "Received %s event from %s: %s",
@@ -216,9 +321,20 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     self.device.info.satellite.name,
                     evt.event_data,
                 )
+                if evt.event_type == STATUS_EVENT_TYPE:
+                    status = evt.event_data or {}
+                    if "rtsp_url" in status:
+                        rtsp_url = status["rtsp_url"]
+                        self.device.rtsp_url = (
+                            rtsp_url if isinstance(rtsp_url, str) and rtsp_url else None
+                        )
                 if evt.event_type == SETTINGS_EVENT_TYPE and not evt.event_data:
                     # Handle settings request from satellite
-                    self.hass.async_create_task(self.on_handle_settings_request())
+                    self.config_entry.async_create_background_task(
+                        self.hass,
+                        self.on_handle_settings_request(),
+                        "handle settings request",
+                    )
 
             async_dispatcher_send(
                 self.hass,
@@ -246,6 +362,25 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
             on_receive_callback=self.on_receive_event_callback,
         )
         await self._client.connect()
+        self._set_connected(True)
+
+    async def _disconnect(self) -> None:
+        """Disconnect from satellite and update connected state."""
+        try:
+            await super()._disconnect()
+        finally:
+            self._set_connected(False)
+
+    def _set_connected(self, connected: bool) -> None:
+        """Update device connected state and notify listeners."""
+        if self.device.connected == connected:
+            return
+        self.device.connected = connected
+        async_dispatcher_send(
+            self.hass,
+            f"{DOMAIN}_{self.device.device_id}_connection_update",
+            connected,
+        )
 
     def on_pipeline_event(self, event: PipelineEvent) -> None:
         """Handle pipeline events from the assist pipeline.
@@ -448,24 +583,33 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         if self._client is not None and self._client.can_write_event():
             self.config_entry.async_create_background_task(
                 self.hass,
-                self._client.write_event(
-                    CustomEvent(
-                        SETTINGS_EVENT_TYPE,
-                        {
-                            SETTINGS_EVENT_TYPE: dict(
-                                sorted(self.device.custom_settings.items())
-                            )
-                            if setting is None
-                            else {setting: value}
-                        },
-                    ).event()
-                ),
+                self._async_write_settings(setting, value),
                 "custom settings event",
             )
 
-    def _send_custom_action(
-        self, command: str, payload: str | float | None = None
+    async def _async_write_settings(
+        self, setting: str | None = None, value: Any = None
     ) -> None:
+        """Wait for HA to start, then create and send a settings event."""
+        await self._async_wait_for_ha_started()
+
+        if self._client is None or not self._client.can_write_event():
+            return
+
+        await self._client.write_event(
+            CustomEvent(
+                SETTINGS_EVENT_TYPE,
+                {
+                    SETTINGS_EVENT_TYPE: dict(
+                        sorted(self.device.custom_settings.items())
+                    )
+                    if setting is None
+                    else {setting: value}
+                },
+            ).event()
+        )
+
+    def _send_custom_action(self, command: str, payload: Any = None) -> None:
         """Send a media player command to the satellite."""
         if self._client is not None and self._client.can_write_event():
             self.config_entry.async_create_background_task(

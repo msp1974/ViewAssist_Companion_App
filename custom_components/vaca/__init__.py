@@ -18,6 +18,7 @@ from .data import VAWyomingService
 from .devices import VASatelliteDevice
 from .http import HTTPManager
 from .models import DomainDataItem
+from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ SATELLITE_PLATFORMS = [
     Platform.ASSIST_SATELLITE,
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
+    Platform.CAMERA,
     Platform.EVENT,
     Platform.SELECT,
     Platform.SWITCH,
@@ -51,6 +53,7 @@ class WyomingError(HomeAssistantError):
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Wyoming integration."""
     async_register_websocket_api(hass)
+    async_setup_services(hass)
 
     return True
 

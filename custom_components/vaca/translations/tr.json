@@ -128,6 +128,15 @@
             "wake_word": {
                 "name": "Uyandırma kelimesi"
             },
+            "sendspin_preferred_server": {
+                "name": "Sendspin Music Assistant Server"
+            },
+            "audio_input": {
+                "name": "Audio input"
+            },
+            "audio_output": {
+                "name": "Audio output"
+            },
             "wake_word_sound": {
                 "name": "Uyandırma kelimesi sesi",
                 "state": {
@@ -232,6 +241,9 @@
             },
             "screen_on_motion": {
                 "name": "Hareket ile ekranı aç"
+            },
+            "sendspin_enabled": {
+                "name": "Sendspin Enabled"
             }
         }
     }

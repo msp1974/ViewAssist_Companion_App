@@ -41,16 +41,23 @@ async def async_setup_entry(
         WyomingSatelliteScreenAutoBrightnessSwitch(device),
         WyomingSatelliteScreenAlwaysOnSwitch(device),
         WyomingSatelliteDarkModeSwitch(device),
+        WyomingSatelliteShowStatusBarSwitch(device),
         WyomingSatelliteDiagnosticsSwitch(device),
         WyomingSatelliteContinueConversationSwitch(device),
         WyomingSatelliteAlarmSwitch(device),
         WyomingSatelliteScreenOnWakeWordSwitch(device),
         WyomingSatelliteScreenSaverSwitch(device),
+        WyomingSatelliteSendSpinSwitch(device),
+        WyomingSatelliteSendSpinOverlaySwitch(device),
+        WyomingSatelliteBluetoothProxySwitch(device),
     ]
 
     if capabilities := device.capabilities:
         if capabilities.get("has_dnd"):
             entities.append(WyomingSatelliteDNDSwitch(device))
+
+        if capabilities.get("has_front_camera"):
+            entities.append(WyomingSatelliteRTSPServerSwitch(device))
 
     if device.supportBump():
         entities.append(WyomingSatelliteScreenOnBumpSwitch(device))
@@ -147,7 +154,7 @@ class WyomingSatelliteScreenSwitch(BaseFeedbackSwitch):
         return "mdi:monitor" if self._attr_is_on else "mdi:monitor-off"
 
 
-class WyomingSatelliteMuteSwitch(BaseSwitch):
+class WyomingSatelliteMuteSwitch(BaseFeedbackSwitch):
     """Entity to represent if satellite is muted."""
 
     entity_description = SwitchEntityDescription(key="mute", translation_key="mute")
@@ -159,7 +166,7 @@ class WyomingSatelliteMuteSwitch(BaseSwitch):
         return "mdi:microphone-off" if self._attr_is_on else "mdi:microphone"
 
 
-class WyomingSatelliteQuickActionsSheetSwitch(BaseSwitch):
+class WyomingSatelliteQuickActionsSheetSwitch(BaseFeedbackSwitch):
     """Entity to control quick actions sheet."""
 
     entity_description = SwitchEntityDescription(
@@ -171,7 +178,7 @@ class WyomingSatelliteQuickActionsSheetSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteScreenAutoBrightnessSwitch(BaseSwitch):
+class WyomingSatelliteScreenAutoBrightnessSwitch(BaseFeedbackSwitch):
     """Entity to control screen auto brightness."""
 
     entity_description = SwitchEntityDescription(
@@ -183,7 +190,7 @@ class WyomingSatelliteScreenAutoBrightnessSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteScreenAlwaysOnSwitch(BaseSwitch):
+class WyomingSatelliteScreenAlwaysOnSwitch(BaseFeedbackSwitch):
     """Entity to control screen always on."""
 
     entity_description = SwitchEntityDescription(
@@ -195,7 +202,7 @@ class WyomingSatelliteScreenAlwaysOnSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteDarkModeSwitch(BaseSwitch):
+class WyomingSatelliteDarkModeSwitch(BaseFeedbackSwitch):
     """Entity to control screen always on."""
 
     entity_description = SwitchEntityDescription(
@@ -205,6 +212,18 @@ class WyomingSatelliteDarkModeSwitch(BaseSwitch):
         entity_category=EntityCategory.CONFIG,
     )
     default_on = True
+
+
+class WyomingSatelliteShowStatusBarSwitch(BaseFeedbackSwitch):
+    """Entity to control showing the status bar."""
+
+    entity_description = SwitchEntityDescription(
+        key="show_status_bar",
+        translation_key="show_status_bar",
+        icon="mdi:dock-top",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
 
 
 class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
@@ -218,7 +237,7 @@ class WyomingSatelliteDNDSwitch(BaseFeedbackSwitch):
     default_on = False
 
 
-class WyomingSatelliteDiagnosticsSwitch(BaseSwitch):
+class WyomingSatelliteDiagnosticsSwitch(BaseFeedbackSwitch):
     """Entity to control diagnostics overlay on/off."""
 
     entity_description = SwitchEntityDescription(
@@ -230,7 +249,7 @@ class WyomingSatelliteDiagnosticsSwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteContinueConversationSwitch(BaseSwitch):
+class WyomingSatelliteContinueConversationSwitch(BaseFeedbackSwitch):
     """Entity to control continue conversation on/off."""
 
     entity_description = SwitchEntityDescription(
@@ -309,7 +328,7 @@ class WyomingSatelliteAlarmSwitch(BaseFeedbackSwitch):
             )
 
 
-class WyomingSatelliteScreenOnWakeWordSwitch(BaseSwitch):
+class WyomingSatelliteScreenOnWakeWordSwitch(BaseFeedbackSwitch):
     """Entity to control screen on/off with wake word."""
 
     entity_description = SwitchEntityDescription(
@@ -321,7 +340,7 @@ class WyomingSatelliteScreenOnWakeWordSwitch(BaseSwitch):
     default_on = True
 
 
-class WyomingSatelliteScreenOnBumpSwitch(BaseSwitch):
+class WyomingSatelliteScreenOnBumpSwitch(BaseFeedbackSwitch):
     """Entity to control screen on with bump."""
 
     entity_description = SwitchEntityDescription(
@@ -333,7 +352,7 @@ class WyomingSatelliteScreenOnBumpSwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteScreenOnProximitySwitch(BaseSwitch):
+class WyomingSatelliteScreenOnProximitySwitch(BaseFeedbackSwitch):
     """Entity to control screen on with proximity."""
 
     entity_description = SwitchEntityDescription(
@@ -345,7 +364,7 @@ class WyomingSatelliteScreenOnProximitySwitch(BaseSwitch):
     default_on = False
 
 
-class WyomingSatelliteScreenOnMotionSwitch(BaseSwitch):
+class WyomingSatelliteScreenOnMotionSwitch(BaseFeedbackSwitch):
     """Entity to control screen on with motion."""
 
     entity_description = SwitchEntityDescription(
@@ -364,5 +383,53 @@ class WyomingSatelliteScreenSaverSwitch(BaseFeedbackSwitch):
         key="screen_saver",
         translation_key="screen_saver",
         icon="mdi:monitor-shimmer",
+    )
+    default_on = False
+
+
+class WyomingSatelliteSendSpinSwitch(BaseFeedbackSwitch):
+    """Entity to control SendSpin on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="sendspin_enabled",
+        translation_key="sendspin_enabled",
+        icon="mdi:speaker-wireless",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteSendSpinOverlaySwitch(BaseFeedbackSwitch):
+    """Entity to control SendSpin overlay on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="sendspin_overlay_enabled",
+        translation_key="sendspin_overlay_enabled",
+        icon="mdi:multimedia",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteBluetoothProxySwitch(BaseFeedbackSwitch):
+    """Entity to control Bluetooth proxy on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="bluetooth_proxy_enabled",
+        translation_key="bluetooth_proxy_enabled",
+        icon="mdi:bluetooth",
+        entity_category=EntityCategory.CONFIG,
+    )
+    default_on = False
+
+
+class WyomingSatelliteRTSPServerSwitch(BaseFeedbackSwitch):
+    """Entity to control RTSP server on/off."""
+
+    entity_description = SwitchEntityDescription(
+        key="rtsp_enabled",
+        translation_key="rtsp_enabled",
+        icon="mdi:video",
+        entity_category=EntityCategory.CONFIG,
     )
     default_on = False
