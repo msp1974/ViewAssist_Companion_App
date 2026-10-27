@@ -288,6 +288,10 @@ class WyomingSatelliteWakeWordSelect(BaseFeedbackSelectEntity):
         """Convert the option value to the format expected by the device."""
         return option.lower().replace(" ", "_")
 
+    def _option_setting_value_convert(self, setting_value: str) -> str:
+        """Convert the setting value to the format expected by the device."""
+        return setting_value.lower().replace("_", " ").title()
+
 
 class WyomingSatelliteWakeWordSoundSelect(BaseFeedbackSelectEntity):
     """Entity to represent wake word sound setting."""
@@ -321,6 +325,10 @@ class WyomingSatelliteWakeWordSoundSelect(BaseFeedbackSelectEntity):
     def _option_value_convert(self, option: str) -> str:
         """Convert the option value to the format expected by the device."""
         return option.lower().replace(" ", "_")
+
+    def _option_setting_value_convert(self, setting_value: str) -> str:
+        """Convert the setting value to the format expected by the device."""
+        return setting_value.lower().replace("_", " ").title()
 
 
 class WyomingSatelliteScreenTimeoutSelect(BaseFeedbackSelectEntity):
@@ -386,7 +394,9 @@ class WyomingSatelliteWakeWordEngineSelect(BaseFeedbackSelectEntity):
     )
     _attr_options = ["openwakeword", "openwakeword_rt", "microwakeword"]
 
-    async def async_select_option(self, option: str) -> None:
+    async def async_select_option(
+        self, option: str, send_to_device: bool = True
+    ) -> None:
         """Select an option."""
         self._device.wakeword_engine = option
         async_dispatcher_send(
@@ -394,7 +404,7 @@ class WyomingSatelliteWakeWordEngineSelect(BaseFeedbackSelectEntity):
             f"{DOMAIN}_{self._device.device_id}_wakewords_update",
             {"engine": option},
         )
-        await super().async_select_option(option)
+        await super().async_select_option(option, send_to_device=send_to_device)
 
 
 class WyomingSatelliteMusicAssistantServerSelect(BaseFeedbackSelectEntity):
