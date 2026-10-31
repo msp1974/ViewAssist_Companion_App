@@ -27,6 +27,7 @@ from homeassistant.core import CoreState, HomeAssistant, callback
 from homeassistant.helpers import area_registry as ar, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.instance_id import async_get as async_get_instance_id
 from homeassistant.helpers.start import async_at_started
 from homeassistant.util import dt as dt_util, slugify
 
@@ -42,6 +43,7 @@ from .const import (
 )
 from .custom import (
     ACTION_EVENT_TYPE,
+    INSTANCE_INFO_EVENT_TYPE,
     LOGS_EVENT_TYPE,
     SETTINGS_EVENT_TYPE,
     STATUS_EVENT_TYPE,
@@ -363,6 +365,18 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         )
         await self._client.connect()
         self._set_connected(True)
+
+        try:
+            instance_uuid = await async_get_instance_id(self.hass)
+            await self._client.write_event(
+                CustomEvent(
+                    INSTANCE_INFO_EVENT_TYPE,
+                    {"instance_uuid": instance_uuid},
+                ).event()
+            )
+            _LOGGER.debug("Sent instance UUID to satellite: %s", instance_uuid)
+        except Exception as ex:
+            _LOGGER.warning("Could not send instance UUID to satellite: %s", ex)
 
     async def _disconnect(self) -> None:
         """Disconnect from satellite and update connected state."""
