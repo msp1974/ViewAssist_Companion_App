@@ -130,11 +130,21 @@ class WyomingMediaPlayer(VASatelliteEntity, MediaPlayerEntity, RestoreEntity):
             )
             media_id = async_process_play_media_url(self.hass, play_item.url)
 
-        _LOGGER.info("Playing media: '%s'", media_id)
+        _LOGGER.info("Playing media: '%s', announce=%s", media_id, bool(announce))
         self._device.send_custom_action(
             command=CustomActions.MEDIA_PLAY_MEDIA,
-            payload={"url": media_id, "volume": (self._attr_volume_level or 0) * 100},
+            payload={
+                "url": media_id,
+                "volume": (self._attr_volume_level or 0) * 100,
+                "announce": bool(announce),
+            },
         )
+
+        # Announcements play on a separate device player over any current media,
+        # so leave the media state and metadata unchanged
+        if announce:
+            return
+
         self._attr_state = MediaPlayerState.PLAYING
 
         # Handle metadata if available
