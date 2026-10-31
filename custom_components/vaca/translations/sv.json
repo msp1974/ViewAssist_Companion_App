@@ -1,0 +1,276 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Tjänsten är redan konfigurerad",
+            "no_port": "Ingen port för endpoint",
+            "no_services": "Inga tjänster hittades vid endpoint"
+        },
+        "error": {
+            "cannot_connect": "Kunde inte ansluta"
+        },
+        "step": {
+            "hassio_confirm": {
+                "description": "Vill du konfigurera Home Assistant att ansluta till Wyoming-tjänsten som tillhandahålls av tillägget: {addon}?"
+            },
+            "user": {
+                "data": {
+                    "host": "Värd",
+                    "port": "Port"
+                }
+            },
+            "zeroconf_confirm": {
+                "description": "Vill du konfigurera Home Assistant att ansluta till Wyoming-tjänsten {name}?",
+                "title": "Hittade Wyoming-tjänst"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "ha_url": "Home Assistant URL"
+                },
+                "data_description": {
+                    "ha_url": "URL:en som skickas till enheten för att ansluta tillbaka till Home Assistant. Lämna tomt för att använda den interna nätverks-URL:en som är konfigurerad i Home Assistant."
+                }
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "battery_charging": {
+                "name": "Laddar batteri"
+            },
+            "screen_on": {
+                "name": "Skärm"
+            },
+            "motion_detected": {
+                "name": "Rörelse"
+            }
+        },
+        "button": {
+            "refresh": {
+                "name": "Uppdatera"
+            },
+            "screen_wake": {
+                "name": "Väck skärm"
+            },
+            "screen_sleep": {
+                "name": "Släck skärm"
+            },
+            "wake": {
+                "name": "Väck"
+            }
+        },
+        "event": {
+            "gesture": {
+                "name": "Gest"
+            }
+        },
+        "media_player": {
+            "media_player": {
+                "name": "Mediaspelare",
+                "state": {
+                    "playing": "Spelar",
+                    "paused": "Pausad",
+                    "idle": "Inaktiv"
+                }
+            }
+        },
+        "number": {
+            "mic_gain": {
+                "name": "Mikrofonförstärkning"
+            },
+            "screen_brightness": {
+                "name": "Skärmljusstyrka"
+            },
+            "notification_volume": {
+                "name": "Röstvolym"
+            },
+            "motion_detection_sensitivity": {
+                "name": "Rörelsekänslighet"
+            },
+            "music_volume": {
+                "name": "Musikvolym"
+            },
+            "alarm_volume": {
+                "name": "Alarmvolym"
+            },
+            "ducking_volume": {
+                "name": "Volym vid duckning"
+            },
+            "wake_word_threshold": {
+                "name": "Tröskel för wake word"
+            },
+            "zoom_level": {
+                "name": "Zoomnivå"
+            },
+            "text_size": {
+                "name": "Textstorlek"
+            },
+            "raw_proximity_threshold": {
+                "name": "Närhetsströskel"
+            },
+            "bump_sensitivity": {
+                "name": "Stötkänslighet"
+            }
+        },
+        "select": {
+            "noise_suppression_level": {
+                "name": "Brusreduktionsnivå",
+                "state": {
+                    "high": "Hög",
+                    "low": "Låg",
+                    "max": "Max",
+                    "medium": "Medium",
+                    "off": "Av"
+                }
+            },
+            "pipeline": {
+                "name": "Assistent",
+                "state": {
+                    "preferred": "Föredragen"
+                }
+            },
+            "vad_sensitivity": {
+                "name": "Detektering av talslut",
+                "state": {
+                    "aggressive": "Aggressiv",
+                    "default": "Standard",
+                    "relaxed": "Avslappnad"
+                }
+            },
+            "wake_word_engine": {
+                "name": "Motor för wake word",
+                "state": {
+                    "openwakeword": "OpenWakeWord(onnx)",
+                    "openwakeword_rt": "OpenWakeWord(tflite)",
+                    "microwakeword": "MicroWakeWord"
+                }
+            },
+            "wake_word": {
+                "name": "Aktiveringsord"
+            },
+            "wake_word_sound": {
+                "name": "Ljud vid wake word"
+            },
+            "alarm_sound": {
+                "name": "Alarmljud"
+            },
+            "screen_timeout": {
+                "name": "Skärmtimeout",
+                "state": {
+                    "15": "15 sekunder",
+                    "30": "30 sekunder",
+                    "60": "1 minut",
+                    "120": "2 minuter",
+                    "300": "5 minuter",
+                    "600": "10 minuter",
+                    "1800": "30 minuter"
+                }
+            },
+            "screen_orientation_mode": {
+                "name": "Skärmorientering",
+                "state": {
+                    "auto": "Automatisk",
+                    "portrait": "Stående",
+                    "landscape": "Liggande",
+                    "reverse_portrait": "Omvänt stående",
+                    "reverse_landscape": "Omvänt liggande"
+                }
+            },
+            "motion_detection_mode": {
+                "name": "Rörelsedetektering",
+                "state": {
+                    "none": "Av",
+                    "motion": "Rörelse",
+                    "face": "Ansikte"
+                }
+            }
+        },
+        "sensor": {
+            "stt": {
+                "name": "STT"
+            },
+            "tts": {
+                "name": "TTS"
+            },
+            "intent": {
+                "name": "Intent"
+            },
+            "light_level": {
+                "name": "Ljusnivå"
+            },
+            "orientation": {
+                "name": "Orientering",
+                "state": {
+                    "unknown": "Okänd",
+                    "portrait": "Stående",
+                    "landscape": "Liggande"
+                }
+            },
+            "battery_level": {
+                "name": "Batteri"
+            },
+            "app_version": {
+                "name": "Appversion"
+            },
+            "current_path": {
+                "name": "Aktuell sökväg"
+            },
+            "last_motion": {
+                "name": "Senaste rörelse"
+            }
+        },
+        "switch": {
+            "mute": {
+                "name": "Ljud av"
+            },
+            "screen_on": {
+                "name": "Skärm"
+            },
+            "quick_actions": {
+                "name": "Snabbåtgärder"
+            },
+            "screen_auto_brightness": {
+                "name": "Automatisk ljusstyrka"
+            },
+            "screen_always_on": {
+                "name": "Skärm alltid på"
+            },
+            "do_not_disturb": {
+                "name": "Stör ej"
+            },
+            "dark_mode": {
+                "name": "Mörkt läge"
+            },
+            "diagnostics_enabled": {
+                "name": "Diagnostik på skärm"
+            },
+            "continue_conversation": {
+                "name": "Fortsätt konversation"
+            },
+            "alarm": {
+                "name": "Alarm"
+            },
+            "enable_motion_detection": {
+                "name": "Rörelsedetektering"
+            },
+            "screen_on_wake_word": {
+                "name": "Tänd skärm med wake word"
+            },
+            "screen_on_bump": {
+                "name": "Tänd skärm vid stöt"
+            },
+            "screen_on_proximity": {
+                "name": "Tänd skärm vid närvaro"
+            },
+            "screen_on_motion": {
+                "name": "Tänd skärm vid rörelse"
+            },
+            "screen_saver": {
+                "name": "Skärmsläckare"
+            }
+        }
+    }
+}
