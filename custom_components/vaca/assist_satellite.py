@@ -62,6 +62,7 @@ _RESTART_SECONDS: Final = 3
 _TTS_SAMPLE_RATE: Final = 22050
 _ANNOUNCE_CHUNK_BYTES: Final = 2048  # 1024 samples
 _HA_START_TIMEOUT_SECONDS: Final = 30  # fallback if HA never reports started
+_TTS_TIMEOUT_EXTRA: Final = 1.0  # matches HA wyoming fallback idle timer
 
 
 async def async_setup_entry(
@@ -118,6 +119,9 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
         # stream tts var to allow interupt and cancel remaining response
         self.stream_tts = False
         self._full_settings_pending = False
+
+        # Incremented on every pipeline run so stale TTS timeouts can be ignored
+        self._pipeline_run_count = 0
 
     async def on_restart(self) -> None:
         """Block until pipeline loop will be restarted."""
@@ -454,6 +458,30 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                     )
 
         super().on_pipeline_event(event)
+
+    def _run_pipeline_once(
+        self, run_pipeline: RunPipeline, wake_word_phrase: str | None = None
+    ) -> None:
+        """Run a pipeline once, tracking the run for TTS timeout handling."""
+        self._pipeline_run_count += 1
+        super()._run_pipeline_once(run_pipeline, wake_word_phrase)
+
+    async def _tts_timeout(
+        self, timeout_seconds: float, run_loop_id: str | None
+    ) -> None:
+        """Force idle if the played event is missed, unless a new run has started.
+
+        HA only guards this against the connection loop id, which does not change
+        between pipeline runs. The fallback timer can therefore fire during the
+        next run (e.g. continued conversation) and wrongly set the state to idle.
+        """
+        run_count = self._pipeline_run_count
+        await asyncio.sleep(timeout_seconds + _TTS_TIMEOUT_EXTRA)
+
+        if run_loop_id != self._run_loop_id or run_count != self._pipeline_run_count:
+            return
+
+        self.tts_response_finished()
 
     async def async_announce(self, announcement: AssistSatelliteAnnouncement) -> None:
         """Announce media on the satellite.
