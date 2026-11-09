@@ -93,6 +93,9 @@
             }
         },
         "button": {
+            "interrupt": {
+                "name": "Interrupt"
+            },
             "refresh": {
                 "name": "Refresh"
             },

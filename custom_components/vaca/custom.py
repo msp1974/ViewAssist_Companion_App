@@ -40,6 +40,7 @@ STATUS_EVENT_TYPE = "status"
 class CustomActions(StrEnum):
     """Actions for media control."""
 
+    INTERRUPT = "interrupt"
     MEDIA_PLAY_MEDIA = "play-media"
     MEDIA_PLAY = "play"
     MEDIA_PAUSE = "pause"

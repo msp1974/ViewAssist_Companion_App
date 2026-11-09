@@ -34,6 +34,7 @@ async def async_setup_entry(
         [
             WyomingSatelliteWakeButton(device),
             WyomingSatelliteRefreshButton(device),
+            WyomingSatelliteInterruptButton(device),
         ]
     )
 
@@ -60,4 +61,16 @@ class WyomingSatelliteRefreshButton(VASatelliteEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Press the button."""
         self._device.send_custom_action(CustomActions.REFRESH)
+
+
+class WyomingSatelliteInterruptButton(VASatelliteEntity, ButtonEntity):
+    """Entity to send an interrupt event to the satellite."""
+
+    entity_description = ButtonEntityDescription(
+        key="interrupt", translation_key="interrupt", icon="mdi:hand-back-right"
+    )
+
+    async def async_press(self) -> None:
+        """Press the button."""
+        self._device.send_custom_action(CustomActions.INTERRUPT)
 
