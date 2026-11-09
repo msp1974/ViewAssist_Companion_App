@@ -1,4 +1,4 @@
-# View Assist Companion
+# View Assist Companion App
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![downloads](https://shields.io/github/downloads/msp1974/ViewAssist_Companion_App/latest/total?style=for-the-badge)](https://github.com/msp1974/ViewAssist_Companion_App)
@@ -8,40 +8,136 @@
 
 **The easiest way to build your own smart display with View Assist and Home Assistant!**
 
-View Assist Companion App (or VACA for short) is an Android application and Home Assistant integration, designed to turn your old Android device into a Home Assistant integrated, voice controlled smart display! Along with the amazing [View Assist project by @dinki](https://github.com/dinki/View-Assist), you can make your own Alexa Show or Google Home replacement.
+View Assist Companion App (VACA for short) is an Android app and Home Assistant integration that turns an old Android device into a voice controlled smart display. Together with the amazing [View Assist project by @dinki](https://github.com/dinki/View-Assist), you can build your own Alexa Show or Google Home replacement.
 
-Extending the already amazing voice capabilities of Home Assistant, you can now have more than just voice devices. You can have a fully functioning voice enabled smart display with...
+Other solutions have historically needed a mix of apps for voice and display, with an involved setup. VACA is a one-stop shop for voice, media and browser display, all from a single Android app install. It is built for View Assist, but works without it too.
 
-- Built in wake word detection (no need to setup openwakeword in your HA environment) with 6 built-in options and the ability to add your own custom wake words
-- Straight forward integration to HA Voice assistants (no additional configuration needed and you can choose which Voice Assistant to use for each device)
-- Browser display to show your HA dashboards (and View Assist views)
-- A media player to play your favourite music / radio station from Home Assistant
-- Many built in controls for your device (screen on/off, brightness, dark mode, dnd, mic mute and more)
-- Built in sensors for your device (battery level, charging, light level, orientation, last command, last response and more)
-- Motion detection for camera enabled devices
+<p align="center">
+  <a href="https://github.com/msp1974/ViewAssist_Companion_App/wiki/Getting-Started"><b>🚀 Get Started</b></a> &nbsp;•&nbsp;
+  <a href="https://github.com/msp1974/ViewAssist_Companion_App/wiki"><b>📖 Wiki</b></a> &nbsp;•&nbsp;
+  <a href="https://github.com/msp1974/ViewAssist_Companion_App/issues"><b>🐛 Issues</b></a> &nbsp;•&nbsp;
+  <a href="https://discord.gg/3WXXfGAf8T"><b>💬 Discord</b></a>
+</p>
 
-It has been built from the ground up to make the first steps into making your own smart display quick and simple but also allow you to progress to much more advanced functionality as you grow.
+## ✨ Key Features
 
-## Installation & Information
+| | |
+|---|---|
+| 🎙️ **On-device voice** | Wake word detection runs on the device, so there is no audio streaming until you speak and no need for openWakeWord in your HA setup. Supports OpenWakeWord (onnx and tflite) and MicroWakeWord engines, with built-in wake words or your own custom ones. |
+| 🏠 **Native Assist integration** | Appears in Home Assistant as an Assist satellite. Choose the voice assistant per device, with continued conversation, announcements and start conversation support. |
+| 🖥️ **Browser display** | Automatically loads your HA dashboards and View Assist views. Control dark mode, zoom and text size. |
+| 🔆 **Device screen control** | Control the screen from Home Assistant: on/off, brightness and auto brightness, screen always on, timeout, orientation, screen saver and status bar. Wake the screen with the wake word, motion, proximity or a bump, and use gesture and proximity events in your automations. |
+| 🎵 **Media** | A media player for music, radio and alerts, with Sendspin / Music Assistant support, separate volumes for voice, music, alarms and ducking, and alarm sounds. |
+| 📷 **Camera & motion** | Camera motion and face detection with adjustable motion sensitivity, plus a camera stream from the device. |
+| 📡 **Bluetooth proxy** | Use the device as a Bluetooth proxy for Home Assistant. |
+| 🎧 **Flexible audio** | Select Bluetooth, USB or wired microphones and speakers, with mic gain and noise suppression. |
+| ⚙️ **Highly configurable** | A large number of switches, selects and numbers per device, an on-device settings menu and in-app updates. |
 
-Documentation, including installation instructions and configuration information about this integration can be found on the wiki pages [here](https://github.com/msp1974/ViewAssist_Companion_App/wiki)
+## 🧩 What You Get in Home Assistant
 
-## Issues
+Each device is added with a full set of entities and an action for your automations.
 
-For issues/bugs, please log an issue [here](https://github.com/msp1974/ViewAssist_Companion_App/issues)
+| Type | Examples |
+|---|---|
+| **Assist satellite** | Voice pipeline, announcements, start conversation |
+| **Media player** | Play media, volume and stop, with Sendspin support |
+| **Switches** | Mute, screen, auto brightness, screen always on, dark mode, do not disturb, continue conversation, alarm, screen saver, motion detection, screen-on triggers, Sendspin, Bluetooth proxy, video stream |
+| **Selects** | Assistant, wake word engine, wake word and sound, screen timeout, orientation, audio input / output, noise suppression, alarm sound |
+| **Numbers** | Mic gain, screen brightness, voice / music / alarm / ducking volume, wake word threshold, zoom, text size, motion / bump / proximity sensitivity |
+| **Sensors** | Battery, light level, orientation, current path, last motion, app version, last speech (STT), last response (TTS), last intent |
+| **Binary sensors** | Connected, battery charging, screen, motion |
+| **Buttons** | Wake, interrupt, refresh, wake screen, sleep screen |
+| **Events** | Gesture, proximity |
+| **Camera** | Device camera stream |
 
-## Discord
+### ⚙️ Configuration Options
 
-If you need help or just want to chat with like minded people, feel free to drop into the View Assist discord server [here](https://discord.gg/3WXXfGAf8T)
+Most settings are available in the Home Assistant device page, and the majority are also available on the device in Quick Actions → Menu → Configuration. See [Configuration Options](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Configuration-Options) for what each one does.
 
-## Screenshots (using View Assist views)
+<p align="center">
+  <img width="480" alt="Configuration options" src="https://github.com/user-attachments/assets/bb461af9-751b-446f-83a5-c8352ba3a62a" />
+</p>
 
-<img width="235" height="495" alt="image" src="https://github.com/user-attachments/assets/164b4f1a-ec70-4a3e-8e08-a79770fdded5" />
-<img width="235" height="490" alt="image" src="https://github.com/user-attachments/assets/9e54578b-390e-4eb2-afad-33e3c5d73091" />
-<img width="235" height="430" alt="image" src="https://github.com/user-attachments/assets/8a628cd7-d4a4-4a37-abf3-ea0130d6be3d" />
-<img width="235" height="467" alt="image" src="https://github.com/user-attachments/assets/44f7db39-95a0-45d4-a092-593684a92c3e" />
+<p align="center">
+  <img width="300" alt="Configuration entities, part 1" src="https://github.com/user-attachments/assets/167a6a63-eebc-4b9a-baff-509e78e56a69" />
+  &nbsp;
+  <img width="300" alt="Configuration entities, part 2" src="https://github.com/user-attachments/assets/8da86fe9-a689-4e16-8418-3f4fcd3e076b" />
+</p>
 
-<img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/25539d64-f355-45a1-8ae5-2242d3027ef5" />
+### 🎛️ Controls, Sensors & Events
+
+Controls, sensors and events are described in [Sensors, Controls & Events](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Controls,-Sensors-and-Events). Sensors depend on what your device supports.
+
+<p align="center">
+  <img width="300" alt="Controls" src="https://github.com/user-attachments/assets/8d0227a9-237d-4a36-a02c-1defe0942a45" />
+  &nbsp;
+  <img width="300" alt="Sensors" src="https://github.com/user-attachments/assets/44f7db39-95a0-45d4-a092-593684a92c3e" />
+</p>
+
+### 🛠️ Action: `vaca.send_event`
+
+Send a custom event to one or more devices from automations and scripts:
+
+| Event | Purpose |
+|---|---|
+| `navigate` | Open a dashboard path, e.g. `{"path": "/view-assist/clock"}` |
+| `toast-message` | Show a message on the device |
+| `alarm` | Trigger an alarm |
+| `wake` / `interrupt` | Wake the device or interrupt the current response |
+| `refresh` | Reload the display |
+| `get-logs` | Retrieve device logs |
+
+```yaml
+action: vaca.send_event
+target:
+  entity_id: assist_satellite.kitchen_display
+data:
+  event_name: navigate
+  event_value:
+    path: /view-assist/clock
+```
+
+## 📲 Installation
+
+1. Install the integration through [HACS](https://hacs.xyz) (requires Home Assistant 2026.9.0 or later).
+2. Install the VACA Android app on your device (see the Getting Started guide for the download).
+3. The device is discovered automatically in Home Assistant. Confirm it to add it.
+
+Full instructions are in the [Getting Started guide](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Getting-Started).
+
+## 📱 Device Compatibility
+
+VACA runs on most Android 8+ devices. Keep the device powered, as on-device wake word and camera motion detection use a lot of battery.
+
+- **Tested:** Amazon Echo 5 / 8 Gen 1\*, Lenovo ThinkSmart View, Lenovo Smart Display 10", Lenovo Smart Clock 2 (some out of memory issues reported), Samsung S24 / S25, Samsung Tab S6 / A9, Xiaomi Smart Clock
+- **Community reported:** Amazon Fire 8 (2021), Amazon Fire 10 (2022), Amazon Echo Show 5 Gen 2\*, Sonoff NSPanel Pro, Samsung Galaxy Tab A8, Surface Duo 2
+
+\* Requires LineageOS. The OS build is fairly new and may have stability issues.
+
+Sensors depend on what your device supports. If your device has issues, please [log an issue](https://github.com/msp1974/ViewAssist_Companion_App/issues).
+
+## 📚 Documentation
+
+| | |
+|---|---|
+| [Getting Started](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Getting-Started) | Installation and first setup |
+| [Configuration Options](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Configuration-Options) | Integration and device options |
+| [Sensors, Controls & Events](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Controls,-Sensors-and-Events) | All entities explained |
+| [Actions](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Actions) | Using actions in automations |
+| [Working with View Assist](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Working-with-View-Assist) | Using VACA with View Assist |
+| [Custom Files](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Custom-Files) | Custom wake words and sounds (v0.12+) |
+| [Wake Word & Voice Recognition](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Wake-Word-Detection-&-Voice-Recognition) | Tuning detection |
+| [On Device Menu](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Settings-Menu) | Settings on the device |
+| [Diagnostics](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Diagnostics) | Diagnostic information |
+| [FAQs](https://github.com/msp1974/ViewAssist_Companion_App/wiki/FAQs) / [Troubleshooting](https://github.com/msp1974/ViewAssist_Companion_App/wiki/Troubleshooting) | Help when things go wrong |
+
+## 🤝 Support & Community
+
+- **Bugs and requests:** [open an issue](https://github.com/msp1974/ViewAssist_Companion_App/issues)
+- **Chat and help:** the [View Assist Discord server](https://discord.gg/3WXXfGAf8T)
+
+## 📸 Screenshots (using View Assist views)
+
 
 <img width="960" height="480" alt="image" src="https://github.com/user-attachments/assets/164e00e7-55e9-48e3-8e9f-dc7bd35104b5" />
 
