@@ -32,6 +32,7 @@ _PIPELINE_ENDED_EVENT_TYPE = "pipeline-ended"
 
 ACTION_EVENT_TYPE = "action"
 CAPABILITIES_EVENT_TYPE = "capabilities"
+INSTANCE_INFO_EVENT_TYPE = "instance-info"
 LOGS_EVENT_TYPE = "logs"
 SETTINGS_EVENT_TYPE = "settings"
 STATUS_EVENT_TYPE = "status"
