@@ -49,6 +49,7 @@ from .custom import (
     CustomEvent,
     PipelineEnded,
     get_custom_files_data,
+    get_staged_apk,
     getIntegrationVersion,
     getVADashboardPath,
 )
@@ -204,6 +205,16 @@ class ViewAssistSatelliteEntity(WyomingAssistSatellite, VASatelliteEntity):
                 "integration_version"
             ] = await getIntegrationVersion(self.hass)
             self.device.custom_settings["min_required_apk_version"] = MIN_APK_VERSION
+            # APK staged in /config/vaca/custom/apk, for devices without internet access
+            staged_apk = await self.hass.async_add_executor_job(
+                get_staged_apk, self.hass
+            )
+            self.device.custom_settings["apk_update_version"] = (
+                staged_apk[0] if staged_apk else ""
+            )
+            self.device.custom_settings["apk_update_file"] = (
+                staged_apk[1] if staged_apk else ""
+            )
             # Update url and port
             self.device.custom_settings["ha_port"] = (
                 self.hass.config.api.port if self.hass.config.api else 8123

@@ -36,4 +36,6 @@ MWW_PATH = "microwakeword"
 OWW_PATH = "openwakeword"
 WW_SOUNDS_PATH = "wakeword_sounds"
 ALARMS_PATH = "alarms"
-SUB_DIRS = [MWW_PATH, OWW_PATH, WW_SOUNDS_PATH, ALARMS_PATH]
+# VACA app APKs for devices that cannot reach GitHub: served at /vaca/custom/apk/<file>
+APK_PATH = "apk"
+SUB_DIRS = [MWW_PATH, OWW_PATH, WW_SOUNDS_PATH, ALARMS_PATH, APK_PATH]

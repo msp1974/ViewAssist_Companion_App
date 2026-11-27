@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 import logging
 from pathlib import Path
+import re
 from typing import Any
 
 from awesomeversion import AwesomeVersion
@@ -21,6 +22,7 @@ from .const import (
     MWW_PATH,
     OWW_PATH,
     SUB_DIRS,
+    APK_PATH,
     CUSTOM_PATH,
     WW_SOUNDS_PATH,
 )
@@ -187,6 +189,32 @@ custom_file_formats = [
         file_type="alarms", path=ALARMS_PATH, required_files=["mp3", "wav"]
     ),
 ]
+
+
+_APK_FILE_RE = re.compile(r"^vaca-(\d+)\.(\d+)\.(\d+).*\.apk$", re.IGNORECASE)
+
+
+def get_staged_apk(hass: HomeAssistant) -> tuple[str, str] | None:
+    """Return (version, filename) of the newest VACA APK in the apk folder.
+
+    Files are named vaca-<major>.<minor>.<patch>[-anything].apk. When several files share
+    the highest version the most recently modified one wins.
+    """
+    apk_dir = Path(hass.config.path(DOMAIN), CUSTOM_PATH, APK_PATH)
+    if not apk_dir.is_dir():
+        return None
+
+    best: tuple[tuple[int, ...], float, str] | None = None
+    for file in apk_dir.iterdir():
+        if not file.is_file() or not (match := _APK_FILE_RE.match(file.name)):
+            continue
+        candidate = (tuple(int(p) for p in match.groups()), file.stat().st_mtime, file.name)
+        if best is None or candidate[:2] > best[:2]:
+            best = candidate
+
+    if best is None:
+        return None
+    return ".".join(str(p) for p in best[0]), best[2]
 
 
 def get_custom_files_data(hass: HomeAssistant) -> dict[str, str] | None:
