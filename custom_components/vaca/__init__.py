@@ -12,6 +12,7 @@ from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
+from .apk_updater import async_setup_apk_updates
 from .const import ATTR_SPEAKER, DOMAIN
 from .coordinator import WyomingInfoCoordinator
 from .data import VAWyomingService
@@ -54,6 +55,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the Wyoming integration."""
     async_register_websocket_api(hass)
     async_setup_services(hass)
+    async_setup_apk_updates(hass)
 
     return True
 
